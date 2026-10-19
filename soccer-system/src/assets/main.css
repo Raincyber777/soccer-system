@@ -1,0 +1,42 @@
+/* ===== 全局基础样式 ===== */
+:root {
+  /* 足球主题配色：深草绿 + 场地绿 + 奶白 */
+  --green-deeper: #0f2f20;
+  --green-dark: #17402c;
+  --green: #1e7a3f;
+  --green-bright: #2e9e52;
+  --green-light: #e6f2e9;
+  --cream: #f7f3ea;
+  --ink: #22312a;
+  --muted: #6b7a71;
+  --line: #e3e0d6;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+}
+
+body {
+  font-family: 'PingFang SC', 'Microsoft YaHei', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  color: var(--ink);
+  background-color: var(--cream);
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+button,
+input {
+  font-family: inherit;
+}
