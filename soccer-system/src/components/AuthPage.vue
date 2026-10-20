@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { computed, reactive, ref, watch } from 'vue'
+import { reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useAuth, type UserRole, type UserPersona } from '../stores/auth'
+import { useAuth, personaLabels, type UserRole, type UserPersona } from '../stores/auth'
 import AppIcon from './common/AppIcon.vue'
 
 const route = useRoute()
@@ -18,38 +18,19 @@ watch(
   },
 )
 
-// 登录方式：账号 / 手机号
-const loginMode = ref<'account' | 'phone'>('account')
+// 统一登录：一个表单，系统按账号自动识别角色（进哪一端）与身份（用户端菜单），无需手选
+const form = reactive({ account: '', password: '' })
+const showPassword = ref(false)
+const errorMsg = ref('')
+const successMsg = ref('')
 
-// 登录后进入哪一端
-const targetRole = ref<UserRole>('user')
-
-// 用户端登录身份：决定用户端里"我的球队 / 运动员中心 / 教练员中心"菜单的可见性
-const persona = ref<UserPersona>('leader')
-
+// 注册身份：注册只面向参赛人员；管理员/超管账号不开放注册，由超级管理员在后台创建
+const registerPersona = ref<UserPersona>('leader')
 const personaOptions: { value: UserPersona; label: string }[] = [
   { value: 'leader', label: '球队负责人' },
   { value: 'student', label: '学生运动员' },
   { value: 'coach', label: '教练员' },
 ]
-
-const form = reactive({
-  account: '',
-  phone: '',
-  password: '',
-})
-
-// v-model 不能直接绑定三元表达式，用计算属性按登录方式读写对应字段
-const accountModel = computed<string>({
-  get: () => (loginMode.value === 'phone' ? form.phone : form.account),
-  set: (value) => {
-    if (loginMode.value === 'phone') {
-      form.phone = value
-    } else {
-      form.account = value
-    }
-  },
-})
 
 const registerForm = reactive({
   username: '',
@@ -58,13 +39,10 @@ const registerForm = reactive({
   password: '',
   confirmPassword: '',
 })
-
-const showPassword = ref(false)
-const errorMsg = ref('')
-const successMsg = ref('')
 const registerMsg = ref('')
+const registerSuccess = ref('')
 
-// 演示账号：点击直接填入表单，方便查看三个端与用户端的不同身份
+// 演示账号（内置"账号库"）：登录时按账号反查角色与身份
 const demoAccounts: {
   role: UserRole
   persona?: UserPersona
@@ -80,17 +58,56 @@ const demoAccounts: {
   { role: 'super', icon: 'crown', label: '超级管理员端 · 超级管理员', account: 'super001', password: '123456' },
 ]
 
-function fillDemo(demo: (typeof demoAccounts)[number]) {
-  activeTab.value = 'login'
-  loginMode.value = 'account'
-  targetRole.value = demo.role
-  persona.value = demo.persona ?? 'leader'
-  form.account = demo.account
-  form.phone = ''
-  form.password = demo.password
-  errorMsg.value = ''
-  registerMsg.value = ''
-  successMsg.value = `已填入「${demo.label}」的演示账号，点击「登 录」即可进入`
+// 已注册的参赛账号保存在 localStorage，模拟后端账号库；接入后端时替换这里
+interface RegisteredUser {
+  account: string
+  password: string
+  school: string
+  email: string
+  persona: UserPersona
+}
+const REGISTERED_KEY = 'soccer-registered-users'
+
+function loadRegistered(): RegisteredUser[] {
+  try {
+    const raw = localStorage.getItem(REGISTERED_KEY)
+    return raw ? (JSON.parse(raw) as RegisteredUser[]) : []
+  } catch {
+    return []
+  }
+}
+
+function saveRegistered(list: RegisteredUser[]) {
+  try {
+    localStorage.setItem(REGISTERED_KEY, JSON.stringify(list))
+  } catch {
+    /* 忽略存储异常（如隐私模式） */
+  }
+}
+
+// 账号解析：先查内置演示账号，再查本地已注册账号；都查不到说明账号不存在
+function resolveAccount(
+  account: string,
+): { role: UserRole; persona: UserPersona; password: string; label: string } | null {
+  const key = account.trim().toLowerCase()
+  const demo = demoAccounts.find((d) => d.account.toLowerCase() === key)
+  if (demo) {
+    return { role: demo.role, persona: demo.persona ?? 'leader', password: demo.password, label: demo.label }
+  }
+  const registered = loadRegistered().find((u) => u.account.toLowerCase() === key)
+  if (registered) {
+    return {
+      role: 'user',
+      persona: registered.persona,
+      password: registered.password,
+      label: `用户端 · ${personaLabels[registered.persona]}`,
+    }
+  }
+  return null
+}
+
+function dashboardPath(role: UserRole) {
+  return role === 'super' ? '/super/dashboard' : role === 'admin' ? '/admin/dashboard' : '/user/dashboard'
 }
 
 const roleTexts: Record<UserRole, string> = {
@@ -103,28 +120,43 @@ function handleLogin() {
   errorMsg.value = ''
   successMsg.value = ''
 
-  const account = loginMode.value === 'phone' ? form.phone : form.account
-  if (!account.trim() || !form.password) {
-    errorMsg.value = '请填写完整的账号和密码'
+  const account = form.account.trim()
+  if (!account || !form.password) {
+    errorMsg.value = '请填写账号和密码'
     return
   }
 
-  // 目前没有后端，先模拟登录成功，接入接口时替换这里
-  auth.loginAs(targetRole.value, account, targetRole.value === 'user' ? persona.value : undefined)
-  successMsg.value = `登录成功，即将进入${roleTexts[targetRole.value]}…`
-  const homePath =
-    targetRole.value === 'super'
-      ? '/super/dashboard'
-      : targetRole.value === 'admin'
-        ? '/admin/dashboard'
-        : '/user/dashboard'
+  // 目前没有后端，用本地账号表模拟"按账号识别角色"；接入接口时替换这里
+  const found = resolveAccount(account)
+  if (!found) {
+    errorMsg.value = '账号不存在：可用下方演示账号一键进入，或在「注册」页创建参赛账号'
+    return
+  }
+  if (found.password !== form.password) {
+    errorMsg.value = '密码错误，请重新输入'
+    return
+  }
+
+  auth.loginAs(found.role, account, found.role === 'user' ? found.persona : undefined)
+  successMsg.value = `登录成功：${found.label}，即将进入${roleTexts[found.role]}…`
   setTimeout(() => {
-    router.push(homePath)
-  }, 1000)
+    router.push(dashboardPath(found.role))
+  }, 600)
+}
+
+// 演示账号一键登录
+function quickLogin(demo: (typeof demoAccounts)[number]) {
+  errorMsg.value = ''
+  successMsg.value = `正在以「${demo.label}」进入…`
+  auth.loginAs(demo.role, demo.account, demo.role === 'user' ? (demo.persona ?? 'leader') : undefined)
+  setTimeout(() => {
+    router.push(dashboardPath(demo.role))
+  }, 400)
 }
 
 function handleRegister() {
   registerMsg.value = ''
+  registerSuccess.value = ''
 
   if (
     !registerForm.username.trim() ||
@@ -153,14 +185,31 @@ function handleRegister() {
     return
   }
 
-  // 模拟注册成功：切回登录页并带出用户名（演示数据不保存，接入后端时替换）
-  form.account = registerForm.username
-  form.phone = ''
-  form.password = ''
-  targetRole.value = 'user'
-  activeTab.value = 'login'
-  errorMsg.value = ''
-  successMsg.value = '注册成功，请使用刚注册的账号登录'
+  const account = registerForm.username.trim()
+  const taken =
+    demoAccounts.some((d) => d.account.toLowerCase() === account.toLowerCase()) ||
+    loadRegistered().some((u) => u.account.toLowerCase() === account.toLowerCase())
+  if (taken) {
+    registerMsg.value = '该账号已被注册，请换一个用户名'
+    return
+  }
+
+  // 模拟注册成功：写入本地"账号库"并直接登录进入用户端；接入后端时替换这里
+  const list = loadRegistered()
+  list.push({
+    account,
+    password: registerForm.password,
+    school: registerForm.school.trim(),
+    email: registerForm.email.trim(),
+    persona: registerPersona.value,
+  })
+  saveRegistered(list)
+
+  auth.loginAs('user', account, registerPersona.value)
+  registerSuccess.value = `注册成功，正在以「${personaLabels[registerPersona.value]}」身份进入用户端…`
+  setTimeout(() => {
+    router.push('/user/dashboard')
+  }, 800)
 }
 </script>
 
@@ -198,16 +247,16 @@ function handleRegister() {
         </button>
       </div>
 
-      <!-- 演示账号区：三端各一个，点击直接填入 -->
+      <!-- 演示账号区：点击一键登录 -->
       <div class="demo-box">
-        <p class="demo-title">演示账号（点击快速填入）</p>
+        <p class="demo-title">演示账号（点击一键登录）</p>
         <div class="demo-list">
           <button
             v-for="demo in demoAccounts"
             :key="demo.account"
             type="button"
             class="demo-item"
-            @click="fillDemo(demo)"
+            @click="quickLogin(demo)"
           >
             <span class="demo-icon">
               <AppIcon :name="demo.icon" :size="15" />
@@ -218,36 +267,17 @@ function handleRegister() {
         </div>
       </div>
 
-      <!-- 登录表单 -->
+      <!-- 登录表单：账号密码即可，角色与身份由账号自动识别 -->
       <template v-if="activeTab === 'login'">
-        <div class="seg">
-          <button
-            type="button"
-            :class="{ active: loginMode === 'account' }"
-            @click="loginMode = 'account'"
-          >
-            账号登录
-          </button>
-          <button
-            type="button"
-            :class="{ active: loginMode === 'phone' }"
-            @click="loginMode = 'phone'"
-          >
-            手机号登录
-          </button>
-        </div>
-
         <form class="auth-form" @submit.prevent="handleLogin">
-          <label class="form-label" for="auth-account">
-            {{ loginMode === 'phone' ? '手机号' : '账号' }}
-          </label>
+          <label class="form-label" for="auth-account">账号</label>
           <div class="input-wrap">
             <input
               id="auth-account"
-              v-model="accountModel"
+              v-model="form.account"
               class="form-input"
               type="text"
-              :placeholder="loginMode === 'phone' ? '请输入手机号' : '用户名 / 邮箱'"
+              placeholder="用户名 / 手机号"
               autocomplete="username"
             />
           </div>
@@ -273,26 +303,7 @@ function handleRegister() {
             </button>
           </div>
 
-          <div class="role-row">
-            <span class="role-label">进入</span>
-            <label class="role-option">
-              <input v-model="targetRole" type="radio" value="user" /> 用户端
-            </label>
-            <label class="role-option">
-              <input v-model="targetRole" type="radio" value="admin" /> 管理员端
-            </label>
-            <label class="role-option">
-              <input v-model="targetRole" type="radio" value="super" /> 超级管理员端
-            </label>
-          </div>
-
-          <!-- 用户端区分登录身份：菜单按身份显示 -->
-          <div v-if="targetRole === 'user'" class="role-row">
-            <span class="role-label">身份</span>
-            <label v-for="p in personaOptions" :key="p.value" class="role-option">
-              <input v-model="persona" type="radio" :value="p.value" /> {{ p.label }}
-            </label>
-          </div>
+          <p class="login-hint">统一登录入口：系统按账号自动进入对应端——参赛人员进用户端，管理人员进管理后台，菜单权限随身份加载。</p>
 
           <p v-if="errorMsg" class="form-error">{{ errorMsg }}</p>
           <p v-if="successMsg" class="form-success">{{ successMsg }}</p>
@@ -308,16 +319,16 @@ function handleRegister() {
         </router-link>
       </template>
 
-      <!-- 注册表单 -->
+      <!-- 注册表单：只面向参赛人员 -->
       <template v-else>
         <form class="auth-form" @submit.prevent="handleRegister">
-          <label class="form-label" for="reg-username">用户名</label>
+          <label class="form-label" for="reg-username">用户名（登录账号）</label>
           <input
             id="reg-username"
             v-model="registerForm.username"
             class="form-input plain"
             type="text"
-            placeholder="给自己起个响亮的名字"
+            placeholder="如：fc2026 或球队拼音缩写"
             autocomplete="username"
           />
 
@@ -330,6 +341,13 @@ function handleRegister() {
             placeholder="球队或学校全称，如：实验中学"
             autocomplete="organization"
           />
+
+          <div class="role-row">
+            <span class="role-label">注册身份</span>
+            <label v-for="p in personaOptions" :key="p.value" class="role-option">
+              <input v-model="registerPersona" type="radio" :value="p.value" /> {{ p.label }}
+            </label>
+          </div>
 
           <label class="form-label" for="reg-email">邮箱</label>
           <input
@@ -362,11 +380,15 @@ function handleRegister() {
           />
 
           <p v-if="registerMsg" class="form-error">{{ registerMsg }}</p>
+          <p v-if="registerSuccess" class="form-success">{{ registerSuccess }}</p>
 
           <button type="submit" class="auth-submit">注 册</button>
         </form>
 
-        <p class="register-tip">管理员与超级管理员账户不开放注册，由超级管理员在后台创建。</p>
+        <p class="register-tip">
+          参赛账号（球队负责人 / 学生运动员 / 教练员）注册后即可登录；<br />
+          管理员与超级管理员账号不开放注册，由超级管理员在后台统一创建。
+        </p>
       </template>
     </div>
 
@@ -532,35 +554,6 @@ function handleRegister() {
   font-family: Consolas, monospace;
 }
 
-/* 登录方式切换 */
-.seg {
-  margin-top: 16px;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  background: #f3f2ec;
-  border-radius: 10px;
-  padding: 4px;
-  gap: 4px;
-}
-
-.seg button {
-  border: none;
-  background: transparent;
-  border-radius: 8px;
-  padding: 9px 0;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--muted);
-  cursor: pointer;
-  transition: background 0.2s, color 0.2s;
-}
-
-.seg button.active {
-  background: #fff;
-  color: var(--ink);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
-}
-
 /* 表单 */
 .auth-form {
   margin-top: 18px;
@@ -644,6 +637,16 @@ function handleRegister() {
 
 .role-option input {
   accent-color: var(--green);
+}
+
+.login-hint {
+  font-size: 12px;
+  color: var(--muted);
+  background: #f6f5ef;
+  border-radius: 8px;
+  padding: 8px 10px;
+  margin-bottom: 12px;
+  line-height: 1.6;
 }
 
 .form-error {
