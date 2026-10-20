@@ -37,6 +37,132 @@ a {
 }
 
 button,
-input {
+input,
+select,
+textarea {
   font-family: inherit;
+}
+
+/* ===== 后台系统通用工具类（user 端和 admin 端共用） ===== */
+.card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 14px rgba(20, 60, 40, 0.05);
+}
+
+.section-title {
+  margin: 28px 0 14px;
+  font-size: 17px;
+  color: var(--green-dark);
+  border-left: 4px solid var(--green);
+  padding-left: 10px;
+}
+
+.page-tip {
+  background: var(--green-light);
+  color: var(--green-dark);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 13px;
+  margin-bottom: 16px;
+  line-height: 1.7;
+}
+
+.btn {
+  padding: 8px 18px;
+  border-radius: 6px;
+  border: 1.5px solid transparent;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-primary {
+  background: var(--green);
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background: var(--green-bright);
+}
+
+.btn-ghost {
+  border-color: #cfd8d0;
+  color: var(--ink);
+  background: #fff;
+}
+
+.btn-ghost:hover {
+  border-color: var(--green);
+  color: var(--green);
+}
+
+.table-btn {
+  border: none;
+  background: none;
+  color: var(--green);
+  font-size: 13px;
+  cursor: pointer;
+  padding: 2px 6px;
+}
+
+.table-btn:hover {
+  text-decoration: underline;
+}
+
+.badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.badge.ok {
+  background: #e3f4e8;
+  color: #1e7a3f;
+}
+
+.badge.pending {
+  background: #fdf3dc;
+  color: #b07d1a;
+}
+
+.badge.fail {
+  background: #fde7e4;
+  color: #c0392b;
+}
+
+.badge.plain {
+  background: #eef1ee;
+  color: #6b7a71;
+}
+
+/* 后台页面常用网格布局 */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.quick-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.upload-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 900px) {
+  .stat-grid,
+  .quick-grid,
+  .upload-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
