@@ -2,12 +2,15 @@
 import type { RouteRecordRaw } from 'vue-router'
 import { useRouter } from 'vue-router'
 import { superRoutes } from '../../routers/superRoutes'
-import { useAuth } from '../../stores/auth'
+import { useAuth, STAFF_IDENTITY } from '../../stores/auth'
 import AppIcon from '../../components/common/AppIcon.vue'
 import SideNav from '../../components/common/SideNav.vue'
 
 const router = useRouter()
 const auth = useAuth()
+
+// 顶栏身份标签：演示账号映射「角色 · 所属机构」，便于使用者确认自己的身份与辖区
+const identity = STAFF_IDENTITY[auth.state.account] ?? '省级管理员 · 省本级'
 
 // 从路由配置里读出菜单，保证菜单和路由只有一份配置来源
 const children = (superRoutes[0]?.children ?? []) as RouteRecordRaw[]
@@ -52,6 +55,7 @@ function handleLogout() {
             绿茵汇
           </span>
           <span class="brand-tag super-tag">超级管理员</span>
+          <span class="brand-identity">{{ identity }}</span>
         </router-link>
         <div class="topbar-right">
           <span class="user-name">
@@ -120,6 +124,16 @@ function handleLogout() {
   color: #5c4400;
 }
 
+.brand-identity {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: #f7ecc8;
+  color: #6b4e00;
+  letter-spacing: 0.5px;
+}
+
 .topbar-right {
   display: flex;
   align-items: center;
@@ -168,6 +182,12 @@ function handleLogout() {
 
 @media (max-width: 900px) {
   .user-name {
+    display: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .brand-identity {
     display: none;
   }
 }

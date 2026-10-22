@@ -3,11 +3,12 @@ import PageHeader from '../../components/common/PageHeader.vue'
 import SearchBar from '../../components/common/SearchBar.vue'
 import DataTable from '../../components/common/DataTable.vue'
 import type { SearchField, TableColumn } from '../../components/common/types'
+import { SICHUAN_CITY_OPTIONS } from '../../data/sichuan-schools'
 
 // 参赛管理（对应需求：球队信息管理、按市州/赛事类别查看、重置密码、查看成员/教练/比赛记录、球员遴选档案）
 const teamSearch: SearchField[] = [
   { key: 'team', label: '球队名称', placeholder: '输入球队名称' },
-  { key: 'city', label: '市州', type: 'select', options: ['贵阳市', '遵义市', '安顺市', '六盘水市', '毕节市', '铜仁市'] },
+  { key: 'city', label: '市州', type: 'select', options: SICHUAN_CITY_OPTIONS },
   { key: 'group', label: '赛事类别', type: 'select', options: ['小学组', '中学组', '高中组', '高校组'] },
 ]
 
@@ -19,9 +20,9 @@ const teamColumns: TableColumn[] = [
 ]
 
 const teamRows = [
-  { team: '实验中学足球队', city: '贵阳市', school: '实验中学', group: '中学组' },
-  { team: '第一实验小学队', city: '遵义市', school: '第一实验小学', group: '小学组' },
-  { team: '师范大学联队', city: '贵阳市', school: '师范大学', group: '高校组' },
+  { team: '实验中学足球队', city: '成都市', school: '实验中学', group: '中学组' },
+  { team: '第一实验小学队', city: '绵阳市', school: '第一实验小学', group: '小学组' },
+  { team: '川师大队', city: '成都市', school: '四川师范大学', group: '高校组' },
 ]
 
 const archiveSearch: SearchField[] = [

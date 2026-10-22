@@ -5,7 +5,7 @@ import SearchBar from '../../components/common/SearchBar.vue'
 import DataTable from '../../components/common/DataTable.vue'
 import type { FormField, SearchField, TableColumn } from '../../components/common/types'
 
-// 用户账户管理（超级管理员专属）：创建/删除用户端账户、重置密码
+// 用户账户管理（超级管理员）：全省范围的用户端账户管理，「删除账户」仅超管可执行
 const formFields: FormField[] = [
   { key: 'account', label: '登录账号', placeholder: '如：szyds_zq02' },
   { key: 'name', label: '姓名 / 单位名' },
@@ -25,17 +25,17 @@ const columns: TableColumn[] = [
   { key: 'name', label: '姓名 / 单位名' },
   { key: 'type', label: '类型', width: '110px' },
   { key: 'unit', label: '所属单位', width: '150px' },
-  { key: 'createTime', label: '创建时间', width: '150px' },
+  { key: 'city', label: '所属市州', width: '100px' },
   { key: 'status', label: '状态', width: '90px' },
 ]
 
 const rows = [
-  { account: 'szyds_zq01', name: '实验中学足球队', type: '球队账号', unit: '实验中学', createTime: '2026-09-01 10:00', status: '已生效' },
-  { account: 'ydy_001', name: '王小磊', type: '运动员账号', unit: '实验中学', createTime: '2026-09-10 11:20', status: '已生效' },
-  { account: 'jly_001', name: '张建国', type: '教练员账号', unit: '实验中学', createTime: '2026-09-10 11:35', status: '已生效' },
-  { account: 'gzsfdx_fc', name: '师范大学联队', type: '高校账号', unit: '师范大学', createTime: '2026-09-03 15:30', status: '已生效' },
-  { account: 'gy_shi_zhen', name: '贵阳市教育局', type: '市州账号', unit: '贵阳市教育局', createTime: '2026-08-20 09:12', status: '已生效' },
-  { account: 'test_001', name: '测试账户', type: '球队账号', unit: '—', createTime: '2026-08-25 14:40', status: '已删除' },
+  { account: 'szyds_zq01', name: '实验中学足球队', type: '球队账号', unit: '实验中学', city: '成都市', status: '已生效' },
+  { account: 'ydy_001', name: '王小磊', type: '运动员账号', unit: '实验中学', city: '成都市', status: '已生效' },
+  { account: 'jly_001', name: '张建国', type: '教练员账号', unit: '实验中学', city: '成都市', status: '已生效' },
+  { account: 'scsfdx_fc', name: '川师大队', type: '高校账号', unit: '四川师范大学', city: '成都市', status: '已生效' },
+  { account: 'cd_shi_zhen', name: '成都市教育局', type: '市州账号', unit: '成都市教育局', city: '成都市', status: '已生效' },
+  { account: 'test_001', name: '测试账户', type: '球队账号', unit: '—', city: '—', status: '已删除' },
 ]
 
 function onSubmit(data: Record<string, string>) {
@@ -54,9 +54,12 @@ function onAction(action: string) {
 </script>
 
 <template>
-  <PageHeader title="用户账户管理" desc="超级管理员专属：创建、删除用户端账户并重置密码" />
+  <PageHeader title="用户账户管理" desc="超级管理员专属：管理全省用户端账户，删除账户仅超管可执行" />
 
-  <p class="page-tip">普通管理员也可以创建/删除用户账户，但只能在本端操作；删除前建议确认该账户无进行中的报名。</p>
+  <p class="page-tip">
+    用户端账户的日常操作（开户、编辑、重置密码、禁用/启用）已下放各市州普通管理员（限本区域）；
+    超级管理员负责全省范围的账户管理，并保留「删除账户」等高风险操作，删除前建议确认该账户无进行中的报名。
+  </p>
 
   <h3 class="section-title">创建用户账户</h3>
   <DataForm :fields="formFields" submit-text="创建账户" @submit="onSubmit" />

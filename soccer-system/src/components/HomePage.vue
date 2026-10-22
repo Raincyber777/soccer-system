@@ -1,28 +1,45 @@
 <script setup lang="ts">
-import soccerMatch from '../assets/soccer-match.png'
+import { ref } from 'vue'
+import soccerVictory from '../assets/soccer-victory.jpg'
 import AppIcon from './common/AppIcon.vue'
+import AppModal from './common/AppModal.vue'
 
-// 顶部导航（功能后续再接入对应页面）
-const navLinks = [
-  { label: '首页', active: true },
-  { label: '赛事报名', active: false },
-  { label: '球队管理', active: false },
-  { label: '信息公示', active: false },
+// 功能入口弹窗：未登录访客点击入口先看流程说明，再引导登录 / 注册
+type ModalKey = 'registration' | 'team' | 'publicity'
+const activeModal = ref<ModalKey | null>(null)
+
+function openModal(key: ModalKey) {
+  activeModal.value = key
+}
+
+// 顶部导航：首页回顶部，其余三项打开对应功能弹窗
+const navLinks: { label: string; modal: ModalKey | null }[] = [
+  { label: '首页', modal: null },
+  { label: '赛事报名', modal: 'registration' },
+  { label: '球队管理', modal: 'team' },
+  { label: '信息公示', modal: 'publicity' },
 ]
 
-// 首页下方的功能亮点介绍（icon 为 AppIcon 图标名）
-const features = [
+function backToTop() {
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+}
+
+// 首页下方的功能亮点介绍（icon 为 AppIcon 图标名，key 对应功能弹窗）
+const features: { key: ModalKey; icon: string; title: string; desc: string }[] = [
   {
+    key: 'registration',
     icon: 'trophy',
     title: '赛事报名',
     desc: '在线填报报名表、上传盖章件与学籍材料，审核进度实时可查。',
   },
   {
+    key: 'team',
     icon: 'users',
     title: '球队与人员管理',
     desc: '维护球队资料、队员名单与教练组，运动员、教练员注册信息统一管理。',
   },
   {
+    key: 'publicity',
     icon: 'megaphone',
     title: '信息公示',
     desc: '赛程对阵、比赛结果、新闻政策与榜单公示，成绩荣誉公开可查。',
@@ -45,14 +62,14 @@ const features = [
             v-for="link in navLinks"
             :key="link.label"
             class="nav-link"
-            :class="{ active: link.active }"
+            :class="{ active: link.modal === null }"
+            @click="link.modal ? openModal(link.modal) : backToTop()"
           >
             {{ link.label }}
           </span>
         </nav>
 
         <div class="nav-actions">
-          <router-link to="/admin/dashboard" class="btn btn-admin">管理端</router-link>
           <router-link to="/login" class="btn btn-ghost">登录</router-link>
           <router-link to="/register" class="btn btn-primary">注册</router-link>
         </div>
@@ -77,14 +94,14 @@ const features = [
             学校在线报名组队，运动员、教练员注册信息一站维护，赛程赛果与政策文件及时公示，让每一场比赛都规范、公开、精彩。
           </p>
           <div class="hero-actions">
-            <router-link to="/user/registration-form" class="hero-btn primary">赛事报名</router-link>
-            <router-link to="/user/team-info" class="hero-btn ghost">球队管理</router-link>
-            <router-link to="/user/publicity" class="hero-btn ghost">信息公示</router-link>
+            <button type="button" class="hero-btn primary" @click="openModal('registration')">赛事报名</button>
+            <button type="button" class="hero-btn primary" @click="openModal('team')">球队管理</button>
+            <button type="button" class="hero-btn primary" @click="openModal('publicity')">信息公示</button>
           </div>
         </div>
 
         <div class="hero-media">
-          <img :src="soccerMatch" alt="绿茵场上的校园足球比赛" />
+          <img :src="soccerVictory" alt="绿茵场上的胜利庆祝时刻" />
         </div>
       </div>
 
@@ -104,9 +121,9 @@ const features = [
       </div>
     </section>
 
-    <!-- 功能亮点 -->
+    <!-- 功能亮点（点击打开对应功能说明弹窗） -->
     <section class="features">
-      <div v-for="item in features" :key="item.title" class="feature-card">
+      <div v-for="item in features" :key="item.title" class="feature-card" role="button" @click="openModal(item.key)">
         <span class="feature-icon">
           <AppIcon :name="item.icon" :size="30" />
         </span>
@@ -114,6 +131,55 @@ const features = [
         <p class="feature-desc">{{ item.desc }}</p>
       </div>
     </section>
+
+    <!-- 功能入口弹窗：未登录访客先了解流程，再引导登录 / 注册 -->
+    <AppModal :open="activeModal === 'registration'" title="赛事报名" @close="activeModal = null">
+      <p class="modal-lead">从组队到出赛的完整流程：</p>
+      <ol class="flow-list">
+        <li>球队负责人注册 / 登录，按学校标识码绑定所属学校</li>
+        <li>在线填报赛事报名表，批量报送球员信息与照片</li>
+        <li>上传盖章报名表、学籍验证等报名材料</li>
+        <li>市州管理员初审 → 省级终审，审核进度实时可查</li>
+        <li>审核通过进入公示，正式参赛</li>
+      </ol>
+      <p class="modal-tip">
+        参赛组别：小学组 / 中学组 / 高中组 / 高校组（随学校学段自动限定）。
+        报名属球队级操作，由球队负责人统一办理；队员可在「我的报名」查看进度。
+      </p>
+      <template #footer>
+        <router-link to="/register" class="btn btn-ghost">去注册</router-link>
+        <router-link to="/login" class="btn btn-primary">去登录</router-link>
+      </template>
+    </AppModal>
+
+    <AppModal :open="activeModal === 'team'" title="球队与人员管理" @close="activeModal = null">
+      <p class="modal-lead">球队与人员的日常维护：</p>
+      <ul class="flow-list">
+        <li>球队信息：绑定学校、参赛组别、队旗队徽与球队资料</li>
+        <li>球员管理：负责人批量报送球员信息，运动员注册个人信息</li>
+        <li>教练员：申报资质并上传等级证书，审核通过后带队参赛</li>
+        <li>报名资料：盖章件导出与学籍验证材料上传</li>
+      </ul>
+      <p class="modal-tip">球队资料由球队负责人维护；运动员、教练员使用各自账号注册并维护个人信息。</p>
+      <template #footer>
+        <router-link to="/register" class="btn btn-ghost">去注册</router-link>
+        <router-link to="/login" class="btn btn-primary">去登录</router-link>
+      </template>
+    </AppModal>
+
+    <AppModal :open="activeModal === 'publicity'" title="信息公示" @close="activeModal = null">
+      <p class="modal-lead">以下信息全部公开可查：</p>
+      <ul class="flow-list">
+        <li>赛程对阵与比赛结果</li>
+        <li>新闻动态与政策文件</li>
+        <li>最佳阵容与各类榜单</li>
+        <li>赛事精彩瞬间图集</li>
+      </ul>
+      <p class="modal-tip">公示页面位于用户端，登录后即可浏览完整内容（演示数据为示例）。</p>
+      <template #footer>
+        <router-link to="/login" class="btn btn-primary">登录查看</router-link>
+      </template>
+    </AppModal>
 
     <!-- 页脚 -->
     <footer class="footer">
@@ -190,6 +256,8 @@ const features = [
   font-size: 14px;
   font-weight: 600;
   line-height: 1.6;
+  font-family: inherit;
+  cursor: pointer;
   transition: all 0.2s;
 }
 
@@ -212,14 +280,30 @@ const features = [
   background: var(--green-deeper);
 }
 
-.btn-admin {
-  background: #f1efe8;
-  color: var(--muted);
-  border: 1.5px solid transparent;
+/* ===== 功能入口弹窗内容 ===== */
+.modal-lead {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
 }
 
-.btn-admin:hover {
-  background: #e7e4da;
+.flow-list {
+  margin: 10px 0 0;
+  padding-left: 20px;
+  display: grid;
+  gap: 8px;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--muted);
+}
+
+.modal-tip {
+  margin-top: 14px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--green-light);
+  font-size: 13px;
+  line-height: 1.7;
   color: var(--green-dark);
 }
 
@@ -296,10 +380,13 @@ const features = [
 
 .hero-btn {
   display: inline-block;
+  border: none;
   border-radius: 999px;
   padding: 12px 30px;
   font-size: 15px;
   font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
   transition: background 0.2s, border-color 0.2s, color 0.2s;
 }
 
@@ -310,16 +397,6 @@ const features = [
 
 .hero-btn.primary:hover {
   background: #3cb768;
-}
-
-.hero-btn.ghost {
-  border: 1.5px solid rgba(255, 255, 255, 0.45);
-  color: #fff;
-}
-
-.hero-btn.ghost:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: #fff;
 }
 
 /* 右侧比赛图片：向下探入波浪区，让波浪盖住图片下缘 */
@@ -374,6 +451,7 @@ const features = [
   padding: 32px 28px;
   text-align: center;
   box-shadow: 0 6px 18px rgba(20, 60, 40, 0.06);
+  cursor: pointer;
   transition: transform 0.25s, box-shadow 0.25s;
 }
 

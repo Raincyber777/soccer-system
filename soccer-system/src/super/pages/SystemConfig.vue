@@ -24,8 +24,9 @@ const dictColumns: TableColumn[] = [
 ]
 
 const dictRows = [
-  { dict: '报名组别', values: '小学组 / 中学组 / 高校组', updated: '2026-09-01 10:00' },
-  { dict: '市州列表', values: '贵阳市 / 遵义市 / 安顺市 …', updated: '2026-09-01 10:00' },
+  { dict: '报名组别', values: '小学组 / 中学组 / 高中组 / 高校组', updated: '2026-09-01 10:00' },
+  { dict: '市州列表', values: '成都市 / 绵阳市 / 德阳市 …', updated: '2026-09-01 10:00' },
+  { dict: '学校代码', values: '教育部学校（机构）标识码（10 位）', updated: '2026-10-21 09:30' },
   { dict: '审核环节', values: '市州审核 / 高校审核 / 省级终审', updated: '2026-09-20 16:40' },
 ]
 

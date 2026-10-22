@@ -18,8 +18,8 @@ const coachColumns: TableColumn[] = [
 ]
 
 const coachRows = [
-  { name: '张建国', idCard: '5201**********1011', unit: '实验中学', status: '已生效' },
-  { name: '刘洋', idCard: '5201**********1022', unit: '第一实验小学', status: '已生效' },
+  { name: '张建国', idCard: '5101**********1011', unit: '实验中学', status: '已生效' },
+  { name: '刘洋', idCard: '5101**********1022', unit: '第一实验小学', status: '已生效' },
 ]
 
 const playerColumns: TableColumn[] = [
@@ -31,14 +31,14 @@ const playerColumns: TableColumn[] = [
 ]
 
 const playerRows = [
-  { name: '王小磊', idCard: '5201**********0011', team: '实验中学足球队', avatar: '已上传', status: '已生效' },
-  { name: '李泽宇', idCard: '5201**********0022', team: '实验中学足球队', avatar: '未上传', status: '已生效' },
+  { name: '王小磊', idCard: '5101**********0011', team: '实验中学足球队', avatar: '已上传', status: '已生效' },
+  { name: '李泽宇', idCard: '5101**********0022', team: '实验中学足球队', avatar: '未上传', status: '已生效' },
 ]
 
 const cityStats = [
-  { city: '贵阳市', teams: 32, players: 402 },
-  { city: '遵义市', teams: 28, players: 351 },
-  { city: '毕节市', teams: 21, players: 268 },
+  { city: '成都市', teams: 32, players: 402 },
+  { city: '绵阳市', teams: 28, players: 351 },
+  { city: '达州市', teams: 21, players: 268 },
 ]
 
 const cityStatColumns: TableColumn[] = [
@@ -84,7 +84,7 @@ function onAction(action: string) {
     </div>
     <div class="card">
       <p class="stat-block-title">高校报名情况统计</p>
-      <DataTable :columns="cityStatColumns" :rows="[{ city: '贵州大学', teams: 4, players: 86 }, { city: '师范大学', teams: 3, players: 65 }]" />
+      <DataTable :columns="cityStatColumns" :rows="[{ city: '四川大学', teams: 4, players: 86 }, { city: '四川师范大学', teams: 3, players: 65 }]" />
     </div>
   </div>
 </template>

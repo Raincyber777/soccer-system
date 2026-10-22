@@ -21,9 +21,9 @@ const columns: TableColumn[] = [
 ]
 
 const rows = [
-  { team: '实验中学足球队', city: '贵阳市', group: '中学组', players: 18, submitTime: '2026-10-16 14:20', status: '待审核' },
-  { team: '第一实验小学队', city: '遵义市', group: '小学组', players: 12, submitTime: '2026-10-15 11:02', status: '待审核' },
-  { team: '师范大学联队', city: '贵阳市', group: '高校组', players: 22, submitTime: '2026-10-14 16:45', status: '已通过' },
+  { team: '实验中学足球队', city: '成都市', group: '中学组', players: 18, submitTime: '2026-10-16 14:20', status: '待审核' },
+  { team: '第一实验小学队', city: '绵阳市', group: '小学组', players: 12, submitTime: '2026-10-15 11:02', status: '待审核' },
+  { team: '川师大队', city: '成都市', group: '高校组', players: 22, submitTime: '2026-10-14 16:45', status: '已通过' },
 ]
 
 function onSearch(filters: Record<string, string>) {
@@ -42,7 +42,8 @@ function onAction(action: string) {
   <SearchBar :fields="searchFields" @search="onSearch" @reset="onSearch" />
 
   <p class="page-tip">
-    驳回时需填写驳回原因，原因将推送给报送单位；「下载word」导出球员报名信息表，「下载学籍材料」打包下载学籍验证文件。
+    本页复核经市州管理员初审（管理员端【报名初审】）提交的报名件；驳回时需填写驳回原因，原因将推送给报送单位；
+    「下载word」导出球员报名信息表，「下载学籍材料」打包下载学籍验证文件。
   </p>
 
   <DataTable

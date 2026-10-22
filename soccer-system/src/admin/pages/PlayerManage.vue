@@ -19,9 +19,9 @@ const columns: TableColumn[] = [
 ]
 
 const rows = [
-  { name: '王小磊', idCard: '5201**********0011', team: '实验中学足球队', group: '中学组', status: '已公示' },
-  { name: '李泽宇', idCard: '5201**********0022', team: '实验中学足球队', group: '中学组', status: '已公示' },
-  { name: '陈昊', idCard: '5201**********0033', team: '实验中学足球队', group: '中学组', status: '待审核' },
+  { name: '王小磊', idCard: '5101**********0011', team: '实验中学足球队', group: '中学组', status: '已公示' },
+  { name: '李泽宇', idCard: '5101**********0022', team: '实验中学足球队', group: '中学组', status: '已公示' },
+  { name: '陈昊', idCard: '5101**********0033', team: '实验中学足球队', group: '中学组', status: '待审核' },
 ]
 
 function onSearch(filters: Record<string, string>) {

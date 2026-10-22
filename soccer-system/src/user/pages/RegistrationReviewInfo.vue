@@ -27,9 +27,9 @@ const publicColumns: TableColumn[] = [
 ]
 
 const publicRows = [
-  { team: '实验中学足球队', city: '贵阳市', group: '中学组', players: 18, status: '已公示' },
-  { team: '市二中足球队', city: '遵义市', group: '中学组', players: 16, status: '已公示' },
-  { team: '师范附小足球队', city: '贵阳市', group: '小学组', players: 14, status: '待审核' },
+  { team: '实验中学足球队', city: '成都市', group: '中学组', players: 18, status: '已公示' },
+  { team: '市二中足球队', city: '绵阳市', group: '中学组', players: 16, status: '已公示' },
+  { team: '师范附小足球队', city: '成都市', group: '小学组', players: 14, status: '待审核' },
 ]
 
 function onAction(action: string) {

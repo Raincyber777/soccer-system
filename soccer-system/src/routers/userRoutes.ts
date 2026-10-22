@@ -12,12 +12,12 @@ export const userRoutes: RouteRecordRaw[] = [
     children: [
       // 概览
       { path: 'dashboard', name: 'user-dashboard', component: () => import('../user/pages/UserDashboard.vue'), meta: { title: '工作台', group: '概览' } },
-      // 赛事报名（所有参赛用户可见）
+      // 赛事报名（浏览对所有参赛用户开放；报名表与报名资料是球队级操作，仅球队负责人）
       { path: 'tournaments', name: 'user-tournaments', component: () => import('../user/pages/TournamentList.vue'), meta: { title: '赛事列表', group: '赛事报名' } },
-      { path: 'registration-form', name: 'user-registration-form', component: () => import('../user/pages/RegistrationForm.vue'), meta: { title: '赛事报名', group: '赛事报名' } },
+      { path: 'registration-form', name: 'user-registration-form', component: () => import('../user/pages/RegistrationForm.vue'), meta: { title: '赛事报名', group: '赛事报名', personas: ['leader'] } },
       { path: 'registrations', name: 'user-registrations', component: () => import('../user/pages/MyRegistrations.vue'), meta: { title: '我的报名', group: '赛事报名' } },
       { path: 'registration-review-info', name: 'user-registration-review-info', component: () => import('../user/pages/RegistrationReviewInfo.vue'), meta: { title: '报名审核信息', group: '赛事报名' } },
-      { path: 'registration-docs', name: 'user-registration-docs', component: () => import('../user/pages/RegistrationDocs.vue'), meta: { title: '报名资料', group: '赛事报名' } },
+      { path: 'registration-docs', name: 'user-registration-docs', component: () => import('../user/pages/RegistrationDocs.vue'), meta: { title: '报名资料', group: '赛事报名', personas: ['leader'] } },
       // 我的球队（团队管理，仅球队负责人；不含个人自助功能）
       { path: 'team-info', name: 'user-team-info', component: () => import('../user/pages/TeamInfo.vue'), meta: { title: '球队信息', group: '我的球队', personas: ['leader'] } },
       { path: 'team-members', name: 'user-team-members', component: () => import('../user/pages/TeamMembers.vue'), meta: { title: '队员列表', group: '我的球队', personas: ['leader'] } },
@@ -32,6 +32,10 @@ export const userRoutes: RouteRecordRaw[] = [
       { path: 'publicity', name: 'user-publicity', component: () => import('../user/pages/PublicityView.vue'), meta: { title: '信息公示', group: '信息公示' } },
       // 个人中心
       { path: 'profile', name: 'user-profile', component: () => import('../user/pages/UserProfile.vue'), meta: { title: '个人中心', group: '个人中心' } },
+      // 帮助（使用说明按身份拆成三份，meta.personas 限定每个人只看到自己那份）
+      { path: 'usage-guide', name: 'user-usage-guide-leader', component: () => import('../user/pages/UsageGuide.vue'), meta: { title: '使用说明', group: '帮助', personas: ['leader'], persona: 'leader' } },
+      { path: 'usage-guide-student', name: 'user-usage-guide-student', component: () => import('../user/pages/UsageGuide.vue'), meta: { title: '使用说明', group: '帮助', personas: ['student'], persona: 'student' } },
+      { path: 'usage-guide-coach', name: 'user-usage-guide-coach', component: () => import('../user/pages/UsageGuide.vue'), meta: { title: '使用说明', group: '帮助', personas: ['coach'], persona: 'coach' } },
     ],
   },
 ]

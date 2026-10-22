@@ -20,7 +20,7 @@ const columns: TableColumn[] = [
 
 const rows = [
   { match: '小学组 第 2 轮：实小少年队 vs 朝阳小学', platform: '视频号', link: 'https://live.example.com/green-1002', status: '进行中' },
-  { match: '高校组 第 1 轮：贵州大学 vs 师范大学', platform: 'B站', link: 'https://live.example.com/green-0918', status: '已结束' },
+  { match: '高校组 第 1 轮：四川大学 vs 川师大队', platform: 'B站', link: 'https://live.example.com/green-0918', status: '已结束' },
 ]
 
 function onSubmit(data: Record<string, string>) {

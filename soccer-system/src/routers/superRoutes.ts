@@ -8,9 +8,9 @@ import { adminRoutes } from './adminRoutes'
 const adminChildren = adminRoutes[0]?.children ?? []
 
 // 复用管理端内容页：去掉管理端控制台（超级管理员端有全省数据总览），
-// 以及管理端的两个账户页（超级管理员端有自己的可编辑版账户管理页面），
-// 并去掉路由 name 避免与 /admin 重名
-const excludedPaths = ['dashboard', 'user-accounts', 'admin-accounts']
+// 以及管理端的两个账户页（超级管理员端有自己的可编辑版账户管理页面）、
+// 管理端的使用说明（超管端用自己的版本），并去掉路由 name 避免与 /admin 重名
+const excludedPaths = ['dashboard', 'user-accounts', 'admin-accounts', 'usage-guide']
 const reusedChildren: RouteRecordRaw[] = adminChildren
   .filter((child) => !excludedPaths.includes(child.path) && child.component)
   .map((child) => ({
@@ -40,6 +40,8 @@ export const superRoutes: RouteRecordRaw[] = [
       { path: 'data-permission', name: 'super-data-permission', component: () => import('../super/pages/DataPermission.vue'), meta: { title: '跨区数据权限', group: '系统管理' } },
       // 以下全部复用管理端页面
       ...reusedChildren,
+      // 帮助（超管端自己的使用说明，放在侧栏最底部）
+      { path: 'usage-guide', name: 'super-usage-guide', component: () => import('../super/pages/UsageGuide.vue'), meta: { title: '使用说明', group: '帮助' } },
     ],
   },
 ]

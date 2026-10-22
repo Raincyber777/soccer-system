@@ -12,9 +12,9 @@ const columns: TableColumn[] = [
 ]
 
 const rows = [
-  { city: '贵阳市', admins: 2, scope: '本市州报名与球队数据', status: '已生效' },
-  { city: '遵义市', admins: 2, scope: '本市州报名与球队数据', status: '已生效' },
-  { city: '安顺市', admins: 1, scope: '本市州报名与球队数据', status: '进行中' },
+  { city: '成都市', admins: 2, scope: '本市州报名与球队数据', status: '已生效' },
+  { city: '绵阳市', admins: 2, scope: '本市州报名与球队数据', status: '已生效' },
+  { city: '宜宾市', admins: 1, scope: '本市州报名与球队数据', status: '进行中' },
 ]
 
 function onAction(action: string) {

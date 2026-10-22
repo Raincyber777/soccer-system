@@ -21,7 +21,7 @@ const columns: TableColumn[] = [
 const rows = [
   { name: '王小磊', team: '实验中学足球队', position: '前锋', group: '中学组', status: '已发布' },
   { name: '李泽宇', team: '实验中学足球队', position: '中场', group: '中学组', status: '已发布' },
-  { name: '赵一鸣', team: '贵州大学队', position: '后卫', group: '高校组', status: '待审核' },
+  { name: '赵一鸣', team: '四川大学队', position: '后卫', group: '高校组', status: '待审核' },
 ]
 
 function onSearch(filters: Record<string, string>) {

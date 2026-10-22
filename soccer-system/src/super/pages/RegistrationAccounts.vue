@@ -14,8 +14,8 @@ const accountColumns: TableColumn[] = [
 
 const accounts = [
   { account: 'szyds_zq01', unit: '实验中学', role: '球队账号', createTime: '2026-09-01 10:00', status: '已生效' },
-  { account: 'gzsfdx_fc', unit: '师范大学', role: '高校账号', createTime: '2026-09-03 15:30', status: '已生效' },
-  { account: 'gy_shi_zhen', unit: '贵阳市教育局', role: '市州账号', createTime: '2026-08-20 09:12', status: '已生效' },
+  { account: 'scsfdx_fc', unit: '四川师范大学', role: '高校账号', createTime: '2026-09-03 15:30', status: '已生效' },
+  { account: 'cd_shi_zhen', unit: '成都市教育局', role: '市州账号', createTime: '2026-08-20 09:12', status: '已生效' },
   { account: 'test_001', unit: '测试单位', role: '球队账号', createTime: '2026-08-25 14:40', status: '已删除' },
 ]
 
@@ -28,7 +28,7 @@ const logColumns: TableColumn[] = [
 
 const logs = [
   { time: '2026-10-16 14:20', account: 'szyds_zq01', action: '提交球队报名表（中学组）', ip: '10.12.3.44' },
-  { time: '2026-10-16 10:05', account: 'gy_shi_zhen', action: '审核通过球队报名 3 份', ip: '10.8.1.17' },
+  { time: '2026-10-16 10:05', account: 'cd_shi_zhen', action: '审核通过球队报名 3 份', ip: '10.8.1.17' },
   { time: '2026-10-15 17:12', account: 'admin', action: '修改教练员身份信息（张建国）', ip: '10.0.0.8' },
 ]
 

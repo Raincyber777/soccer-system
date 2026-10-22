@@ -24,7 +24,8 @@ const quickLinks: {
   to: string
   personas?: UserPersona[]
 }[] = [
-  { icon: 'clipboard-list', title: '赛事报名', desc: '填写报名表并报送球员信息', to: '/user/registration-form' },
+  { icon: 'trophy', title: '赛事列表', desc: '浏览各项赛事与报名要求', to: '/user/tournaments' },
+  { icon: 'clipboard-list', title: '赛事报名', desc: '填写报名表并报送球员信息', to: '/user/registration-form', personas: ['leader'] },
   { icon: 'file-text', title: '我的报名', desc: '查看审核状态、修改报名信息', to: '/user/registrations' },
   { icon: 'circle-check', title: '报名审核信息', desc: '查看审核进度与报名公示', to: '/user/registration-review-info' },
   { icon: 'shield', title: '球队信息', desc: '创建球队、维护队旗队徽资料', to: '/user/team-info', personas: ['leader'] },
@@ -35,9 +36,18 @@ const quickLinks: {
   { icon: 'user', title: '个人中心', desc: '基础信息、密码修改与退出登录', to: '/user/profile' },
 ]
 
-const visibleLinks = computed(() =>
-  quickLinks.filter((q) => !q.personas || (auth.state.persona !== null && q.personas.includes(auth.state.persona))),
-)
+// 使用说明按身份各有一份，快捷入口指向当前身份对应的那份
+const guideLinks: Record<UserPersona, { icon: string; title: string; desc: string; to: string }> = {
+  leader: { icon: 'info', title: '使用说明', desc: '组队与报名分步指引', to: '/user/usage-guide' },
+  student: { icon: 'info', title: '使用说明', desc: '学籍与履历上传指引', to: '/user/usage-guide-student' },
+  coach: { icon: 'info', title: '使用说明', desc: '执教资质维护指引', to: '/user/usage-guide-coach' },
+}
+
+const visibleLinks = computed(() => {
+  const links = quickLinks.filter((q) => !q.personas || (auth.state.persona !== null && q.personas.includes(auth.state.persona)))
+  const persona = auth.state.persona ?? 'leader'
+  return [...links, guideLinks[persona]]
+})
 
 const columns = [
   { key: 'title', label: '消息标题' },

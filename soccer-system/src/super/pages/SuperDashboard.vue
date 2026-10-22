@@ -21,6 +21,7 @@ const quickLinks = [
   { icon: 'megaphone', title: '新闻发布', desc: '发布赛事新闻与政策文件', to: '/super/news-manage' },
   { icon: 'clipboard-list', title: '系统参数配置', desc: '全局开关与字典管理', to: '/super/system-config' },
   { icon: 'scroll-text', title: '操作日志', desc: '查看用户操作日志', to: '/super/operation-logs' },
+  { icon: 'info', title: '使用说明', desc: '超管端操作流程与权限对照', to: '/super/usage-guide' },
 ]
 
 const columns = [
@@ -31,8 +32,8 @@ const columns = [
 ]
 
 const todos = [
-  { todo: '为遵义市新设 2 个市级审核员账户', level: '高', deadline: '2026-10-20', status: '待审核' },
-  { todo: '审核市州报送的中小学组报名 15 份', level: '高', deadline: '2026-10-21', status: '待审核' },
+  { todo: '为绵阳市新设 2 个市级审核员账户', level: '高', deadline: '2026-10-23', status: '待审核' },
+  { todo: '终审市州报送的中小学组报名 15 份', level: '高', deadline: '2026-10-24', status: '待审核' },
   { todo: '清理 90 天未登录的休眠账户', level: '低', deadline: '2026-10-31', status: '进行中' },
 ]
 

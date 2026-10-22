@@ -2,8 +2,8 @@ import type { RouteRecordRaw } from 'vue-router'
 import AdminLayout from '../admin/components/AdminLayout.vue'
 
 // 管理员端路由：meta.group 是侧边栏分组名，meta.title 是菜单名
-// 普通管理员 = 市州/高校组审核员与赛事运营人员，负责日常运营（内容、直播、遴选、日志）；
-// 报名审核等省级高权限功能已收口到超级管理员端
+// 普通管理员 = 市州级赛事管理角色（教育局/市足协等），负责本区域报名初审、账户日常管理与赛事运营（内容、直播、遴选、日志）；
+// 报名终审、删除账户、管理员账户管理等省级高权限收口超级管理员端
 export const adminRoutes: RouteRecordRaw[] = [
   {
     path: '/admin',
@@ -12,9 +12,11 @@ export const adminRoutes: RouteRecordRaw[] = [
     children: [
       // 概览
       { path: 'dashboard', name: 'admin-dashboard', component: () => import('../admin/pages/AdminDashboard.vue'), meta: { title: '管理控制台', group: '概览' } },
-      // 账户管理（普通管理员：只能创建/删除用户账户；管理员账户仅可查看）
-      { path: 'user-accounts', name: 'admin-user-accounts', component: () => import('../admin/pages/UserAccountManage.vue'), meta: { title: '用户账户管理', group: '账户管理' } },
+      // 账户管理（普通管理员：用户账户限本区域日常操作——开户/编辑/重置密码/禁用启用；删除与管理员账户管理收口超级管理员）
+      { path: 'user-accounts', name: 'admin-user-accounts', component: () => import('../admin/pages/UserAccountManage.vue'), meta: { title: '用户账户', group: '账户管理' } },
       { path: 'admin-accounts', name: 'admin-admin-accounts', component: () => import('../admin/pages/AdminAccountsView.vue'), meta: { title: '管理员账户（只读）', group: '账户管理' } },
+      // 报名管理（市州初审：本区域报名材料初审，通过后自动提交省级终审；终审在超级管理员端【省级审核】）
+      { path: 'registration-first-review', name: 'admin-registration-first-review', component: () => import('../admin/pages/RegistrationFirstReview.vue'), meta: { title: '报名初审', group: '报名管理' } },
       // 球员管理
       { path: 'player-manage', name: 'admin-player-manage', component: () => import('../admin/pages/PlayerManage.vue'), meta: { title: '球员管理', group: '球员管理' } },
       // 教练员管理
@@ -44,6 +46,8 @@ export const adminRoutes: RouteRecordRaw[] = [
       { path: 'match-stats', name: 'admin-match-stats', component: () => import('../admin/pages/MatchStats.vue'), meta: { title: '赛事统计', group: '赛事门户管理' } },
       // 日志管理
       { path: 'operation-logs', name: 'admin-operation-logs', component: () => import('../admin/pages/OperationLogs.vue'), meta: { title: '操作日志', group: '日志管理' } },
+      // 帮助
+      { path: 'usage-guide', name: 'admin-usage-guide', component: () => import('../admin/pages/UsageGuide.vue'), meta: { title: '使用说明', group: '帮助' } },
     ],
   },
 ]

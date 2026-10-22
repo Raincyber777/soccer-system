@@ -20,9 +20,9 @@ const columns: TableColumn[] = [
 ]
 
 const rows = [
-  { name: '王小磊', idCard: '5201**********0011', team: '实验中学足球队', group: '中学组', matches: 12, status: '已归档' },
-  { name: '李泽宇', idCard: '5201**********0022', team: '实验中学足球队', group: '中学组', matches: 10, status: '已归档' },
-  { name: '陈昊', idCard: '5201**********0033', team: '实验中学足球队', group: '中学组', matches: 8, status: '进行中' },
+  { name: '王小磊', idCard: '5101**********0011', team: '实验中学足球队', group: '中学组', matches: 12, status: '已归档' },
+  { name: '李泽宇', idCard: '5101**********0022', team: '实验中学足球队', group: '中学组', matches: 10, status: '已归档' },
+  { name: '陈昊', idCard: '5101**********0033', team: '实验中学足球队', group: '中学组', matches: 8, status: '进行中' },
 ]
 
 function onSearch(filters: Record<string, string>) {

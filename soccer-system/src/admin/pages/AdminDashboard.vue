@@ -9,18 +9,20 @@ const stats = [
   { icon: 'shield', label: '报名球队', value: 128, hint: '较上周 +6' },
   { icon: 'user', label: '注册球员', value: 1560, hint: '已公示 1203' },
   { icon: 'medal', label: '注册教练员', value: 240, hint: '已公示 187' },
-  { icon: 'clipboard-list', label: '待审核报名', value: 23, hint: '需尽快处理' },
+  { icon: 'clipboard-list', label: '待初审报名', value: 23, hint: '本区域初审待办' },
 ]
 
 const quickLinks = [
-  { icon: 'users', title: '用户账户管理', desc: '创建、删除用户端账户（管理员权限）', to: '/admin/user-accounts' },
-  { icon: 'shield', title: '管理员账户（只读）', desc: '查看管理员账户列表，不可管理', to: '/admin/admin-accounts' },
+  { icon: 'clipboard-list', title: '报名初审', desc: '本区域报名材料初审，通过后提交省级终审', to: '/admin/registration-first-review' },
+  { icon: 'users', title: '用户账户', desc: '本区域账户日常管理：开户、重置密码、禁用/启用', to: '/admin/user-accounts' },
+  { icon: 'shield', title: '管理员账户（只读）', desc: '查看同级管理员基本信息，不可操作', to: '/admin/admin-accounts' },
   { icon: 'video', title: '赛事图文直播', desc: '进入直播间发布图文赛况', to: '/admin/live-text' },
   { icon: 'circle-check', title: '赛事信息录入', desc: '录入对阵、进球、判罚与裁判信息', to: '/admin/match-entry' },
   { icon: 'megaphone', title: '新闻发布', desc: '发布赛事新闻与政策文件', to: '/admin/news-manage' },
   { icon: 'user', title: '球员管理', desc: '搜索、公示、重置球员账号', to: '/admin/player-manage' },
   { icon: 'star', title: '初选评分', desc: '足球遴选队员初选评分与汇总导出', to: '/admin/selection-manage' },
   { icon: 'scroll-text', title: '操作日志', desc: '查看用户操作日志', to: '/admin/operation-logs' },
+  { icon: 'info', title: '使用说明', desc: '管理员端操作流程指引', to: '/admin/usage-guide' },
 ]
 
 const columns = [
@@ -31,9 +33,9 @@ const columns = [
 ]
 
 const todos = [
-  { todo: '审核市州报送的中小学组报名 15 份', level: '高', deadline: '2026-10-21', status: '待审核' },
-  { todo: '高校组报名信息复核 8 份', level: '中', deadline: '2026-10-23', status: '待审核' },
-  { todo: '发布秋季联赛第四轮对阵信息', level: '高', deadline: '2026-10-20', status: '进行中' },
+  { todo: '初审本区域中小学组报名 15 份', level: '高', deadline: '2026-10-23', status: '待初审' },
+  { todo: '初审高校组报名 8 份', level: '中', deadline: '2026-10-24', status: '待初审' },
+  { todo: '发布秋季联赛第四轮对阵信息', level: '高', deadline: '2026-10-25', status: '进行中' },
 ]
 
 function onAction(action: string) {

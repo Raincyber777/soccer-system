@@ -13,9 +13,9 @@ const columns: TableColumn[] = [
 ]
 
 const rows = [
-  { name: '王小磊', idCard: '5201**********0011', team: '实验中学足球队', match: '第 3 轮 vs 市二中', status: '待核验' },
-  { name: '李泽宇', idCard: '5201**********0022', team: '实验中学足球队', match: '第 3 轮 vs 市二中', status: '已核验' },
-  { name: '陈昊', idCard: '5201**********0033', team: '实验中学足球队', match: '第 3 轮 vs 市二中', status: '已核验' },
+  { name: '王小磊', idCard: '5101**********0011', team: '实验中学足球队', match: '第 3 轮 vs 市二中', status: '待核验' },
+  { name: '李泽宇', idCard: '5101**********0022', team: '实验中学足球队', match: '第 3 轮 vs 市二中', status: '已核验' },
+  { name: '陈昊', idCard: '5101**********0033', team: '实验中学足球队', match: '第 3 轮 vs 市二中', status: '已核验' },
 ]
 
 function onAction(action: string) {

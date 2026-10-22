@@ -50,11 +50,8 @@ const groups = computed<MenuGroup[]>(() => {
   return result
 })
 
-// 顶栏用户名：身份 + 账号
-const userLabel = computed(() => {
-  const personaLabel = auth.state.persona ? personaLabels[auth.state.persona] : '球队负责人'
-  return auth.state.account ? `${personaLabel} ${auth.state.account}` : personaLabel
-})
+// 顶栏：端标签旁显示身份 pill；右侧只显示账号，避免身份重复展示
+const personaLabel = computed(() => (auth.state.persona ? personaLabels[auth.state.persona] : '球队负责人'))
 </script>
 
 <template>
@@ -67,11 +64,12 @@ const userLabel = computed(() => {
             绿茵汇
           </span>
           <span class="brand-tag user-tag">用户端</span>
+          <span class="brand-identity">{{ personaLabel }}</span>
         </router-link>
         <div class="topbar-right">
           <span class="user-name">
             <AppIcon name="user" :size="15" />
-            当前用户：{{ userLabel }}
+            当前用户：{{ auth.state.account || personaLabel }}
           </span>
           <a href="/" class="exit-link" @click.prevent="handleLogout">退出系统</a>
         </div>
@@ -134,6 +132,17 @@ const userLabel = computed(() => {
   color: var(--green-dark);
 }
 
+.brand-identity {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 2px 10px;
+  border-radius: 999px;
+  border: 1px solid #cfe0d3;
+  background: #fff;
+  color: var(--green-dark);
+  letter-spacing: 0.5px;
+}
+
 .topbar-right {
   display: flex;
   align-items: center;
@@ -172,6 +181,12 @@ const userLabel = computed(() => {
 
 @media (max-width: 900px) {
   .user-name {
+    display: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .brand-identity {
     display: none;
   }
 }

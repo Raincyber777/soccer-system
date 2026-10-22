@@ -13,7 +13,7 @@ const columns: TableColumn[] = [
 ]
 
 const rows = [
-  { match: '高校组 第 1 轮：贵州大学 vs 师范大学', score: '2 : 0', group: '高校组', time: '2026-10-18 17:00', status: '已发布' },
+  { match: '高校组 第 1 轮：四川大学 vs 川师大队', score: '2 : 0', group: '高校组', time: '2026-10-18 17:00', status: '已发布' },
   { match: '小学组 第 1 轮：实小少年队 vs 城关小学', score: '5 : 2', group: '小学组', time: '2026-10-12 11:30', status: '已发布' },
   { match: '中学组 第 2 轮：一中 vs 师大附中', score: '1 : 1', group: '中学组', time: '2026-10-19 17:10', status: '待审核' },
 ]

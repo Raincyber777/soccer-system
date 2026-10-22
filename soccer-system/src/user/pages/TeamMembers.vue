@@ -21,9 +21,9 @@ const columns: TableColumn[] = [
 ]
 
 const members = [
-  { name: '王小磊', idCard: '5201**********0011', birth: '2011-03-12', position: '前锋', photo: '已上传', status: '已生效' },
-  { name: '李泽宇', idCard: '5201**********0022', birth: '2011-07-25', position: '中场', photo: '已上传', status: '已生效' },
-  { name: '陈昊', idCard: '5201**********0033', birth: '2010-11-08', position: '守门员', photo: '未上传', status: '待审核' },
+  { name: '王小磊', idCard: '5101**********0011', birth: '2011-03-12', position: '前锋', photo: '已上传', status: '已生效' },
+  { name: '李泽宇', idCard: '5101**********0022', birth: '2011-07-25', position: '中场', photo: '已上传', status: '已生效' },
+  { name: '陈昊', idCard: '5101**********0033', birth: '2010-11-08', position: '守门员', photo: '未上传', status: '待审核' },
 ]
 
 function onSearch(filters: Record<string, string>) {

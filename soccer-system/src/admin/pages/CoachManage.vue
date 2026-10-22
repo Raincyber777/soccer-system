@@ -20,8 +20,8 @@ const columns: TableColumn[] = [
 ]
 
 const rows = [
-  { name: '张建国', idCard: '5201**********1011', unit: '实验中学', category: '专职教练员', status: '已通过' },
-  { name: '刘洋', idCard: '5201**********1022', unit: '第一实验小学', category: '体育教师兼任', status: '待审核' },
+  { name: '张建国', idCard: '5101**********1011', unit: '实验中学', category: '专职教练员', status: '已通过' },
+  { name: '刘洋', idCard: '5101**********1022', unit: '第一实验小学', category: '体育教师兼任', status: '待审核' },
 ]
 
 function onSearch(filters: Record<string, string>) {

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { reactive } from 'vue'
 import type { SearchField } from './types'
+import AppSelect from './AppSelect.vue'
 
 // 通用搜索栏：传入搜索字段配置，点搜索时把条件抛给父页面
 const props = defineProps<{
@@ -29,10 +30,14 @@ function doReset() {
   <div class="search-bar">
     <label v-for="f in fields" :key="f.key" class="search-item">
       <span class="search-label">{{ f.label }}</span>
-      <select v-if="f.type === 'select'" v-model="filters[f.key]">
-        <option value="">全部</option>
-        <option v-for="opt in f.options" :key="opt" :value="opt">{{ opt }}</option>
-      </select>
+      <AppSelect
+        v-if="f.type === 'select'"
+        v-model="filters[f.key]"
+        :options="f.options ?? []"
+        placeholder="全部"
+        clear-text="全部"
+        compact
+      />
       <input v-else v-model="filters[f.key]" type="text" :placeholder="f.placeholder" />
     </label>
     <button type="button" class="btn btn-primary search-btn" @click="doSearch">搜索</button>
@@ -65,8 +70,7 @@ function doReset() {
   white-space: nowrap;
 }
 
-.search-item input,
-.search-item select {
+.search-item input {
   padding: 8px 10px;
   border: 1.5px solid #d8e2da;
   border-radius: 6px;
@@ -75,8 +79,7 @@ function doReset() {
   min-width: 140px;
 }
 
-.search-item input:focus,
-.search-item select:focus {
+.search-item input:focus {
   border-color: var(--green);
 }
 

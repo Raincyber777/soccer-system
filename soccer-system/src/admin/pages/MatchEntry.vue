@@ -22,7 +22,7 @@ const rows = [
   { match: '中学组 第 3 轮', home: '实验中学', away: '市二中', time: '2026-10-22 15:00', status: '未开始' },
   { match: '中学组 第 3 轮', home: '师大附中', away: '一中', time: '2026-10-22 16:30', status: '未开始' },
   { match: '小学组 第 2 轮', home: '实小少年队', away: '朝阳小学', time: '2026-10-19 10:00', status: '进行中' },
-  { match: '高校组 第 1 轮', home: '贵州大学', away: '师范大学', time: '2026-10-18 15:00', status: '已结束' },
+  { match: '高校组 第 1 轮', home: '四川大学', away: '川师大队', time: '2026-10-18 15:00', status: '已结束' },
 ]
 
 function onSearch(filters: Record<string, string>) {

@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { reactive } from 'vue'
 import type { FormField } from './types'
+import AppSelect from './AppSelect.vue'
+import AppDatePicker from './AppDatePicker.vue'
 
 // 通用表单：传入字段配置，点提交时把整个表单数据抛给父页面
 const props = defineProps<{
@@ -26,25 +28,36 @@ function onSubmit() {
       v-for="f in fields"
       :key="f.key"
       class="form-field"
-      :class="{ 'full-row': f.type === 'textarea' }"
+      :class="{ 'full-row': f.type === 'textarea' || f.type === 'custom' }"
     >
       <span class="form-label">{{ f.label }}</span>
-      <select v-if="f.type === 'select'" v-model="form[f.key]">
-        <option value="">请选择</option>
-        <option v-for="opt in f.options" :key="opt" :value="opt">{{ opt }}</option>
-      </select>
-      <textarea
-        v-else-if="f.type === 'textarea'"
-        v-model="form[f.key]"
-        rows="3"
-        :placeholder="f.placeholder"
-      ></textarea>
-      <input
-        v-else
-        v-model="form[f.key]"
-        :type="f.type ?? 'text'"
-        :placeholder="f.placeholder"
-      />
+      <!-- 具名字段插槽：页面可用自定义控件（如学校选择器）替换某个字段的默认输入 -->
+      <slot :name="`field-${f.key}`" :field="f">
+        <AppSelect
+          v-if="f.type === 'select'"
+          v-model="form[f.key]"
+          :options="f.options ?? []"
+          placeholder="请选择"
+        />
+        <AppDatePicker
+          v-else-if="f.type === 'date'"
+          v-model="form[f.key]"
+          :min="f.min"
+          :max="f.max"
+        />
+        <textarea
+          v-else-if="f.type === 'textarea'"
+          v-model="form[f.key]"
+          rows="3"
+          :placeholder="f.placeholder"
+        ></textarea>
+        <input
+          v-else-if="f.type !== 'custom'"
+          v-model="form[f.key]"
+          :type="f.type ?? 'text'"
+          :placeholder="f.placeholder"
+        />
+      </slot>
     </label>
     <div class="form-actions full-row">
       <button type="submit" class="btn btn-primary">{{ submitText ?? '提交' }}</button>
@@ -80,7 +93,6 @@ function onSubmit() {
 }
 
 .form-field input,
-.form-field select,
 .form-field textarea {
   padding: 10px 12px;
   border: 1.5px solid #d8e2da;
@@ -92,7 +104,6 @@ function onSubmit() {
 }
 
 .form-field input:focus,
-.form-field select:focus,
 .form-field textarea:focus {
   border-color: var(--green);
   box-shadow: 0 0 0 3px rgba(30, 122, 63, 0.12);

@@ -20,6 +20,13 @@ export const personaLabels: Record<UserPersona, string> = {
   coach: '教练员',
 }
 
+// 管理端/超管端演示账号的具体身份（顶栏「端标签」旁展示）：角色 · 所属机构
+// 接入后端后由登录接口按账号返回，无需前端映射
+export const STAFF_IDENTITY: Record<string, string> = {
+  admin001: '市州管理员 · 成都市教育局',
+  super001: '省级管理员 · 省本级',
+}
+
 interface AuthState {
   role: UserRole | null
   persona: UserPersona | null

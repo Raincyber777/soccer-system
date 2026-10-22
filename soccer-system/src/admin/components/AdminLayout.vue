@@ -2,12 +2,15 @@
 import type { RouteRecordRaw } from 'vue-router'
 import { useRouter } from 'vue-router'
 import { adminRoutes } from '../../routers/adminRoutes'
-import { useAuth } from '../../stores/auth'
+import { useAuth, STAFF_IDENTITY } from '../../stores/auth'
 import AppIcon from '../../components/common/AppIcon.vue'
 import SideNav from '../../components/common/SideNav.vue'
 
 const router = useRouter()
 const auth = useAuth()
+
+// 顶栏身份标签：演示账号映射「角色 · 所属机构」，便于使用者确认自己的身份与辖区
+const identity = STAFF_IDENTITY[auth.state.account] ?? '市州管理员'
 
 function handleLogout() {
   auth.logout()
@@ -52,6 +55,7 @@ for (const child of children) {
             绿茵汇
           </span>
           <span class="brand-tag admin-tag">管理端</span>
+          <span class="brand-identity">{{ identity }}</span>
         </router-link>
         <div class="topbar-right">
           <span class="user-name">
@@ -119,6 +123,16 @@ for (const child of children) {
   color: #fff;
 }
 
+.brand-identity {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--green-light);
+  color: var(--green-dark);
+  letter-spacing: 0.5px;
+}
+
 .topbar-right {
   display: flex;
   align-items: center;
@@ -167,6 +181,12 @@ for (const child of children) {
 
 @media (max-width: 900px) {
   .user-name {
+    display: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .brand-identity {
     display: none;
   }
 }

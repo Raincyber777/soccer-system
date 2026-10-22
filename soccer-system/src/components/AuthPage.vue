@@ -3,6 +3,8 @@ import { reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuth, personaLabels, type UserRole, type UserPersona } from '../stores/auth'
 import AppIcon from './common/AppIcon.vue'
+import SchoolSelect from './common/SchoolSelect.vue'
+import type { SchoolInfo } from '../data/sichuan-schools'
 
 const route = useRoute()
 const router = useRouter()
@@ -34,11 +36,12 @@ const personaOptions: { value: UserPersona; label: string }[] = [
 
 const registerForm = reactive({
   username: '',
-  school: '',
   email: '',
   password: '',
   confirmPassword: '',
 })
+// 所属学校不开放自由填写，统一用学校选择器按「学校标识码」精准绑定
+const registerSchool = ref<SchoolInfo | null>(null)
 const registerMsg = ref('')
 const registerSuccess = ref('')
 
@@ -63,6 +66,7 @@ interface RegisteredUser {
   account: string
   password: string
   school: string
+  schoolCode: string
   email: string
   persona: UserPersona
 }
@@ -160,12 +164,12 @@ function handleRegister() {
 
   if (
     !registerForm.username.trim() ||
-    !registerForm.school.trim() ||
+    !registerSchool.value ||
     !registerForm.email.trim() ||
     !registerForm.password ||
     !registerForm.confirmPassword
   ) {
-    registerMsg.value = '请填写完整的注册信息'
+    registerMsg.value = '请填写完整的注册信息（所属学校需通过搜索选择）'
     return
   }
 
@@ -199,7 +203,8 @@ function handleRegister() {
   list.push({
     account,
     password: registerForm.password,
-    school: registerForm.school.trim(),
+    school: registerSchool.value.name,
+    schoolCode: registerSchool.value.code,
     email: registerForm.email.trim(),
     persona: registerPersona.value,
   })
@@ -332,15 +337,10 @@ function handleRegister() {
             autocomplete="username"
           />
 
-          <label class="form-label" for="reg-school">所属学校 / 单位</label>
-          <input
-            id="reg-school"
-            v-model="registerForm.school"
-            class="form-input plain"
-            type="text"
-            placeholder="球队或学校全称，如：实验中学"
-            autocomplete="organization"
-          />
+          <label class="form-label">所属学校（按学校代码精准选择）</label>
+          <div class="reg-school">
+            <SchoolSelect v-model="registerSchool" />
+          </div>
 
           <div class="role-row">
             <span class="role-label">注册身份</span>
@@ -386,7 +386,7 @@ function handleRegister() {
         </form>
 
         <p class="register-tip">
-          参赛账号（球队负责人 / 学生运动员 / 教练员）注册后即可登录；<br />
+          所属学校通过学校标识码精准绑定，避免重名错填；参赛账号（球队负责人 / 学生运动员 / 教练员）注册后即可登录；<br />
           管理员与超级管理员账号不开放注册，由超级管理员在后台统一创建。
         </p>
       </template>
@@ -588,6 +588,10 @@ function handleRegister() {
 }
 
 .form-input.plain {
+  margin-bottom: 14px;
+}
+
+.reg-school {
   margin-bottom: 14px;
 }
 

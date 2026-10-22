@@ -9,9 +9,12 @@ export interface TableColumn {
 export interface FormField {
   key: string
   label: string
-  type?: 'text' | 'number' | 'date' | 'password' | 'select' | 'textarea'
+  type?: 'text' | 'number' | 'date' | 'password' | 'select' | 'textarea' | 'custom'
   options?: string[]
   placeholder?: string
+  /** type=date 时可选：可选日期范围（YYYY-MM-DD），如出生日期禁选未来 */
+  min?: string
+  max?: string
 }
 
 export interface SearchField {
