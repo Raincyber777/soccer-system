@@ -1,0 +1,91 @@
+/* 登录 / 注册子表单共用样式：由 LoginForm、RegisterForm 以 <style scoped src> 引入，
+   作用域仍限制在各自组件内，不会泄漏到全局 */
+
+.auth-form {
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 6px;
+}
+
+.input-wrap {
+  position: relative;
+  margin-bottom: 14px;
+}
+
+.form-input {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1.5px solid #d8e2da;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.input-wrap .form-input {
+  padding-right: 42px;
+}
+
+.form-input.plain {
+  margin-bottom: 14px;
+}
+
+.form-input:focus {
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(30, 122, 63, 0.15);
+}
+
+.eye-btn {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.eye-btn:hover {
+  color: var(--green);
+}
+
+.form-error {
+  color: #c0392b;
+  font-size: 13px;
+  margin-bottom: 10px;
+}
+
+.form-success {
+  color: var(--green);
+  font-size: 13px;
+  margin-bottom: 10px;
+}
+
+.auth-submit {
+  background: var(--green);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  text-indent: 4px;
+  transition: background 0.2s;
+}
+
+.auth-submit:hover {
+  background: var(--green-bright);
+}

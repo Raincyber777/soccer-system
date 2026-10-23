@@ -3,10 +3,11 @@ import { computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useAuth } from '../../stores/auth'
 import AppIcon from '../common/AppIcon.vue'
-import AppModal from '../common/AppModal.vue'
+import PortalGuideModals from './PortalGuideModals.vue'
 
-// 门户公共头部：品牌、导航、登录区 + 功能说明弹窗，门户首页与公开浏览页共用
-// 三个说明弹窗由头部自己持有：导航直接打开，首页 hero 按钮可通过 ref 调 openModal
+// 门户公共头部：品牌、导航、登录区，门户首页与公开浏览页共用
+// 三个功能说明弹窗在 PortalGuideModals 中，由这里持有开关状态；
+// 导航直接打开，首页 hero 按钮可通过 ref 调 openModal
 
 type ModalKey = 'registration' | 'team' | 'publicity'
 
@@ -136,55 +137,8 @@ defineExpose({ openModal })
     </div>
   </header>
 
-  <!-- 功能入口弹窗：访客先了解流程，再引导登录 / 注册 -->
-  <AppModal :open="activeModal === 'registration'" title="赛事报名" @close="activeModal = null">
-    <p class="modal-lead">从组队到出赛的完整流程：</p>
-    <ol class="flow-list">
-      <li>球队负责人注册 / 登录，按学校标识码绑定所属学校</li>
-      <li>在线填报赛事报名表，批量报送球员信息与照片</li>
-      <li>上传盖章报名表、学籍验证等报名材料</li>
-      <li>市州管理员初审 → 省级终审，审核进度实时可查</li>
-      <li>审核通过进入公示，正式参赛</li>
-    </ol>
-    <p class="modal-tip">
-      参赛组别：小学组 / 中学组 / 高中组 / 高校组（随学校学段自动限定）。
-      报名属球队级操作，由球队负责人统一办理；队员可在「我的报名」查看进度。
-    </p>
-    <template #footer>
-      <router-link to="/register" class="btn btn-ghost">去注册</router-link>
-      <router-link to="/login" class="btn btn-primary">去登录</router-link>
-    </template>
-  </AppModal>
-
-  <AppModal :open="activeModal === 'team'" title="球队与人员管理" @close="activeModal = null">
-    <p class="modal-lead">球队与人员的日常维护：</p>
-    <ul class="flow-list">
-      <li>球队信息：绑定学校、参赛组别、队旗队徽与球队资料</li>
-      <li>球员管理：负责人批量报送球员信息，运动员注册个人信息</li>
-      <li>教练员：申报资质并上传等级证书，审核通过后带队参赛</li>
-      <li>报名资料：盖章件导出与学籍验证材料上传</li>
-    </ul>
-    <p class="modal-tip">球队资料由球队负责人维护；运动员、教练员使用各自账号注册并维护个人信息。</p>
-    <template #footer>
-      <router-link to="/register" class="btn btn-ghost">去注册</router-link>
-      <router-link to="/login" class="btn btn-primary">去登录</router-link>
-    </template>
-  </AppModal>
-
-  <AppModal :open="activeModal === 'publicity'" title="信息公示" @close="activeModal = null">
-    <p class="modal-lead">以下信息全部公开，无需登录即可浏览：</p>
-    <ul class="flow-list">
-      <li>赛程对阵与比赛结果（赛程赛果页）</li>
-      <li>新闻动态与政策文件（新闻政策页）</li>
-      <li>组别积分榜与射手榜（榜单页）</li>
-    </ul>
-    <p class="modal-tip">点击下方按钮直达对应公示页面；登录后可在用户端查看报名进度等个人信息。</p>
-    <template #footer>
-      <router-link to="/news" class="btn btn-ghost">新闻政策</router-link>
-      <router-link to="/schedule" class="btn btn-ghost">赛程赛果</router-link>
-      <router-link to="/rankings" class="btn btn-primary">赛事榜单</router-link>
-    </template>
-  </AppModal>
+  <!-- 功能说明弹窗（赛事报名 / 球队管理 / 信息公示） -->
+  <PortalGuideModals :open="activeModal" @close="activeModal = null" />
 </template>
 
 <style scoped>
@@ -277,33 +231,6 @@ defineExpose({ openModal })
   background: var(--green-deeper);
   transform: translateY(-1px);
   box-shadow: 0 6px 16px rgba(15, 47, 32, 0.25);
-}
-
-/* ===== 功能入口弹窗内容 ===== */
-.modal-lead {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--ink);
-}
-
-.flow-list {
-  margin: 10px 0 0;
-  padding-left: 20px;
-  display: grid;
-  gap: 8px;
-  font-size: 14px;
-  line-height: 1.7;
-  color: var(--muted);
-}
-
-.modal-tip {
-  margin-top: 14px;
-  padding: 10px 12px;
-  border-radius: 8px;
-  background: var(--green-light);
-  font-size: 13px;
-  line-height: 1.7;
-  color: var(--green-dark);
 }
 
 .menu-toggle {

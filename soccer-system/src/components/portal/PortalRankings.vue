@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue'
 import PortalHeader from './PortalHeader.vue'
 import PortalFooter from './PortalFooter.vue'
+import PortalBanner from './PortalBanner.vue'
 import AppSelect from '../common/AppSelect.vue'
 import DataTable from '../common/DataTable.vue'
 import type { TableColumn } from '../common/types'
@@ -79,13 +80,11 @@ const scorers = [
   <div class="portal-page">
     <PortalHeader />
 
-    <section class="page-banner">
-      <div class="banner-inner">
-        <p class="banner-kicker">公开信息 · 无需登录</p>
-        <h1 class="banner-title">赛事榜单</h1>
-        <p class="banner-desc">组别积分榜与射手榜，比赛完赛并审核发布后自动计入统计。</p>
-      </div>
-    </section>
+    <PortalBanner
+      kicker="公开信息 · 无需登录"
+      title="赛事榜单"
+      desc="组别积分榜与射手榜，比赛完赛并审核发布后自动计入统计。"
+    />
 
     <main class="container">
       <h3 class="section-title">积分榜</h3>
@@ -108,37 +107,6 @@ const scorers = [
 </template>
 
 <style scoped>
-.page-banner {
-  background: linear-gradient(140deg, #0f2f20 0%, #17402c 55%, #1e5a38 100%);
-  color: #fff;
-  padding: 40px 24px 44px;
-}
-
-.banner-inner {
-  max-width: 1100px;
-  margin: 0 auto;
-}
-
-.banner-kicker {
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.3em;
-  color: #9fd4b5;
-}
-
-.banner-title {
-  margin-top: 8px;
-  font-size: 30px;
-  font-weight: 800;
-}
-
-.banner-desc {
-  margin-top: 10px;
-  font-size: 14px;
-  line-height: 1.8;
-  color: #d7e7dc;
-}
-
 .container {
   max-width: 1100px;
   margin: 0 auto;
