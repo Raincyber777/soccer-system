@@ -21,10 +21,22 @@ defineProps<{
 .page-header h2 {
   font-size: 22px;
   color: var(--ink);
+  letter-spacing: 0.01em;
+}
+
+/* 标题下的渐变小横条，替代纯文字标题的单调感 */
+.page-header h2::after {
+  content: '';
+  display: block;
+  width: 46px;
+  height: 4px;
+  margin-top: 10px;
+  border-radius: 999px;
+  background: var(--grad-green);
 }
 
 .page-header p {
-  margin-top: 6px;
+  margin-top: 8px;
   font-size: 13px;
   color: var(--muted);
 }

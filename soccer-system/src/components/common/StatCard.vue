@@ -26,24 +26,33 @@ defineProps<{
 <style scoped>
 .stat-card {
   background: #fff;
-  border-radius: 12px;
+  border: 1px solid #eef2ee;
+  border-radius: var(--radius);
   padding: 18px 20px;
   display: flex;
   align-items: center;
-  gap: 14px;
-  box-shadow: 0 4px 14px rgba(20, 60, 40, 0.05);
+  gap: 16px;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
+.stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+
+/* 绿色渐变图标底 + 投影，比纯色块更精神 */
 .stat-icon-wrap {
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
-  background: var(--green-light);
-  color: var(--green);
+  width: 50px;
+  height: 50px;
+  border-radius: 13px;
+  background: var(--grad-green);
+  color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  box-shadow: 0 8px 18px rgba(30, 122, 63, 0.28);
 }
 
 .stat-label {
@@ -56,6 +65,7 @@ defineProps<{
   font-weight: 800;
   color: var(--green-dark);
   line-height: 1.2;
+  letter-spacing: -0.02em;
 }
 
 .stat-hint {

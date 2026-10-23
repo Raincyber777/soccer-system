@@ -102,18 +102,19 @@ watch(
   margin-top: 14px;
 }
 
-/* 管理端（默认）：深绿底 */
+/* 管理端（默认）：深绿底（纵向渐变增加层次） */
 .variant-admin {
-  background: var(--green-deeper);
+  background: linear-gradient(180deg, #123a27, var(--green-deeper));
 }
 
 /* 超管端：更深绿底 + 金色高亮 */
 .variant-super {
-  background: #0b241a;
+  background: linear-gradient(180deg, #0d2b1f, #081d14);
 }
 
 .variant-super .menu-item.router-link-active {
-  background: #b98a1c;
+  background: linear-gradient(135deg, #b98a1c, #d3a52e);
+  box-shadow: 0 4px 12px rgba(185, 138, 28, 0.35);
 }
 
 /* 用户端：白底 */
@@ -204,7 +205,7 @@ watch(
 .menu-item {
   display: block;
   padding: 10px 12px;
-  border-radius: 8px;
+  border-radius: 9px;
   font-size: 14px;
   color: #d5e4da;
   transition: background 0.15s, color 0.15s;
@@ -216,9 +217,10 @@ watch(
 }
 
 .menu-item.router-link-active {
-  background: var(--green);
+  background: var(--grad-green);
   color: #fff;
   font-weight: 600;
+  box-shadow: 0 4px 12px rgba(30, 122, 63, 0.35);
 }
 
 .variant-user .menu-item {
@@ -228,6 +230,11 @@ watch(
 .variant-user .menu-item:hover {
   background: var(--green-light);
   color: var(--green-dark);
+}
+
+/* 用户端白底下的选中态：同款绿色渐变，白字才够对比 */
+.variant-user .menu-item.router-link-active {
+  color: #fff;
 }
 
 @media (prefers-reduced-motion: reduce) {

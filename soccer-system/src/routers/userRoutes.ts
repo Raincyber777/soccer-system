@@ -22,6 +22,7 @@ export const userRoutes: RouteRecordRaw[] = [
       { path: 'team-info', name: 'user-team-info', component: () => import('../user/pages/TeamInfo.vue'), meta: { title: '球队信息', group: '我的球队', personas: ['leader'] } },
       { path: 'team-members', name: 'user-team-members', component: () => import('../user/pages/TeamMembers.vue'), meta: { title: '队员列表', group: '我的球队', personas: ['leader'] } },
       { path: 'team-coaches', name: 'user-team-coaches', component: () => import('../user/pages/TeamCoaches.vue'), meta: { title: '教练列表', group: '我的球队', personas: ['leader'] } },
+      { path: 'team-history', name: 'user-team-history', component: () => import('../user/pages/TeamHistory.vue'), meta: { title: '球队履历', group: '我的球队', personas: ['leader'] } },
       // 运动员中心（学生本人自助：注册、学籍/证书/获奖等个人履历）
       { path: 'athlete-profile', name: 'user-athlete-profile', component: () => import('../user/pages/AthleteProfile.vue'), meta: { title: '注册与信息', group: '运动员中心', personas: ['student'] } },
       { path: 'athlete-resume', name: 'user-athlete-resume', component: () => import('../user/pages/AthleteResume.vue'), meta: { title: '运动员履历', group: '运动员中心', personas: ['student'] } },

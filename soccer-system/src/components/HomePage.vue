@@ -2,30 +2,17 @@
 import { ref } from 'vue'
 import soccerVictory from '../assets/soccer-victory.jpg'
 import AppIcon from './common/AppIcon.vue'
-import AppModal from './common/AppModal.vue'
+import PortalHeader from './portal/PortalHeader.vue'
+import PortalFooter from './portal/PortalFooter.vue'
 
-// 功能入口弹窗：未登录访客点击入口先看流程说明，再引导登录 / 注册
-type ModalKey = 'registration' | 'team' | 'publicity'
-const activeModal = ref<ModalKey | null>(null)
+// 门户首页：品牌 / 导航 / 登录区 / 功能说明弹窗统一在公共头部 PortalHeader 中，
+// hero 按钮与功能卡片通过 ref 调用头部的 openModal 打开对应弹窗
+type FeatureKey = 'registration' | 'team' | 'publicity'
 
-function openModal(key: ModalKey) {
-  activeModal.value = key
-}
-
-// 顶部导航：首页回顶部，其余三项打开对应功能弹窗
-const navLinks: { label: string; modal: ModalKey | null }[] = [
-  { label: '首页', modal: null },
-  { label: '赛事报名', modal: 'registration' },
-  { label: '球队管理', modal: 'team' },
-  { label: '信息公示', modal: 'publicity' },
-]
-
-function backToTop() {
-  window.scrollTo({ top: 0, behavior: 'smooth' })
-}
+const header = ref<InstanceType<typeof PortalHeader> | null>(null)
 
 // 首页下方的功能亮点介绍（icon 为 AppIcon 图标名，key 对应功能弹窗）
-const features: { key: ModalKey; icon: string; title: string; desc: string }[] = [
+const features: { key: FeatureKey; icon: string; title: string; desc: string }[] = [
   {
     key: 'registration',
     icon: 'trophy',
@@ -49,32 +36,8 @@ const features: { key: ModalKey; icon: string; title: string; desc: string }[] =
 
 <template>
   <div class="home-page">
-    <!-- 顶部导航栏 -->
-    <header class="navbar">
-      <div class="nav-inner">
-        <router-link to="/" class="brand">
-          <AppIcon name="ball" :size="24" class="brand-ball" />
-          <span class="brand-name">绿茵汇</span>
-        </router-link>
-
-        <nav class="nav-links">
-          <span
-            v-for="link in navLinks"
-            :key="link.label"
-            class="nav-link"
-            :class="{ active: link.modal === null }"
-            @click="link.modal ? openModal(link.modal) : backToTop()"
-          >
-            {{ link.label }}
-          </span>
-        </nav>
-
-        <div class="nav-actions">
-          <router-link to="/login" class="btn btn-ghost">登录</router-link>
-          <router-link to="/register" class="btn btn-primary">注册</router-link>
-        </div>
-      </div>
-    </header>
+    <!-- 顶部导航：品牌 / 导航 / 登录区 / 说明弹窗统一在公共头部组件中 -->
+    <PortalHeader ref="header" />
 
     <!-- 首屏：整幅深绿背景，左侧文案、右侧大图（图片下缘探入波浪区） -->
     <section class="hero">
@@ -94,9 +57,9 @@ const features: { key: ModalKey; icon: string; title: string; desc: string }[] =
             学校在线报名组队，运动员、教练员注册信息一站维护，赛程赛果与政策文件及时公示，让每一场比赛都规范、公开、精彩。
           </p>
           <div class="hero-actions">
-            <button type="button" class="hero-btn primary" @click="openModal('registration')">赛事报名</button>
-            <button type="button" class="hero-btn primary" @click="openModal('team')">球队管理</button>
-            <button type="button" class="hero-btn primary" @click="openModal('publicity')">信息公示</button>
+            <button type="button" class="hero-btn primary" @click="header?.openModal('registration')">赛事报名</button>
+            <button type="button" class="hero-btn primary" @click="header?.openModal('team')">球队管理</button>
+            <button type="button" class="hero-btn primary" @click="header?.openModal('publicity')">信息公示</button>
           </div>
         </div>
 
@@ -123,7 +86,7 @@ const features: { key: ModalKey; icon: string; title: string; desc: string }[] =
 
     <!-- 功能亮点（点击打开对应功能说明弹窗） -->
     <section class="features">
-      <div v-for="item in features" :key="item.title" class="feature-card" role="button" @click="openModal(item.key)">
+      <div v-for="item in features" :key="item.title" class="feature-card" role="button" @click="header?.openModal(item.key)">
         <span class="feature-icon">
           <AppIcon :name="item.icon" :size="30" />
         </span>
@@ -132,181 +95,12 @@ const features: { key: ModalKey; icon: string; title: string; desc: string }[] =
       </div>
     </section>
 
-    <!-- 功能入口弹窗：未登录访客先了解流程，再引导登录 / 注册 -->
-    <AppModal :open="activeModal === 'registration'" title="赛事报名" @close="activeModal = null">
-      <p class="modal-lead">从组队到出赛的完整流程：</p>
-      <ol class="flow-list">
-        <li>球队负责人注册 / 登录，按学校标识码绑定所属学校</li>
-        <li>在线填报赛事报名表，批量报送球员信息与照片</li>
-        <li>上传盖章报名表、学籍验证等报名材料</li>
-        <li>市州管理员初审 → 省级终审，审核进度实时可查</li>
-        <li>审核通过进入公示，正式参赛</li>
-      </ol>
-      <p class="modal-tip">
-        参赛组别：小学组 / 中学组 / 高中组 / 高校组（随学校学段自动限定）。
-        报名属球队级操作，由球队负责人统一办理；队员可在「我的报名」查看进度。
-      </p>
-      <template #footer>
-        <router-link to="/register" class="btn btn-ghost">去注册</router-link>
-        <router-link to="/login" class="btn btn-primary">去登录</router-link>
-      </template>
-    </AppModal>
-
-    <AppModal :open="activeModal === 'team'" title="球队与人员管理" @close="activeModal = null">
-      <p class="modal-lead">球队与人员的日常维护：</p>
-      <ul class="flow-list">
-        <li>球队信息：绑定学校、参赛组别、队旗队徽与球队资料</li>
-        <li>球员管理：负责人批量报送球员信息，运动员注册个人信息</li>
-        <li>教练员：申报资质并上传等级证书，审核通过后带队参赛</li>
-        <li>报名资料：盖章件导出与学籍验证材料上传</li>
-      </ul>
-      <p class="modal-tip">球队资料由球队负责人维护；运动员、教练员使用各自账号注册并维护个人信息。</p>
-      <template #footer>
-        <router-link to="/register" class="btn btn-ghost">去注册</router-link>
-        <router-link to="/login" class="btn btn-primary">去登录</router-link>
-      </template>
-    </AppModal>
-
-    <AppModal :open="activeModal === 'publicity'" title="信息公示" @close="activeModal = null">
-      <p class="modal-lead">以下信息全部公开可查：</p>
-      <ul class="flow-list">
-        <li>赛程对阵与比赛结果</li>
-        <li>新闻动态与政策文件</li>
-        <li>最佳阵容与各类榜单</li>
-        <li>赛事精彩瞬间图集</li>
-      </ul>
-      <p class="modal-tip">公示页面位于用户端，登录后即可浏览完整内容（演示数据为示例）。</p>
-      <template #footer>
-        <router-link to="/login" class="btn btn-primary">登录查看</router-link>
-      </template>
-    </AppModal>
-
-    <!-- 页脚 -->
-    <footer class="footer">
-      <p class="footer-brand">
-        <AppIcon name="ball" :size="18" />
-        绿茵汇
-      </p>
-      <p class="footer-text">让每一支校园球队都有正式赛场 · © 2026 绿茵汇</p>
-    </footer>
+    <!-- 页脚（与公开浏览页共用） -->
+    <PortalFooter />
   </div>
 </template>
 
 <style scoped>
-/* ===== 顶部导航栏 ===== */
-.navbar {
-  background: #fff;
-  border-bottom: 1px solid var(--line);
-}
-
-.nav-inner {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 24px;
-  height: 64px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-}
-
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 22px;
-  font-weight: 800;
-  color: var(--green-dark);
-  letter-spacing: 2px;
-}
-
-.brand-ball {
-  color: var(--green);
-}
-
-.nav-links {
-  display: flex;
-  gap: 28px;
-}
-
-.nav-link {
-  font-size: 15px;
-  color: var(--muted);
-  cursor: pointer;
-  transition: color 0.2s;
-}
-
-.nav-link:hover {
-  color: var(--green);
-}
-
-.nav-link.active {
-  color: var(--green);
-  font-weight: 700;
-}
-
-.nav-actions {
-  display: flex;
-  gap: 12px;
-}
-
-.btn {
-  padding: 8px 22px;
-  border-radius: 999px;
-  font-size: 14px;
-  font-weight: 600;
-  line-height: 1.6;
-  font-family: inherit;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.btn-ghost {
-  border: 1.5px solid var(--green);
-  color: var(--green);
-}
-
-.btn-ghost:hover {
-  background: var(--green-light);
-}
-
-.btn-primary {
-  background: var(--green-dark);
-  color: #fff;
-  border: 1.5px solid var(--green-dark);
-}
-
-.btn-primary:hover {
-  background: var(--green-deeper);
-}
-
-/* ===== 功能入口弹窗内容 ===== */
-.modal-lead {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--ink);
-}
-
-.flow-list {
-  margin: 10px 0 0;
-  padding-left: 20px;
-  display: grid;
-  gap: 8px;
-  font-size: 14px;
-  line-height: 1.7;
-  color: var(--muted);
-}
-
-.modal-tip {
-  margin-top: 14px;
-  padding: 10px 12px;
-  border-radius: 8px;
-  background: var(--green-light);
-  font-size: 13px;
-  line-height: 1.7;
-  color: var(--green-dark);
-}
-
 /* ===== 首屏：整幅深绿背景 + 左文案右图片 + 底部双层波浪 ===== */
 .hero {
   position: relative;
@@ -387,16 +181,19 @@ const features: { key: ModalKey; icon: string; title: string; desc: string }[] =
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
-  transition: background 0.2s, border-color 0.2s, color 0.2s;
+  transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
 }
 
 .hero-btn.primary {
   background: var(--green-bright);
   color: #fff;
+  box-shadow: 0 4px 14px rgba(46, 158, 82, 0.35);
 }
 
 .hero-btn.primary:hover {
   background: #3cb768;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px rgba(46, 158, 82, 0.4);
 }
 
 /* 右侧比赛图片：向下探入波浪区，让波浪盖住图片下缘 */
@@ -447,7 +244,8 @@ const features: { key: ModalKey; icon: string; title: string; desc: string }[] =
 
 .feature-card {
   background: #fff;
-  border-radius: 12px;
+  border: 1px solid #eef2ee;
+  border-radius: var(--radius);
   padding: 32px 28px;
   text-align: center;
   box-shadow: 0 6px 18px rgba(20, 60, 40, 0.06);
@@ -464,11 +262,18 @@ const features: { key: ModalKey; icon: string; title: string; desc: string }[] =
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background: var(--green-light);
-  color: var(--green);
+  background: var(--grad-green);
+  color: #fff;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 10px 20px rgba(30, 122, 63, 0.25);
+  transition: transform 0.25s;
+}
+
+/* 悬停时图标轻轻放大，呼应卡片上浮 */
+.feature-card:hover .feature-icon {
+  transform: scale(1.08);
 }
 
 .feature-title {
@@ -482,30 +287,6 @@ const features: { key: ModalKey; icon: string; title: string; desc: string }[] =
   font-size: 14px;
   line-height: 1.8;
   color: var(--muted);
-}
-
-/* ===== 页脚 ===== */
-.footer {
-  background: var(--green-dark);
-  color: #cfe0d5;
-  text-align: center;
-  padding: 28px 24px;
-}
-
-.footer-brand {
-  font-size: 18px;
-  font-weight: 700;
-  color: #fff;
-  letter-spacing: 2px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-
-.footer-text {
-  margin-top: 8px;
-  font-size: 13px;
 }
 
 /* ===== 响应式 ===== */
@@ -532,9 +313,13 @@ const features: { key: ModalKey; icon: string; title: string; desc: string }[] =
   .features {
     grid-template-columns: 1fr;
   }
+}
 
-  .nav-links {
-    display: none;
+@media (prefers-reduced-motion: reduce) {
+  .feature-card,
+  .feature-icon,
+  .hero-btn {
+    transition: none;
   }
 }
 </style>

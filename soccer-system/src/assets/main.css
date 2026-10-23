@@ -10,6 +10,12 @@
   --ink: #22312a;
   --muted: #6b7a71;
   --line: #e3e0d6;
+
+  /* 设计变量：圆角 / 分层阴影 / 主渐变，全站统一取值 */
+  --radius: 14px;
+  --shadow-sm: 0 1px 2px rgba(20, 60, 40, 0.04), 0 4px 14px rgba(20, 60, 40, 0.05);
+  --shadow-md: 0 4px 10px rgba(20, 60, 40, 0.06), 0 12px 28px rgba(20, 60, 40, 0.1);
+  --grad-green: linear-gradient(135deg, var(--green), var(--green-bright));
 }
 
 * {
@@ -28,6 +34,10 @@ body {
   font-family: 'PingFang SC', 'Microsoft YaHei', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
   color: var(--ink);
   background-color: var(--cream);
+  /* 奶白底上叠两团极淡的绿色光晕，避免大面积纯色显得平 */
+  background-image: radial-gradient(900px 420px at 85% -10%, rgba(46, 158, 82, 0.07), transparent 60%),
+    radial-gradient(700px 400px at -10% 30%, rgba(23, 64, 44, 0.05), transparent 55%);
+  background-attachment: fixed;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -46,23 +56,36 @@ textarea {
 /* ===== 后台系统通用工具类（user 端和 admin 端共用） ===== */
 .card {
   background: #fff;
-  border-radius: 12px;
+  border: 1px solid #eef1ee;
+  border-radius: var(--radius);
   padding: 20px;
-  box-shadow: 0 4px 14px rgba(20, 60, 40, 0.05);
+  box-shadow: var(--shadow-sm);
 }
 
 .section-title {
   margin: 28px 0 14px;
   font-size: 17px;
   color: var(--green-dark);
-  border-left: 4px solid var(--green);
-  padding-left: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* 渐变小竖条替代原来的 border-left，更有层次 */
+.section-title::before {
+  content: '';
+  width: 4px;
+  height: 18px;
+  border-radius: 999px;
+  background: var(--grad-green);
+  flex-shrink: 0;
 }
 
 .page-tip {
   background: var(--green-light);
   color: var(--green-dark);
-  border-radius: 8px;
+  border: 1px solid rgba(30, 122, 63, 0.18);
+  border-radius: 10px;
   padding: 10px 14px;
   font-size: 13px;
   margin-bottom: 16px;
@@ -71,7 +94,7 @@ textarea {
 
 .btn {
   padding: 8px 18px;
-  border-radius: 6px;
+  border-radius: 10px;
   border: 1.5px solid transparent;
   font-size: 14px;
   font-weight: 600;
@@ -79,13 +102,22 @@ textarea {
   transition: all 0.2s;
 }
 
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
 .btn-primary {
-  background: var(--green);
+  background: var(--grad-green);
   color: #fff;
+  box-shadow: 0 2px 8px rgba(30, 122, 63, 0.25);
 }
 
 .btn-primary:hover {
-  background: var(--green-bright);
+  box-shadow: 0 6px 16px rgba(30, 122, 63, 0.32);
 }
 
 .btn-ghost {
@@ -99,64 +131,56 @@ textarea {
   color: var(--green);
 }
 
-.table-btn {
-  border: none;
-  background: none;
-  color: var(--green);
-  font-size: 13px;
-  cursor: pointer;
-  padding: 2px 6px;
-}
-
-.table-btn:hover {
-  text-decoration: underline;
-}
-
 .badge {
   display: inline-block;
   padding: 2px 10px;
   border-radius: 999px;
   font-size: 12px;
+  font-weight: 600;
   white-space: nowrap;
 }
 
 .badge.ok {
   background: #e3f4e8;
   color: #1e7a3f;
+  border: 1px solid rgba(30, 122, 63, 0.22);
 }
 
 .badge.pending {
   background: #fdf3dc;
   color: #b07d1a;
+  border: 1px solid rgba(176, 125, 26, 0.22);
 }
 
 .badge.fail {
   background: #fde7e4;
   color: #c0392b;
+  border: 1px solid rgba(192, 57, 43, 0.2);
 }
 
 .badge.plain {
   background: #eef1ee;
   color: #6b7a71;
+  border: 1px solid rgba(107, 122, 113, 0.2);
 }
 
 /* 后台页面常用网格布局 */
 .stat-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
+  gap: 18px;
 }
 
 .quick-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
+  gap: 18px;
 }
 
 .upload-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
+  gap: 18px;
 }
 
 @media (max-width: 900px) {

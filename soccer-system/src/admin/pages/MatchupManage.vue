@@ -20,7 +20,7 @@ const columns: TableColumn[] = [
 ]
 
 const rows = [
-  { match: '中学组 第 3 轮', home: '实验中学', away: '市二中', time: '2026-10-22 15:00', venue: '省青少年足球基地 1 号场', status: '未开始' },
+  { match: '中学组 第 4 轮', home: '师大附中', away: '实验中学', time: '2026-10-25 15:00', venue: '省青少年足球基地 1 号场', status: '未开始' },
   { match: '小学组 第 2 轮', home: '实小少年队', away: '朝阳小学', time: '2026-10-19 10:00', venue: '市体育中心副场', status: '进行中' },
   { match: '高校组 第 1 轮', home: '四川大学', away: '川师大队', time: '2026-10-18 15:00', venue: '四川大学足球场', status: '已结束' },
 ]

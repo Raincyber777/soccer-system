@@ -71,7 +71,11 @@ function handleLogout() {
       <SideNav :groups="groups" variant="super" />
 
       <main class="main-area">
-        <router-view />
+        <router-view v-slot="{ Component }">
+          <Transition name="page" mode="out-in">
+            <component :is="Component" />
+          </Transition>
+        </router-view>
       </main>
     </div>
   </div>
@@ -85,7 +89,10 @@ function handleLogout() {
 }
 
 .topbar {
-  background: #fff;
+  /* 半透明毛玻璃顶栏：滚动时内容从底下穿过更通透 */
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(10px) saturate(1.3);
+  -webkit-backdrop-filter: blur(10px) saturate(1.3);
   border-bottom: 1px solid var(--line);
   position: sticky;
   top: 0;
@@ -178,6 +185,28 @@ function handleLogout() {
   flex: 1;
   min-width: 0;
   padding: 24px;
+}
+
+/* 页面切换：轻微上浮淡入（mode out-in 避免新旧页面重叠跳动） */
+.page-enter-active,
+.page-leave-active {
+  transition: opacity 0.16s ease, transform 0.16s ease;
+}
+
+.page-enter-from {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.page-leave-to {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-enter-active,
+  .page-leave-active {
+    transition: none;
+  }
 }
 
 @media (max-width: 900px) {

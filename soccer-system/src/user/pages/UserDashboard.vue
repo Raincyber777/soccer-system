@@ -30,6 +30,7 @@ const quickLinks: {
   { icon: 'circle-check', title: '报名审核信息', desc: '查看审核进度与报名公示', to: '/user/registration-review-info' },
   { icon: 'shield', title: '球队信息', desc: '创建球队、维护队旗队徽资料', to: '/user/team-info', personas: ['leader'] },
   { icon: 'users', title: '队员列表', desc: '维护球队队员信息与照片', to: '/user/team-members', personas: ['leader'] },
+  { icon: 'trophy', title: '球队履历', desc: '历年参赛记录与荣誉墙', to: '/user/team-history', personas: ['leader'] },
   { icon: 'user', title: '运动员信息', desc: '注册表单与个人信息确认', to: '/user/athlete-profile', personas: ['student'] },
   { icon: 'medal', title: '教练员信息', desc: '完善个人信息与执教履历', to: '/user/coach-profile', personas: ['coach'] },
   { icon: 'megaphone', title: '信息公示', desc: '运动员/教练员公示查询', to: '/user/publicity' },
