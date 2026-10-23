@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# Django 运行时
+logs/
+staticfiles/
+*.log
+
+# 本地配置与密钥
+.env
+instance/
+
+# 导出临时文件
+uploads/exports/
