@@ -1,25 +1,43 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import AppIcon from './AppIcon.vue'
 
-// 通用上传占位块：第一版演示用，接入后端后替换为真实上传逻辑
+// 通用上传块：点击选择文件后 emit('select', file)；
+// 旧页面回调不接收参数仍兼容。
 defineProps<{
   title: string
   desc?: string
+  /** 原生 accept，如 .pdf,.jpg 或 image/* */
+  accept?: string
 }>()
 
 const emit = defineEmits<{
-  (e: 'select'): void
+  (e: 'select', file: File): void
 }>()
+
+const inputEl = ref<HTMLInputElement | null>(null)
+
+function pick() {
+  inputEl.value?.click()
+}
+
+function onChange(e: Event) {
+  const input = e.target as HTMLInputElement
+  const file = input.files?.[0]
+  if (file) emit('select', file)
+  input.value = '' // 允许重复选择同一文件
+}
 </script>
 
 <template>
-  <div class="upload-block" @click="emit('select')">
+  <div class="upload-block" @click="pick">
+    <input ref="inputEl" type="file" hidden :accept="accept" @change="onChange" />
     <span class="upload-icon">
       <AppIcon name="upload" :size="26" />
     </span>
     <p class="upload-title">{{ title }}</p>
     <p v-if="desc" class="upload-desc">{{ desc }}</p>
-    <button type="button" class="upload-btn" @click.stop="emit('select')">选择文件</button>
+    <button type="button" class="upload-btn" @click.stop="pick">选择文件</button>
   </div>
 </template>
 

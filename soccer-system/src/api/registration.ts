@@ -123,4 +123,26 @@ export function createRegistration(payload: {
   return api.post<never, RegistrationDetail>('/api/registrations/', payload)
 }
 
+// ---------- 附件上传（multipart） ----------
+
+/** 上传报名附件：POST multipart /upload/（field 为 player_excel / photo_zip / stamp_file 之一，不改审核状态） */
+export function uploadRegistrationFile(
+  id: number,
+  field: 'player_excel' | 'photo_zip' | 'stamp_file',
+  file: File,
+) {
+  const fd = new FormData()
+  fd.append('field', field)
+  fd.append('file', file)
+  return api.post<never, RegistrationDetail>(`/api/registrations/${id}/upload/`, fd)
+}
+
+/** 通用文件上传 POST /api/common/upload/（form-data file + scene，返回 url/path/name） */
+export function uploadCommonFile(file: File, scene: string) {
+  const fd = new FormData()
+  fd.append('file', file)
+  fd.append('scene', scene)
+  return api.post<never, { url: string; path: string; name: string }>('/api/common/upload/', fd)
+}
+
 export { errMsg }
