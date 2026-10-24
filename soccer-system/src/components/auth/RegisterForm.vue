@@ -5,8 +5,11 @@ import { useAuth, personaLabels, type UserPersona } from '../../stores/auth'
 import SchoolSelect from '../common/SchoolSelect.vue'
 import type { SchoolInfo } from '../../data/sichuan-schools'
 import { demoAccounts, loadRegistered, saveRegistered } from './accountStore'
+import { apiRegister, mapBackendUser, saveAuthSession } from '../../api/auth'
+import { ApiError } from '../../api/client'
 
 // 注册表单：只面向参赛人员；管理员/超管账号不开放注册，由超级管理员在后台创建
+// 优先提交后端注册接口（注册即返回 JWT 直接进入登录态）；网络失败回退本地注册表
 const router = useRouter()
 const auth = useAuth()
 
@@ -16,6 +19,13 @@ const personaOptions: { value: UserPersona; label: string }[] = [
   { value: 'student', label: '学生运动员' },
   { value: 'coach', label: '教练员' },
 ]
+
+// 前端身份 → 后端注册角色
+const personaToRole: Record<UserPersona, 'school' | 'athlete' | 'coach'> = {
+  leader: 'school',
+  student: 'athlete',
+  coach: 'coach',
+}
 
 const registerForm = reactive({
   username: '',
@@ -27,8 +37,9 @@ const registerForm = reactive({
 const registerSchool = ref<SchoolInfo | null>(null)
 const registerMsg = ref('')
 const registerSuccess = ref('')
+const registering = ref(false)
 
-function handleRegister() {
+async function handleRegister() {
   registerMsg.value = ''
   registerSuccess.value = ''
 
@@ -60,31 +71,56 @@ function handleRegister() {
   }
 
   const account = registerForm.username.trim()
-  const taken =
-    demoAccounts.some((d) => d.account.toLowerCase() === account.toLowerCase()) ||
-    loadRegistered().some((u) => u.account.toLowerCase() === account.toLowerCase())
-  if (taken) {
-    registerMsg.value = '该账号已被注册，请换一个用户名'
-    return
+  registering.value = true
+  try {
+    // 真实注册：后端校验用户名唯一 + 学校标识码存在，成功即返回 JWT
+    const session = await apiRegister({
+      username: account,
+      password: registerForm.password,
+      role: personaToRole[registerPersona.value],
+      school_code: registerSchool.value.code,
+      email: registerForm.email.trim(),
+    })
+    saveAuthSession(session)
+    const mapped = mapBackendUser(session.user)
+    auth.loginAs(mapped.role, account, mapped.persona ?? registerPersona.value, mapped.staffLabel)
+    registerSuccess.value = `注册成功，正在以「${personaLabels[registerPersona.value]}」身份进入用户端…`
+    setTimeout(() => {
+      router.push('/user/dashboard')
+    }, 800)
+  } catch (err) {
+    // 后端校验失败（用户名已存在/学校不存在等）：展示后端原因
+    if (err instanceof ApiError) {
+      registerMsg.value = err.message
+      return
+    }
+    // 网络失败：写入本地注册表（离线演示模式）
+    const taken =
+      demoAccounts.some((d) => d.account.toLowerCase() === account.toLowerCase()) ||
+      loadRegistered().some((u) => u.account.toLowerCase() === account.toLowerCase())
+    if (taken) {
+      registerMsg.value = '该账号已被注册，请换一个用户名'
+      return
+    }
+    const list = loadRegistered()
+    list.push({
+      account,
+      password: registerForm.password,
+      school: registerSchool.value.name,
+      schoolCode: registerSchool.value.code,
+      email: registerForm.email.trim(),
+      persona: registerPersona.value,
+    })
+    saveRegistered(list)
+
+    auth.loginAs('user', account, registerPersona.value)
+    registerSuccess.value = `（离线演示模式）注册成功，正在以「${personaLabels[registerPersona.value]}」身份进入用户端…`
+    setTimeout(() => {
+      router.push('/user/dashboard')
+    }, 800)
+  } finally {
+    registering.value = false
   }
-
-  // 模拟注册成功：写入本地"账号库"并直接登录进入用户端；接入后端时替换这里
-  const list = loadRegistered()
-  list.push({
-    account,
-    password: registerForm.password,
-    school: registerSchool.value.name,
-    schoolCode: registerSchool.value.code,
-    email: registerForm.email.trim(),
-    persona: registerPersona.value,
-  })
-  saveRegistered(list)
-
-  auth.loginAs('user', account, registerPersona.value)
-  registerSuccess.value = `注册成功，正在以「${personaLabels[registerPersona.value]}」身份进入用户端…`
-  setTimeout(() => {
-    router.push('/user/dashboard')
-  }, 800)
 }
 </script>
 
@@ -145,7 +181,7 @@ function handleRegister() {
     <p v-if="registerMsg" class="form-error">{{ registerMsg }}</p>
     <p v-if="registerSuccess" class="form-success">{{ registerSuccess }}</p>
 
-    <button type="submit" class="auth-submit">注 册</button>
+    <button type="submit" class="auth-submit" :disabled="registering">{{ registering ? '注册中…' : '注 册' }}</button>
   </form>
 
   <p class="register-tip">

@@ -8,6 +8,8 @@ export interface NewsItem {
   date: string
   summary: string
   body: string[]
+  /** 接入后端后正文为富文本 HTML，优先用 html 渲染（mock 数据只有 body 段落） */
+  html?: string
 }
 
 export const news: NewsItem[] = [

@@ -6,6 +6,7 @@ import AppIcon from './common/AppIcon.vue'
 import LoginForm from './auth/LoginForm.vue'
 import RegisterForm from './auth/RegisterForm.vue'
 import { dashboardPath, demoAccounts, type DemoAccount } from './auth/accountStore'
+import { apiLogin, mapBackendUser, saveAuthSession } from '../api/auth'
 
 // 统一登录/注册页：卡片外壳 + 登录/注册标签页，表单逻辑分别在 LoginForm / RegisterForm 中
 const route = useRoute()
@@ -22,12 +23,19 @@ watch(
   },
 )
 
-// 演示账号一键登录
+// 演示账号一键登录：与手动登录同一套后端接口，失败（后端未启动/种子未灌）回退本地演示
 function quickLogin(demo: DemoAccount) {
-  auth.loginAs(demo.role, demo.account, demo.role === 'user' ? (demo.persona ?? 'leader') : undefined)
-  setTimeout(() => {
-    router.push(dashboardPath(demo.role))
-  }, 400)
+  apiLogin(demo.account, demo.password)
+    .then((session) => {
+      saveAuthSession(session)
+      const mapped = mapBackendUser(session.user)
+      auth.loginAs(mapped.role, demo.account, mapped.persona ?? 'leader', mapped.staffLabel)
+      router.push(dashboardPath(mapped.role))
+    })
+    .catch(() => {
+      auth.loginAs(demo.role, demo.account, demo.role === 'user' ? (demo.persona ?? 'leader') : undefined)
+      router.push(dashboardPath(demo.role))
+    })
 }
 </script>
 

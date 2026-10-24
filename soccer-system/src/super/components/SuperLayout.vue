@@ -9,8 +9,8 @@ import SideNav from '../../components/common/SideNav.vue'
 const router = useRouter()
 const auth = useAuth()
 
-// 顶栏身份标签：演示账号映射「角色 · 所属机构」，便于使用者确认自己的身份与辖区
-const identity = STAFF_IDENTITY[auth.state.account] ?? '省级管理员 · 省本级'
+// 顶栏身份标签：优先后端登录返回的「角色 · 所属机构」，离线演示回退到演示账号映射
+const identity = auth.state.staffLabel || (STAFF_IDENTITY[auth.state.account] ?? '省级管理员 · 省本级')
 
 // 从路由配置里读出菜单，保证菜单和路由只有一份配置来源
 const children = (superRoutes[0]?.children ?? []) as RouteRecordRaw[]
