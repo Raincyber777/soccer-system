@@ -132,6 +132,117 @@ export function deleteResult(id: number) {
   return api.delete(`/api/portal/results/${id}/`)
 }
 
+// ---------- 进球记录 /api/portal/goals/（射手榜数据源，一场一球员一条） ----------
+
+export interface ApiGoalRecord {
+  id: number
+  match: number
+  player: number
+  player_name: string
+  team_name: string
+  goals: number
+  assists: number
+  minute: number | null
+  note: string
+  created_at: string
+}
+
+export interface GoalRecordPayload {
+  match: number
+  player: number
+  goals: number
+  assists?: number
+  minute?: number | null
+  note?: string
+}
+
+export function fetchGoalRecords(match?: number) {
+  return tryList<ApiGoalRecord>('/api/portal/goals/', { page_size: 100, ...(match ? { match } : {}) })
+}
+
+export function createGoalRecord(payload: GoalRecordPayload) {
+  return api.post<never, ApiGoalRecord>('/api/portal/goals/', payload)
+}
+
+export function updateGoalRecord(id: number, payload: Partial<GoalRecordPayload>) {
+  return api.patch<never, ApiGoalRecord>(`/api/portal/goals/${id}/`, payload)
+}
+
+export function deleteGoalRecord(id: number) {
+  return api.delete(`/api/portal/goals/${id}/`)
+}
+
+// ---------- 判罚 /api/portal/penalties/ ----------
+
+export interface ApiPenalty {
+  id: number
+  match: number
+  player: number
+  player_name: string
+  type: 'yellow' | 'red'
+  minute: number | null
+  reason: string
+  created_at: string
+}
+
+export interface PenaltyPayload {
+  match: number
+  player: number
+  type: 'yellow' | 'red'
+  minute?: number | null
+  reason?: string
+}
+
+export function fetchPenalties(match?: number) {
+  return tryList<ApiPenalty>('/api/portal/penalties/', { page_size: 100, ...(match ? { match } : {}) })
+}
+
+export function createPenalty(payload: PenaltyPayload) {
+  return api.post<never, ApiPenalty>('/api/portal/penalties/', payload)
+}
+
+export function updatePenalty(id: number, payload: Partial<PenaltyPayload>) {
+  return api.patch<never, ApiPenalty>(`/api/portal/penalties/${id}/`, payload)
+}
+
+export function deletePenalty(id: number) {
+  return api.delete(`/api/portal/penalties/${id}/`)
+}
+
+// ---------- 裁判员 /api/portal/referees/（一场多条） ----------
+
+export interface ApiReferee {
+  id: number
+  match: number
+  name: string
+  role: 'main' | 'linesman' | 'fourth'
+  role_display: string
+  cert_level: string
+}
+
+export interface RefereePayload {
+  match: number
+  name: string
+  role: 'main' | 'linesman' | 'fourth'
+  cert_level?: string
+}
+
+export function fetchReferees(match?: number) {
+  return tryList<ApiReferee>('/api/portal/referees/', { page_size: 100, ...(match ? { match } : {}) })
+}
+
+export function createReferee(payload: RefereePayload) {
+  return api.post<never, ApiReferee>('/api/portal/referees/', payload)
+}
+
+export function updateReferee(id: number, payload: Partial<RefereePayload>) {
+  return api.patch<never, ApiReferee>(`/api/portal/referees/${id}/`, payload)
+}
+
+export function deleteReferee(id: number) {
+  return api.delete(`/api/portal/referees/${id}/`)
+}
+
 /** 统一错误文案：ApiError 用后端 message，其余给通用提示 */
 export function errMsg(err: unknown): string {
   return err instanceof Error ? err.message : '操作失败，请稍后重试'

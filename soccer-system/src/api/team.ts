@@ -35,6 +35,7 @@ export interface ApiPlayer {
   grade: string
   position: string
   jersey_number: number | null
+  phone: string
   photo_url: string
   status: string
   status_display: string

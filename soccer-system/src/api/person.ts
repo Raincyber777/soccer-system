@@ -33,6 +33,47 @@ export function setPersonActive(kind: 'players' | 'coaches', id: number, is_acti
   return api.patch<never, unknown>(`/api/portal/${kind}/${id}/`, { is_active })
 }
 
+// ---------- 身份信息维护（报名信息管理） ----------
+
+export interface PlayerPayload {
+  team?: number | null
+  name?: string
+  gender?: string
+  birth_date?: string
+  id_card?: string
+  grade?: string
+  position?: string
+  jersey_number?: number | null
+  phone?: string
+  photo_url?: string
+  intro?: string
+}
+
+export interface CoachPayload {
+  name?: string
+  gender?: string
+  birth_date?: string
+  id_card?: string
+  phone?: string
+  unit_name?: string
+  years?: number | null
+  cert_level?: string
+  category?: string
+}
+
+/** 增加球员身份信息（新增后为待审核状态，需走人员审核流程生效） */
+export function createPlayer(payload: PlayerPayload) {
+  return api.post<never, ApiPlayer>('/api/portal/players/', payload)
+}
+
+export function updatePlayer(id: number, payload: PlayerPayload) {
+  return api.patch<never, ApiPlayer>(`/api/portal/players/${id}/`, payload)
+}
+
+export function updateCoach(id: number, payload: CoachPayload) {
+  return api.patch<never, ApiCoach>(`/api/portal/coaches/${id}/`, payload)
+}
+
 // ---------- 公示（公开，仅 active 名单；data 直接是数组） ----------
 
 export function fetchPublicityPlayers(params?: Record<string, unknown>) {

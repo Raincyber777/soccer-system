@@ -1,16 +1,24 @@
 <script setup lang="ts">
+import { onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import PageHeader from '../../components/common/PageHeader.vue'
 import StatCard from '../../components/common/StatCard.vue'
 import DataTable from '../../components/common/DataTable.vue'
 import AppIcon from '../../components/common/AppIcon.vue'
+import { fetchPlayers, fetchCoaches } from '../../api/person'
+import { fetchTeams } from '../../api/team'
+import { fetchRegistrations, type RegistrationList } from '../../api/registration'
 
-// 管理控制台：管理员端首页概览
-const stats = [
-  { icon: 'shield', label: '报名球队', value: 128, hint: '较上周 +6' },
-  { icon: 'user', label: '注册球员', value: 1560, hint: '已公示 1203' },
-  { icon: 'medal', label: '注册教练员', value: 240, hint: '已公示 187' },
-  { icon: 'clipboard-list', label: '待初审报名', value: 23, hint: '本区域初审待办' },
-]
+// 管理控制台：统计卡读真实数据（球队/球员/教练员/待初审报名），待办取自待初审报名单
+
+const router = useRouter()
+
+const stats = ref([
+  { icon: 'shield', label: '报名球队', value: '—', hint: '' },
+  { icon: 'user', label: '注册球员', value: '—', hint: '' },
+  { icon: 'medal', label: '注册教练员', value: '—', hint: '' },
+  { icon: 'clipboard-list', label: '待初审报名', value: '—', hint: '' },
+])
 
 const quickLinks = [
   { icon: 'clipboard-list', title: '报名初审', desc: '本区域报名材料初审，通过后提交省级终审', to: '/admin/registration-first-review' },
@@ -26,21 +34,58 @@ const quickLinks = [
 ]
 
 const columns = [
-  { key: 'todo', label: '待办事项' },
-  { key: 'level', label: '优先级', width: '100px' },
-  { key: 'deadline', label: '截止时间', width: '160px' },
-  { key: 'status', label: '状态', width: '100px' },
+  { key: 'todo', label: '待初审报名' },
+  { key: 'team', label: '球队', width: '150px' },
+  { key: 'time', label: '提交时间', width: '160px' },
+  { key: 'status', label: '状态', width: '110px' },
 ]
 
-const todos = [
-  { todo: '初审本区域中小学组报名 15 份', level: '高', deadline: '2026-10-23', status: '待初审' },
-  { todo: '初审高校组报名 8 份', level: '中', deadline: '2026-10-24', status: '待初审' },
-  { todo: '发布秋季联赛第四轮对阵信息', level: '高', deadline: '2026-10-25', status: '进行中' },
-]
-
-function onAction(action: string) {
-  alert(`【演示】${action}：待接入后端`)
+type TodoRow = {
+  id: number
+  todo: string
+  team: string
+  time: string
+  status: string
 }
+
+const todos = ref<TodoRow[]>([])
+
+function onAction(action: string, row: Record<string, unknown>) {
+  void action
+  void row
+  router.push('/admin/registration-first-review')
+}
+
+onMounted(async () => {
+  const [teams, players, coaches, regs] = await Promise.all([
+    fetchTeams(),
+    fetchPlayers(),
+    fetchCoaches(),
+    fetchRegistrations({ page_size: 100 }),
+  ])
+  if (teams) {
+    stats.value[0] = { icon: 'shield', label: '报名球队', value: `${teams.length} 支`, hint: '全省注册球队' }
+  }
+  if (players) {
+    const active = players.filter((p) => p.status === 'active').length
+    stats.value[1] = { icon: 'user', label: '注册球员', value: `${players.length} 人`, hint: `已生效 ${active} 人` }
+  }
+  if (coaches) {
+    const active = coaches.filter((c) => c.status === 'active').length
+    stats.value[2] = { icon: 'medal', label: '注册教练员', value: `${coaches.length} 人`, hint: `已生效 ${active} 人` }
+  }
+  if (regs) {
+    const pending = regs.filter((r) => r.status === 'pending_city_review')
+    stats.value[3] = { icon: 'clipboard-list', label: '待初审报名', value: `${pending.length} 份`, hint: '本区域初审待办' }
+    todos.value = pending.slice(0, 6).map((r: RegistrationList) => ({
+      id: r.id,
+      todo: `${r.tournament_name}（${r.group_type_display}）`,
+      team: r.team_name,
+      time: (r.submit_time || '').slice(0, 16).replace('T', ' '),
+      status: r.status_display,
+    }))
+  }
+})
 </script>
 
 <template>
@@ -62,7 +107,8 @@ function onAction(action: string) {
   </div>
 
   <h3 class="section-title">待办提醒</h3>
-  <DataTable :columns="columns" :rows="todos" :actions="['去处理']" @action="onAction" />
+  <p v-if="!todos.length" class="page-tip">暂无待初审报名，有新报名提交后将在此提醒。</p>
+  <DataTable v-else :columns="columns" :rows="todos" :actions="['去处理']" @action="onAction" />
 </template>
 
 <style scoped>

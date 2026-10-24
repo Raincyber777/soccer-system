@@ -1,16 +1,27 @@
 <script setup lang="ts">
+import { onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import PageHeader from '../../components/common/PageHeader.vue'
 import StatCard from '../../components/common/StatCard.vue'
 import DataTable from '../../components/common/DataTable.vue'
 import AppIcon from '../../components/common/AppIcon.vue'
+import { fetchUsers } from '../../api/account'
+import { fetchTeams } from '../../api/team'
+import { fetchRegistrations, type RegistrationList } from '../../api/registration'
 
-// 超级管理员控制台：比普通管理员多账户管理维度
-const stats = [
-  { icon: 'crown', label: '管理员账户', value: 8, hint: '含各市州审核员' },
-  { icon: 'users', label: '用户账户', value: 132, hint: '球队/运动员/教练员等' },
-  { icon: 'shield', label: '报名球队', value: 128, hint: '较上周 +6' },
-  { icon: 'clipboard-list', label: '待审核报名', value: 23, hint: '需尽快处理' },
-]
+// 超级管理员控制台：统计卡读真实数据（账户/球队/待终审报名），待办取自待省级终审报名单
+
+const router = useRouter()
+
+const ADMIN_ROLES = ['admin', 'city', 'province']
+const USER_ROLES = ['school', 'athlete', 'coach', 'personal']
+
+const stats = ref([
+  { icon: 'crown', label: '管理员账户', value: '—', hint: '' },
+  { icon: 'users', label: '用户账户', value: '—', hint: '' },
+  { icon: 'shield', label: '报名球队', value: '—', hint: '' },
+  { icon: 'clipboard-list', label: '待审核报名', value: '—', hint: '' },
+])
 
 const quickLinks = [
   { icon: 'shield', title: '管理员账户管理', desc: '创建/删除管理员账户（超级管理员专属）', to: '/super/admin-accounts' },
@@ -25,21 +36,59 @@ const quickLinks = [
 ]
 
 const columns = [
-  { key: 'todo', label: '待办事项' },
-  { key: 'level', label: '优先级', width: '100px' },
-  { key: 'deadline', label: '截止时间', width: '160px' },
-  { key: 'status', label: '状态', width: '100px' },
+  { key: 'todo', label: '待终审报名' },
+  { key: 'team', label: '球队', width: '150px' },
+  { key: 'time', label: '提交时间', width: '160px' },
+  { key: 'status', label: '状态', width: '110px' },
 ]
 
-const todos = [
-  { todo: '为绵阳市新设 2 个市级审核员账户', level: '高', deadline: '2026-10-23', status: '待审核' },
-  { todo: '终审市州报送的中小学组报名 15 份', level: '高', deadline: '2026-10-24', status: '待审核' },
-  { todo: '清理 90 天未登录的休眠账户', level: '低', deadline: '2026-10-31', status: '进行中' },
-]
-
-function onAction(action: string) {
-  alert(`【演示】${action}：待接入后端`)
+type TodoRow = {
+  id: number
+  todo: string
+  team: string
+  time: string
+  status: string
 }
+
+const todos = ref<TodoRow[]>([])
+
+function onAction(action: string, row: Record<string, unknown>) {
+  void action
+  void row
+  router.push('/super/registration-review')
+}
+
+onMounted(async () => {
+  const [users, teams, regs] = await Promise.all([
+    fetchUsers({ page_size: 100 }),
+    fetchTeams(),
+    fetchRegistrations({ page_size: 100 }),
+  ])
+  if (users) {
+    const admins = users.filter((u) => ADMIN_ROLES.includes(u.role)).length
+    const normal = users.filter((u) => USER_ROLES.includes(u.role)).length
+    stats.value[0] = { icon: 'crown', label: '管理员账户', value: `${admins} 个`, hint: '含各市州审核员' }
+    stats.value[1] = { icon: 'users', label: '用户账户', value: `${normal} 个`, hint: '球队/运动员/教练员等' }
+  }
+  if (teams) {
+    stats.value[2] = { icon: 'shield', label: '报名球队', value: `${teams.length} 支`, hint: '全省注册球队' }
+  }
+  if (regs) {
+    const pending = regs.filter((r) => r.status.startsWith('pending'))
+    stats.value[3] = { icon: 'clipboard-list', label: '待审核报名', value: `${pending.length} 份`, hint: '含市州初审/省级终审' }
+    // 超管待办聚焦省级终审环节
+    todos.value = pending
+      .filter((r) => r.status === 'pending_province_review')
+      .slice(0, 6)
+      .map((r: RegistrationList) => ({
+        id: r.id,
+        todo: `${r.tournament_name}（${r.group_type_display}）`,
+        team: r.team_name,
+        time: (r.submit_time || '').slice(0, 16).replace('T', ' '),
+        status: r.status_display,
+      }))
+  }
+})
 </script>
 
 <template>
@@ -61,7 +110,8 @@ function onAction(action: string) {
   </div>
 
   <h3 class="section-title">待办提醒</h3>
-  <DataTable :columns="columns" :rows="todos" :actions="['去处理']" @action="onAction" />
+  <p v-if="!todos.length" class="page-tip">暂无待省级终审的报名，市州初审通过后将在此提醒。</p>
+  <DataTable v-else :columns="columns" :rows="todos" :actions="['去处理']" @action="onAction" />
 </template>
 
 <style scoped>
