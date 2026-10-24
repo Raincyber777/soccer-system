@@ -1,23 +1,47 @@
 <script setup lang="ts">
+import { computed, onMounted, ref } from 'vue'
 import PageHeader from '../../components/common/PageHeader.vue'
 import DataForm from '../../components/common/DataForm.vue'
 import SearchBar from '../../components/common/SearchBar.vue'
 import DataTable from '../../components/common/DataTable.vue'
 import type { FormField, SearchField, TableColumn } from '../../components/common/types'
+import {
+  createUser,
+  deleteUser,
+  errMsg,
+  fetchUsers,
+  resetUserPassword,
+  toggleUserActive,
+  updateUser,
+  type ApiUser,
+} from '../../api/account'
 
-// 用户账户管理（超级管理员）：全省范围的用户端账户管理，「删除账户」仅超管可执行
+// 用户账户管理（超级管理员）：全省范围的用户端账户管理，「删除账户」仅超管可执行。
+// 登录 super 端的账户角色即省级管理员（admin），数据域覆盖全省。
+
+const TYPE_TO_ROLE: Record<string, string> = {
+  球队账号: 'school',
+  运动员账号: 'athlete',
+  教练员账号: 'coach',
+  高校账号: 'school',
+  市州账号: 'city',
+}
+const USER_ROLES = ['school', 'athlete', 'coach', 'personal']
+// 同为 school 的两种账户类型展示时无法区分，统一按后端角色显示
+const TYPE_ORDER = ['球队账号', '运动员账号', '教练员账号', '市州账号']
+
 const formFields: FormField[] = [
   { key: 'account', label: '登录账号', placeholder: '如：szyds_zq02' },
   { key: 'name', label: '姓名 / 单位名' },
-  { key: 'type', label: '账户类型', type: 'select', options: ['球队账号', '运动员账号', '教练员账号', '高校账号', '市州账号'] },
+  { key: 'type', label: '账户类型', type: 'select', options: TYPE_ORDER, placeholder: '请选择账户类型' },
   { key: 'unit', label: '所属单位', placeholder: '学校 / 单位名称' },
   { key: 'phone', label: '预留手机号' },
-  { key: 'password', label: '初始密码', placeholder: '至少 6 位' },
+  { key: 'password', label: '初始密码', placeholder: '至少 6 位；编辑时留空则不修改' },
 ]
 
 const searchFields: SearchField[] = [
   { key: 'keyword', label: '账号/姓名', placeholder: '输入账号或姓名' },
-  { key: 'type', label: '账户类型', type: 'select', options: ['球队账号', '运动员账号', '教练员账号', '高校账号', '市州账号'] },
+  { key: 'type', label: '账户类型', type: 'select', options: ['全部', ...TYPE_ORDER] },
 ]
 
 const columns: TableColumn[] = [
@@ -29,27 +53,164 @@ const columns: TableColumn[] = [
   { key: 'status', label: '状态', width: '90px' },
 ]
 
-const rows = [
-  { account: 'szyds_zq01', name: '实验中学足球队', type: '球队账号', unit: '实验中学', city: '成都市', status: '已生效' },
-  { account: 'ydy_001', name: '王小磊', type: '运动员账号', unit: '实验中学', city: '成都市', status: '已生效' },
-  { account: 'jly_001', name: '张建国', type: '教练员账号', unit: '实验中学', city: '成都市', status: '已生效' },
-  { account: 'scsfdx_fc', name: '川师大队', type: '高校账号', unit: '四川师范大学', city: '成都市', status: '已生效' },
-  { account: 'cd_shi_zhen', name: '成都市教育局', type: '市州账号', unit: '成都市教育局', city: '成都市', status: '已生效' },
-  { account: 'test_001', name: '测试账户', type: '球队账号', unit: '—', city: '—', status: '已删除' },
-]
-
-function onSubmit(data: Record<string, string>) {
-  console.log('新用户账户：', data)
-  alert('【演示】用户账户已创建，待接入后端')
+interface UserRow {
+  id: number
+  account: string
+  name: string
+  type: string
+  unit: string
+  city: string
+  status: string
+  raw: ApiUser
 }
 
-function onSearch(filters: Record<string, string>) {
-  console.log('搜索条件：', filters)
-  alert('【演示】搜索：待接入后端')
+const rows = ref<UserRow[]>([])
+const filters = ref<Record<string, string>>({})
+const displayRows = computed(() =>
+  rows.value.filter((r) => {
+    if (filters.value.keyword) {
+      const kw = filters.value.keyword.trim()
+      if (kw && !r.account.includes(kw) && !r.name.includes(kw)) return false
+    }
+    if (filters.value.type && filters.value.type !== '全部' && r.type !== filters.value.type) return false
+    return true
+  }),
+)
+
+const editingId = ref<number | null>(null)
+const formInitial = ref<Record<string, string>>({})
+const formKey = ref(0)
+
+async function refresh() {
+  const list = await fetchUsers()
+  if (!list) return // 后端不可用：保留演示数据
+  rows.value = list
+    .filter((u: ApiUser) => USER_ROLES.includes(u.role) || u.role === 'city')
+    .map((u: ApiUser) => ({
+      id: u.id,
+      account: u.username,
+      name: u.real_name || u.username,
+      type: u.role_display,
+      unit: u.unit_name || '—',
+      city: u.region_name || '—',
+      status: u.is_active ? '已生效' : '已禁用',
+      raw: u,
+    }))
 }
 
-function onAction(action: string) {
-  alert(`【演示】${action}：待接入后端`)
+onMounted(refresh)
+
+function onSearch(f: Record<string, string>) {
+  filters.value = f
+}
+
+async function onSubmit(data: Record<string, string>) {
+  const account = data.account?.trim() ?? ''
+  const name = data.name?.trim() ?? ''
+  if (!account || !name) {
+    alert('请填写登录账号与姓名/单位名')
+    return
+  }
+  try {
+    if (editingId.value) {
+      await updateUser(editingId.value, {
+        real_name: name,
+        unit_name: data.unit?.trim() ?? '',
+        phone: data.phone?.trim() ?? '',
+      })
+      alert('账户资料已更新')
+    } else {
+      const role = TYPE_TO_ROLE[data.type ?? '']
+      if (!role) {
+        alert('请选择账户类型')
+        return
+      }
+      const password = data.password ?? ''
+      if (password.length < 6) {
+        alert('初始密码至少 6 位')
+        return
+      }
+      await createUser({
+        username: account,
+        password,
+        real_name: name,
+        role,
+        unit_name: data.unit?.trim() ?? '',
+        phone: data.phone?.trim() ?? '',
+      })
+      alert(`账户 ${account} 已创建，请将初始密码告知报送单位`)
+    }
+    onCancelEdit()
+    refresh()
+  } catch (err) {
+    alert(errMsg(err))
+  }
+}
+
+function onEdit(row: UserRow) {
+  editingId.value = row.id
+  formInitial.value = {
+    account: row.account,
+    name: row.raw.real_name,
+    unit: row.raw.unit_name,
+    phone: row.raw.phone,
+  }
+  formKey.value++
+}
+
+function onCancelEdit() {
+  editingId.value = null
+  formInitial.value = {}
+  formKey.value++
+}
+
+function onView(row: UserRow) {
+  const u = row.raw
+  alert(
+    `账号：${u.username}（${u.role_display}）\n姓名/单位名：${u.real_name || '—'}\n所属单位：${u.unit_name || '—'}` +
+      `\n所属市州：${u.region_name || '—'}\n手机号：${u.phone || '—'}` +
+      `\n状态：${u.is_active ? '已生效' : '已禁用'}\n创建时间：${(u.date_joined || '').slice(0, 16).replace('T', ' ')}`,
+  )
+}
+
+async function onReset(row: UserRow) {
+  if (!confirm(`确认重置「${row.account}」的密码为初始密码？`)) return
+  try {
+    const r = await resetUserPassword(row.id)
+    alert(r.detail || '密码已重置')
+  } catch (err) {
+    alert(errMsg(err))
+  }
+}
+
+async function onToggle(row: UserRow) {
+  try {
+    const r = await toggleUserActive(row.id)
+    alert(r.detail || '操作成功')
+    refresh()
+  } catch (err) {
+    alert(errMsg(err))
+  }
+}
+
+async function onDelete(row: UserRow) {
+  if (!confirm(`确定删除账户「${row.account}」？删除前请确认该账户无进行中的报名，此操作不可恢复。`)) return
+  try {
+    await deleteUser(row.id)
+    alert(`账户 ${row.account} 已删除`)
+    refresh()
+  } catch (err) {
+    alert(errMsg(err))
+  }
+}
+
+function onAction(action: string, row: Record<string, unknown>) {
+  const r = row as unknown as UserRow
+  if (action === '查看') onView(r)
+  else if (action === '编辑') onEdit(r)
+  else if (action === '重置密码') onReset(r)
+  else if (action === '禁用/启用') onToggle(r)
+  else if (action === '删除') onDelete(r)
 }
 </script>
 
@@ -61,15 +222,22 @@ function onAction(action: string) {
     超级管理员负责全省范围的账户管理，并保留「删除账户」等高风险操作，删除前建议确认该账户无进行中的报名。
   </p>
 
-  <h3 class="section-title">创建用户账户</h3>
-  <DataForm :fields="formFields" submit-text="创建账户" @submit="onSubmit" />
+  <h3 class="section-title">{{ editingId ? '编辑用户账户' : '创建用户账户' }}</h3>
+  <DataForm
+    :key="formKey"
+    :fields="formFields"
+    :initial="formInitial"
+    :submit-text="editingId ? '保存修改' : '创建账户'"
+    @submit="onSubmit"
+  />
+  <button v-if="editingId" type="button" class="btn btn-ghost" @click="onCancelEdit">取消编辑</button>
 
   <h3 class="section-title">用户账户列表</h3>
   <SearchBar :fields="searchFields" @search="onSearch" @reset="onSearch" />
   <DataTable
     :columns="columns"
-    :rows="rows"
-    :actions="['查看', '重置密码', '删除']"
+    :rows="displayRows"
+    :actions="['查看', '编辑', '重置密码', '禁用/启用', '删除']"
     @action="onAction"
   />
 </template>
