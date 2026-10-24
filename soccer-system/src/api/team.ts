@@ -24,16 +24,21 @@ export interface ApiPlayer {
   id: number
   team: number
   team_name: string
+  group_type_display: string
   name: string
   gender: string
   birth_date: string
   id_card: string
+  school: string | null
+  school_code: string
+  school_name: string
   grade: string
   position: string
   jersey_number: number | null
   photo_url: string
   status: string
   status_display: string
+  is_active: boolean
 }
 
 export interface ApiCoach {
@@ -44,8 +49,11 @@ export interface ApiCoach {
   id_card: string
   phone: string
   unit_name: string
+  years: number | null
   cert_level: string
+  category: string
   team: number | null
+  team_name: string
   status: string
   status_display: string
 }
@@ -142,6 +150,8 @@ export interface CoachPayload {
   phone?: string
   unit_name?: string
   cert_level?: string
+  category?: string
+  years?: number | null
 }
 
 export function createCoach(payload: CoachPayload) {
