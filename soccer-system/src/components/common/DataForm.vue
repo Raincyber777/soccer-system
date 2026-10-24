@@ -1,13 +1,15 @@
 <script setup lang="ts">
-import { reactive } from 'vue'
+import { reactive, watch } from 'vue'
 import type { FormField } from './types'
 import AppSelect from './AppSelect.vue'
 import AppDatePicker from './AppDatePicker.vue'
 
 // 通用表单：传入字段配置，点提交时把整个表单数据抛给父页面
+// initial 用于编辑回填：换一个新对象引用即触发重置（不传则全空，向后兼容）
 const props = defineProps<{
   fields: FormField[]
   submitText?: string
+  initial?: Record<string, string>
 }>()
 
 const emit = defineEmits<{
@@ -15,7 +17,16 @@ const emit = defineEmits<{
 }>()
 
 const form = reactive<Record<string, string>>({})
-props.fields.forEach((f) => (form[f.key] = ''))
+
+function fill(initial?: Record<string, string>) {
+  props.fields.forEach((f) => (form[f.key] = initial?.[f.key] ?? ''))
+}
+
+fill(props.initial)
+watch(
+  () => props.initial,
+  (v) => fill(v),
+)
 
 function onSubmit() {
   emit('submit', { ...form })

@@ -60,8 +60,11 @@ export interface ApiMatchResult {
   id: number
   home_score: number
   away_score: number
-  winner_team_id: number | null
+  winner_team: number | null
   winner_team_name: string | null
+  /** 管理端可见：发布状态与发布时间（门户公开数据恒为已发布） */
+  is_published?: boolean
+  published_at?: string
 }
 
 /** 赛事对阵 GET /api/portal/matches/ */
