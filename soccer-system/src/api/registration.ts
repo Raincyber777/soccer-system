@@ -96,4 +96,31 @@ export async function downloadRegistrationWord(id: number, teamName: string) {
   URL.revokeObjectURL(url)
 }
 
+// ---------- 赛事下拉与报名提交 ----------
+
+export interface ApiTournamentOption {
+  id: number
+  name: string
+  [key: string]: unknown
+}
+
+/** 赛事列表（报名表单下拉）GET /api/portal/tournaments/ */
+export function fetchTournaments() {
+  return tryList(() => getPage<ApiTournamentOption>('/api/portal/tournaments/', { page_size: 50 }))
+}
+
+/** 球队提交报名（后端置状态为待初审；school 只能为本人的球队提交） */
+export function createRegistration(payload: {
+  tournament: number
+  team: number
+  group_type: string
+  leader_name: string
+  phone: string
+  player_count: number
+  coach_name: string
+  remark?: string
+}) {
+  return api.post<never, RegistrationDetail>('/api/registrations/', payload)
+}
+
 export { errMsg }
