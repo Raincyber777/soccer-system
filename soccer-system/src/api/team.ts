@@ -69,6 +69,11 @@ async function tryList<T>(fn: () => Promise<T>): Promise<T | null> {
 
 // ---------- 球队 /api/portal/teams/ ----------
 
+/** 球队列表（公开读，staff 视角看全省）：参赛管理检索用 */
+export function fetchTeams(params?: Record<string, unknown>) {
+  return tryList(() => getPage<ApiTeam>('/api/portal/teams/', { page_size: 100, ...params }))
+}
+
 /** 我的球队（?mine=true，school 登录后通常 0 或 1 支） */
 export function fetchMyTeam() {
   return tryList(async () => {
