@@ -10,10 +10,10 @@ import { mockScorers, mockStandings, type ScorerRow, type StandingRow } from '..
 import { fetchScorers, fetchStandings } from '../../api/portal'
 
 // 门户公开页 · 赛事榜单：组别积分榜与射手榜，游客无需登录
-// 数据优先来自后端（射手榜 /api/portal/stats/ranking/；积分榜暂无后端接口，
-// 由对阵 + 已发布赛果在前端聚合，见 src/api/portal.ts fetchStandings），失败回退演示数据
+// 数据优先来自后端聚合接口（/api/portal/stats/ranking|standings/，仅统计已发布赛果），
+// 见 src/api/portal.ts，失败回退演示数据
 
-const groupOptions = ['全部组别', '小学组', '中学组', '高校组']
+const groupOptions = ['全部组别', '小学组', '中学组', '高中组', '高校组']
 const groupFilter = ref('中学组')
 
 const standingColumns: TableColumn[] = [

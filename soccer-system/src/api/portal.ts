@@ -3,6 +3,7 @@ import type { ApiMatch, ApiNews, ApiPolicy, ApiScorer } from './types'
 import { news as mockNews, policies as mockPolicies, type NewsItem } from '../data/portal-news'
 import { mockMatches, type MatchRow } from '../data/portal-matches'
 import { mockScorers, mockStandings, type ScorerRow, type StandingRow } from '../data/portal-rankings'
+import type { ApiStandingRow } from './stats'
 
 // 门户公开数据获取：优先请求后端，请求失败（后端未启动/超时/业务码非 0）时
 // 自动回退到本地演示数据，保证答辩演示与离线浏览不中断。
@@ -79,7 +80,7 @@ export async function fetchMatches(): Promise<MatchRow[]> {
   }
 }
 
-/** 射手榜：后端暂无助攻字段，assists 显示为 —（接口补齐后替换） */
+/** 射手榜：后端聚合（仅统计已发布赛果的进球），助攻同口径 */
 export async function fetchScorers(): Promise<ScorerRow[]> {
   try {
     const list = await getPage<ApiScorer>('/api/portal/stats/ranking/', { limit: 50 })
@@ -89,105 +90,36 @@ export async function fetchScorers(): Promise<ScorerRow[]> {
       name: s.player_name,
       team: s.team_name,
       goals: s.total_goals,
-      assists: '—',
+      assists: s.assists,
     }))
   } catch {
     return mockScorers
   }
 }
 
-/** 未开赛/未发布赛果的对阵不参与积分统计 */
-function standingsFromMatches(matches: ApiMatch[]): StandingRow[] {
-  interface Acc {
-    team: string
-    group: string
-    played: number
-    win: number
-    draw: number
-    loss: number
-    gf: number
-    ga: number
-    points: number
-  }
-
-  const map = new Map<string, Acc>()
-  const entry = (group: string, team: string): Acc => {
-    const key = `${group}|${team}`
-    let acc = map.get(key)
-    if (!acc) {
-      acc = { team, group, played: 0, win: 0, draw: 0, loss: 0, gf: 0, ga: 0, points: 0 }
-      map.set(key, acc)
-    }
-    return acc
-  }
-
-  for (const m of matches) {
-    if (!m.result) continue
-    const { home_score, away_score } = m.result
-    const group = m.group_type_display
-    const home = entry(group, m.home_team_name)
-    const away = entry(group, m.away_team_name)
-    home.played += 1
-    away.played += 1
-    home.gf += home_score
-    home.ga += away_score
-    away.gf += away_score
-    away.ga += home_score
-    if (home_score > away_score) {
-      home.win += 1
-      home.points += 3
-      away.loss += 1
-    } else if (home_score < away_score) {
-      away.win += 1
-      away.points += 3
-      home.loss += 1
-    } else {
-      home.draw += 1
-      away.draw += 1
-      home.points += 1
-      away.points += 1
-    }
-  }
-
-  // 组内排名：积分 → 净胜球 → 进球数，排序后重新编号
-  const byGroup = new Map<string, Acc[]>()
-  for (const acc of map.values()) {
-    const list = byGroup.get(acc.group) ?? []
-    list.push(acc)
-    byGroup.set(acc.group, list)
-  }
-
-  const rows: StandingRow[] = []
-  for (const [, list] of byGroup) {
-    list.sort((a, b) => b.points - a.points || b.gf - b.ga - (a.gf - a.ga) || b.gf - a.gf || a.team.localeCompare(b.team, 'zh'))
-    list.forEach((acc, index) => {
-      rows.push({
-        rank: index + 1,
-        team: acc.team,
-        group: acc.group,
-        played: acc.played,
-        win: acc.win,
-        draw: acc.draw,
-        loss: acc.loss,
-        gf: acc.gf,
-        ga: acc.ga,
-        diff: acc.gf - acc.ga > 0 ? `+${acc.gf - acc.ga}` : String(acc.gf - acc.ga),
-        points: acc.points,
-      })
-    })
-  }
-  return rows
-}
-
 /**
- * 积分榜：后端暂无 standings 接口，用公开对阵 + 已发布赛果在前端聚合（口径与
- * 需求文档 §12 一致：仅统计已发布比分，积分→净胜球→进球数排序）。后端补接口后替换。
+ * 积分榜：后端聚合（/api/portal/stats/standings/，胜 3 平 1 负 0，
+ * 同分按净胜球 → 进球数 → 球队名，按组别分段排名），仅统计已发布赛果。
  */
 export async function fetchStandings(): Promise<StandingRow[]> {
   try {
-    const list = await getPage<ApiMatch>('/api/portal/matches/', { page_size: 100, ordering: 'match_time' })
-    const rows = standingsFromMatches(list)
-    return rows.length ? rows : mockStandings
+    const data = await api.get<never, { group_type: string | null; results: ApiStandingRow[] }>(
+      '/api/portal/stats/standings/',
+    )
+    if (!data.results.length) return mockStandings
+    return data.results.map((r) => ({
+      rank: r.rank ?? 0,
+      team: r.team_name,
+      group: r.group_type_display,
+      played: r.played,
+      win: r.win,
+      draw: r.draw,
+      loss: r.loss,
+      gf: r.goals_for,
+      ga: r.goals_against,
+      diff: r.goals_for - r.goals_against > 0 ? `+${r.goals_for - r.goals_against}` : String(r.goals_for - r.goals_against),
+      points: r.points,
+    }))
   } catch {
     return mockStandings
   }

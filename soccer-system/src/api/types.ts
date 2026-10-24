@@ -101,5 +101,6 @@ export interface ApiScorer {
   group_type: string
   group_type_display: string
   total_goals: number
+  assists: number
   match_count: number
 }

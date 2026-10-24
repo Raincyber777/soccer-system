@@ -21,8 +21,7 @@ export type ScorerRow = {
   name: string
   team: string
   goals: number
-  /** 后端暂无助攻字段，API 数据显示为 — */
-  assists: number | string
+  assists: number
 }
 
 export const mockStandings: StandingRow[] = [

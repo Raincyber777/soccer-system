@@ -13,7 +13,7 @@ import { fetchMatches } from '../../api/portal'
 // 数据优先来自后端 /api/portal/matches/（已发布赛果才返回 result，见 src/api/portal.ts），
 // 后端未启动时自动回退演示数据；与管理员端【对阵信息管理】【赛果发布管理】同口径
 
-const groupOptions = ['全部组别', '小学组', '中学组', '高校组']
+const groupOptions = ['全部组别', '小学组', '中学组', '高中组', '高校组']
 const groupFilter = ref('全部组别')
 
 const columns: TableColumn[] = [
