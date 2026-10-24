@@ -101,6 +101,13 @@ export async function downloadRegistrationWord(id: number, teamName: string) {
 export interface ApiTournamentOption {
   id: number
   name: string
+  /** 赛事覆盖的组别（JSON 数组，如 ['primary','middle']） */
+  group_types: string[] | string
+  organizer: string
+  sign_start_at: string | null
+  sign_end_at: string | null
+  status: string
+  status_display: string
   [key: string]: unknown
 }
 

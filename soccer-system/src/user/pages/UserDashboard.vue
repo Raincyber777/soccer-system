@@ -1,20 +1,85 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import PageHeader from '../../components/common/PageHeader.vue'
 import StatCard from '../../components/common/StatCard.vue'
 import DataTable from '../../components/common/DataTable.vue'
 import AppIcon from '../../components/common/AppIcon.vue'
 import { useAuth, type UserPersona } from '../../stores/auth'
+import { fetchMyTeam } from '../../api/team'
+import { fetchRegistrations, fetchTournaments, type RegistrationList } from '../../api/registration'
 
 const auth = useAuth()
+const router = useRouter()
 
-// 工作台：用户端首页概览
-const stats = [
-  { icon: 'shield', label: '我的球队', value: '1 支', hint: '实验中学足球队' },
-  { icon: 'trophy', label: '进行中赛事', value: '3 项', hint: '可报名 1 项' },
-  { icon: 'clipboard-list', label: '待处理报名', value: '1 份', hint: '等待审核' },
-  { icon: 'bell', label: '未读系统消息', value: '2 条', hint: '点击查看' },
+// 工作台：统计卡读真实数据（我的球队/赛事/我的报名），
+// 消息区展示最新报名审核动态（暂无独立消息模型）。
+
+const stats = ref([
+  { icon: 'shield', label: '我的球队', value: '—', hint: '' },
+  { icon: 'trophy', label: '赛事总数', value: '—', hint: '' },
+  { icon: 'clipboard-list', label: '我的报名', value: '—', hint: '' },
+  { icon: 'bell', label: '待审核报名', value: '—', hint: '' },
+])
+
+const regs = ref<RegistrationList[]>([])
+
+const columns = [
+  { key: 'title', label: '报名项目' },
+  { key: 'type', label: '当前环节', width: '130px' },
+  { key: 'time', label: '提交时间', width: '170px' },
+  { key: 'status', label: '状态', width: '100px' },
 ]
+
+type FeedRow = {
+  id: number
+  title: string
+  type: string
+  time: string
+  status: string
+}
+
+/** 报名状态 → 审核环节文案 */
+function stepOf(r: RegistrationList): string {
+  if (r.status === 'pending_city_review') return '市州初审'
+  if (r.status === 'pending_province_review') return '省级终审'
+  return '已完成'
+}
+
+const feed = computed<FeedRow[]>(() =>
+  regs.value.slice(0, 5).map((r) => ({
+    id: r.id,
+    title: `${r.tournament_name} · ${r.team_name}（${r.group_type_display}）`,
+    type: stepOf(r),
+    time: (r.submit_time || '').slice(0, 16).replace('T', ' '),
+    status: r.status_display,
+  })),
+)
+
+onMounted(async () => {
+  const [team, tournaments, registrationList] = await Promise.all([
+    fetchMyTeam(),
+    fetchTournaments(),
+    fetchRegistrations(),
+  ])
+  // fetchMyTeam 无法区分「后端不可用」与「暂无球队」：一律按 0 支提示
+  stats.value[0] = { icon: 'shield', label: '我的球队', value: team ? '1 支' : '0 支', hint: team?.name ?? '可在「球队信息」创建' }
+  if (tournaments) {
+    const signing = tournaments.filter((t) => t.status_display.includes('报名')).length
+    stats.value[1] = {
+      icon: 'trophy',
+      label: '赛事总数',
+      value: `${tournaments.length} 项`,
+      hint: signing ? `${signing} 项报名中` : '暂无报名中的赛事',
+    }
+  }
+  if (registrationList) {
+    regs.value = registrationList
+    const pending = registrationList.filter((r) => r.status.startsWith('pending')).length
+    stats.value[2] = { icon: 'clipboard-list', label: '我的报名', value: `${registrationList.length} 份`, hint: '' }
+    stats.value[3] = { icon: 'bell', label: '待审核报名', value: `${pending} 份`, hint: pending ? '等待市州/省级审核' : '暂无待审核' }
+  }
+})
 
 // 快捷入口按登录身份过滤：personas 不填 = 所有身份可见
 const quickLinks: {
@@ -50,26 +115,24 @@ const visibleLinks = computed(() => {
   return [...links, guideLinks[persona]]
 })
 
-const columns = [
-  { key: 'title', label: '消息标题' },
-  { key: 'type', label: '类型', width: '110px' },
-  { key: 'time', label: '时间', width: '170px' },
-  { key: 'status', label: '状态', width: '100px' },
-]
-
-const messages = [
-  { title: '2026 年省级青少年足球联赛报名已开始', type: '赛事通知', time: '2026-10-15 09:00', status: '未开始' },
-  { title: '你的球队报名表已通过市州审核', type: '审核通知', time: '2026-10-12 16:30', status: '已通过' },
-  { title: '请补充上传球员学籍验证材料', type: '材料提醒', time: '2026-10-10 10:20', status: '进行中' },
-]
-
-function onAction(action: string) {
-  alert(`【演示】${action}：待接入后端`)
+function onAction(action: string, row: Record<string, unknown>) {
+  const r = row as unknown as FeedRow
+  if (action === '查看') {
+    const reg = regs.value.find((x) => x.id === r.id)
+    if (reg) {
+      alert(
+        `${reg.tournament_name}（${reg.group_type_display}）\n球队：${reg.team_name}\n状态：${reg.status_display}` +
+          `\n提交时间：${(reg.submit_time || '').slice(0, 16).replace('T', ' ')}\n\n审核详情可在「我的报名」中查看`,
+      )
+      return
+    }
+  }
+  router.push('/user/registrations')
 }
 </script>
 
 <template>
-  <PageHeader title="工作台" desc="汇总你的球队、报名与消息动态" />
+  <PageHeader title="工作台" desc="汇总你的球队、报名与审核动态" />
 
   <div class="stat-grid">
     <StatCard v-for="s in stats" :key="s.label" v-bind="s" />
@@ -86,8 +149,8 @@ function onAction(action: string) {
     </router-link>
   </div>
 
-  <h3 class="section-title">系统消息</h3>
-  <DataTable :columns="columns" :rows="messages" :actions="['查看']" @action="onAction" />
+  <h3 class="section-title">报名审核动态</h3>
+  <DataTable :columns="columns" :rows="feed" :actions="['查看']" @action="onAction" />
 </template>
 
 <style scoped>

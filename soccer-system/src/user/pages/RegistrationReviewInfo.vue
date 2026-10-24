@@ -1,22 +1,32 @@
 <script setup lang="ts">
+import { computed, onMounted, ref } from 'vue'
 import PageHeader from '../../components/common/PageHeader.vue'
 import DataTable from '../../components/common/DataTable.vue'
 import type { TableColumn } from '../../components/common/types'
+import { fetchRegistrations, fetchReviewLogs, type RegistrationList, type ReviewLogItem } from '../../api/registration'
 
-// 报名审核信息查看（对应需求：球队审核信息、按组别/市州查看球队报名信息公示）
+// 报名审核信息：我的报名两级审核进度 + 已通过报名的公示信息。
+// 审核记录（含驳回原因）通过 /review-logs/ 按报名件查看。
+
 const reviewColumns: TableColumn[] = [
   { key: 'tournament', label: '赛事' },
   { key: 'group', label: '组别', width: '90px' },
   { key: 'submitTime', label: '提交时间', width: '160px' },
   { key: 'step', label: '当前审核环节', width: '130px' },
   { key: 'status', label: '状态', width: '100px' },
-  { key: 'opinion', label: '审核意见', width: '170px' },
 ]
 
-const reviewRows = [
-  { tournament: '2026 省级青少年足球联赛', group: '中学组', submitTime: '2026-10-12 16:30', step: '市州审核', status: '已通过', opinion: '材料齐全，同意报送' },
-  { tournament: '2026 省级青少年足球联赛', group: '中学组', submitTime: '2026-10-14 09:10', step: '省级终审', status: '待审核', opinion: '—' },
-]
+type ReviewRow = {
+  id: number
+  tournament: string
+  group: string
+  submitTime: string
+  step: string
+  status: string
+  raw: RegistrationList
+}
+
+const reviewRows = ref<ReviewRow[]>([])
 
 const publicColumns: TableColumn[] = [
   { key: 'team', label: '球队名称' },
@@ -26,25 +36,79 @@ const publicColumns: TableColumn[] = [
   { key: 'status', label: '公示状态', width: '100px' },
 ]
 
-const publicRows = [
-  { team: '实验中学足球队', city: '成都市', group: '中学组', players: 18, status: '已公示' },
-  { team: '市二中足球队', city: '绵阳市', group: '中学组', players: 16, status: '已公示' },
-  { team: '师范附小足球队', city: '成都市', group: '小学组', players: 14, status: '待审核' },
-]
+type PublicRow = {
+  id: number
+  team: string
+  city: string
+  group: string
+  players: number
+  status: string
+}
 
-function onAction(action: string) {
-  alert(`【演示】${action}：待接入后端`)
+/** 公示区：审核通过的报名（通过后自动进入公示） */
+const publicRows = computed<PublicRow[]>(() =>
+  reviewRows.value
+    .filter((r) => r.raw.status === 'approved')
+    .map((r) => ({
+      id: r.id,
+      team: r.raw.team_name,
+      city: r.raw.city_name || '—',
+      group: r.raw.group_type_display,
+      players: r.raw.player_count,
+      status: '已公示',
+    })),
+)
+
+function stepOf(r: RegistrationList): string {
+  if (r.status === 'pending_city_review') return '市州初审'
+  if (r.status === 'pending_province_review') return '省级终审'
+  if (r.status === 'approved') return '已完成'
+  return '已驳回'
+}
+
+async function refresh() {
+  const list = await fetchRegistrations()
+  if (!list) return // 后端不可用：保留演示数据
+  reviewRows.value = list.map((r: RegistrationList) => ({
+    id: r.id,
+    tournament: r.tournament_name,
+    group: r.group_type_display,
+    submitTime: (r.submit_time || '').slice(0, 16).replace('T', ' '),
+    step: stepOf(r),
+    status: r.status_display,
+    raw: r,
+  }))
+}
+
+onMounted(refresh)
+
+async function onViewDetail(row: Record<string, unknown>) {
+  const r = row as unknown as ReviewRow
+  const logs = (await fetchReviewLogs(r.id)) ?? []
+  const lines = logs.map((l: ReviewLogItem) => {
+    const result = l.result === 'approve' ? '通过' : '驳回'
+    return `${(l.created_at || '').slice(0, 16).replace('T', ' ')}【${l.stage === 'final' ? '省级终审' : '市州初审'}·${result}】${l.operator_name}${l.reason ? '：' + l.reason : ''}`
+  })
+  alert(
+    `${r.raw.tournament_name} · ${r.raw.team_name}（${r.raw.group_type_display}）\n当前状态：${r.status}（${r.step}）` +
+      (lines.length ? '\n\n' + lines.join('\n') : '\n\n暂无审核记录'),
+  )
+}
+
+function onAction(action: string, row: Record<string, unknown>) {
+  if (action === '查看详情') onViewDetail(row)
+  else if (action === '查看公示') onViewDetail(row)
 }
 </script>
 
 <template>
-  <PageHeader title="报名审核信息" desc="查看球队报名的审核进度与意见，按组别、市州查看报名信息公示" />
+  <PageHeader title="报名审核信息" desc="查看球队报名的审核进度与意见，审核通过的报名自动进入公示" />
 
   <p class="page-tip">流程：球队提交报名 → 市州/高校初审 → 省级终审 → 审核通过后报名信息自动进入公示。</p>
 
   <h3 class="section-title">我的报名审核信息</h3>
   <DataTable :columns="reviewColumns" :rows="reviewRows" :actions="['查看详情']" @action="onAction" />
 
-  <h3 class="section-title">报名信息公示（按组别 / 市州）</h3>
+  <h3 class="section-title">已通过报名公示</h3>
   <DataTable :columns="publicColumns" :rows="publicRows" :actions="['查看公示']" @action="onAction" />
 </template>

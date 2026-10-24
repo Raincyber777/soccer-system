@@ -77,4 +77,24 @@ export function toggleUserActive(id: number) {
   return api.post<never, { detail: string; is_active: boolean }>(`/api/admin/users/${id}/toggle-active/`)
 }
 
+// ---------- 本人资料（用户端个人中心 / 运动员·教练员信息页共用） ----------
+
+/** 当前登录用户 GET /api/auth/me/（读失败返回 null，页面回退演示数据） */
+export function fetchMe() {
+  return tryList(() => api.get<never, ApiUser>('/api/auth/me/'))
+}
+
+/** 本人维护基础资料 PATCH /api/auth/me/（后端仅接受 real_name/phone/email/unit_name） */
+export function updateMe(payload: { real_name?: string; phone?: string; email?: string; unit_name?: string }) {
+  return api.patch<never, ApiUser>('/api/auth/me/', payload)
+}
+
+/** 本人修改密码 PUT /api/auth/password/（旧密码错误返回 40000） */
+export function changePassword(oldPassword: string, newPassword: string) {
+  return api.put<never, { detail: string }>('/api/auth/password/', {
+    old_password: oldPassword,
+    new_password: newPassword,
+  })
+}
+
 export { errMsg }

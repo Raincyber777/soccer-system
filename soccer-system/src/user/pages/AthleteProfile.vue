@@ -1,46 +1,107 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import PageHeader from '../../components/common/PageHeader.vue'
 import DataForm from '../../components/common/DataForm.vue'
-import SchoolSelect from '../../components/common/SchoolSelect.vue'
+import UploadBlock from '../../components/common/UploadBlock.vue'
 import type { FormField } from '../../components/common/types'
-import type { SchoolInfo } from '../../data/sichuan-schools'
-import { todayStr } from '../../utils/date'
+import { errMsg, fetchMe, updateMe } from '../../api/account'
+import { uploadCommonFile } from '../../api/registration'
 
-// 运动员注册与个人信息（对应需求：运动员注册表单 / 个人信息 / 数据匹配 / 信息确认）
-// 所在学校统一通过「学校标识码」选择，避免重名错填；提交后按学校 + 身份证/学籍号做学籍数据匹配
-const school = ref<SchoolInfo | null>(null)
+// 运动员信息：账户基础资料由本人维护（PATCH /api/auth/me/）；
+// 注册信息（身份证/年级/位置等）由所在学校球队负责人在「队员列表」录入，
+// 本人可在「信息公示」查看公示结果；学籍等材料在此上传留存。
 
-const formFields: FormField[] = [
-  { key: 'name', label: '姓名' },
-  { key: 'gender', label: '性别', type: 'select', options: ['男', '女'] },
-  { key: 'birth', label: '出生日期', type: 'date', max: todayStr() },
-  { key: 'idCard', label: '身份证号', placeholder: '用于学籍数据匹配' },
-  { key: 'school', label: '所在学校', type: 'custom' },
-  { key: 'grade', label: '年级', type: 'select', options: ['一年级', '二年级', '三年级', '四年级', '五年级', '六年级', '初一', '初二', '初三', '高一', '高二', '高三'] },
-  { key: 'studentNo', label: '学籍号' },
-  { key: 'position', label: '场上位置', type: 'select', options: ['守门员', '后卫', '中场', '前锋'] },
-  { key: 'shirtNo', label: '球衣号码', type: 'number' },
+const baseFields: FormField[] = [
+  { key: 'name', label: '姓名 / 单位名' },
   { key: 'phone', label: '联系电话' },
-  { key: 'remark', label: '个人简介', type: 'textarea', placeholder: '踢球经历、擅长位置等' },
+  { key: 'email', label: '邮箱' },
+  { key: 'unit', label: '所属学校' },
 ]
 
-function onSubmit(data: Record<string, string>) {
-  console.log('运动员信息：', { ...data, schoolCode: school.value?.code ?? '' })
-  alert('【演示】信息已提交，学籍数据匹配与确认流程待接入后端')
+const baseInitial = ref<Record<string, string>>({})
+const formKey = ref(0)
+const uploading = ref(false)
+const files = ref<{ name: string; url: string }[]>([])
+
+onMounted(async () => {
+  const me = await fetchMe()
+  if (!me) return
+  baseInitial.value = { name: me.real_name, phone: me.phone, email: me.email, unit: me.unit_name }
+  formKey.value++
+})
+
+async function onSubmit(data: Record<string, string>) {
+  try {
+    await updateMe({
+      real_name: data.name?.trim() ?? '',
+      phone: data.phone?.trim() ?? '',
+      email: data.email?.trim() ?? '',
+      unit_name: data.unit?.trim() ?? '',
+    })
+    alert('基础信息已保存')
+  } catch (err) {
+    alert(errMsg(err))
+  }
+}
+
+async function onUpload(file: File) {
+  uploading.value = true
+  try {
+    const r = await uploadCommonFile(file, 'athlete-files')
+    files.value.unshift({ name: file.name, url: r.url })
+    alert(`材料已上传：${r.url}\n可把链接提供给所在学校球队负责人，供注册与资格审核查验`)
+  } catch (err) {
+    alert(errMsg(err))
+  } finally {
+    uploading.value = false
+  }
 }
 </script>
 
 <template>
-  <PageHeader title="运动员注册与信息" desc="填写运动员注册表单，系统将自动匹配学籍数据，确认后进入公示" />
+  <PageHeader title="运动员注册与信息" desc="维护本人联系方式，上传学籍与身份材料，注册信息由学校统一录入" />
 
   <p class="page-tip">
-    提交后系统会按身份证号 / 学籍号进行「运动员数据匹配」，匹配结果请在下方确认；信息确认前可反复修改。
+    注册信息（身份证号、年级、场上位置等）由所在学校球队负责人在「队员列表」中录入并提交审核；
+    审核通过后可在「信息公示」查询。本页维护本人的账户资料，并上传学籍证明等材料留存备查。
   </p>
 
-  <DataForm :fields="formFields" submit-text="保存并提交匹配" @submit="onSubmit">
-    <template #field-school>
-      <SchoolSelect v-model="school" />
-    </template>
-  </DataForm>
+  <h3 class="section-title">账户基础信息</h3>
+  <DataForm
+    :key="formKey"
+    :fields="baseFields"
+    :initial="baseInitial"
+    submit-text="保存"
+    @submit="onSubmit"
+  />
+
+  <h3 class="section-title">上传注册辅助材料</h3>
+  <div class="upload-grid">
+    <UploadBlock
+      title="学籍 / 身份材料上传"
+      desc="学籍表、身份证扫描件等，JPG/PDF/ZIP，单件不超过 20MB"
+      accept=".pdf,.jpg,.jpeg,.png,.zip"
+      @select="onUpload"
+    />
+  </div>
+
+  <template v-if="files.length">
+    <h3 class="section-title">已上传的材料（{{ files.length }}）</h3>
+    <ul class="file-list">
+      <li v-for="f in files" :key="f.url">
+        <a :href="f.url" target="_blank" rel="noopener">{{ f.name }}</a>
+      </li>
+    </ul>
+  </template>
 </template>
+
+<style scoped>
+.file-list {
+  padding-left: 20px;
+  font-size: 13px;
+}
+
+.file-list a {
+  color: var(--green);
+}
+</style>
