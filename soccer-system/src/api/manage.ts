@@ -2,10 +2,10 @@ import { api, getPage } from './client'
 import type { ApiMatch, ApiNews, ApiPolicy } from './types'
 
 // 管理端内容管理：新闻/政策/对阵/赛果的真实 CRUD。
-// 读失败（后端未启动/未登录）返回 null，页面保留演示数据；
+// 读失败（未登录/网络异常）返回 null，页面展示空态；
 // 写失败直接抛 ApiError，由页面提示后端 message（如无权限/参数错误）。
 
-/** 读失败回退 null：调用方据此决定是否保留本地演示行 */
+/** 读失败回退 null：调用方据此展示空态 */
 async function tryList<T>(url: string, params?: Record<string, unknown>): Promise<T[] | null> {
   try {
     return await getPage<T>(url, params)

@@ -5,16 +5,12 @@ import PortalFooter from './PortalFooter.vue'
 import PortalBanner from './PortalBanner.vue'
 import AppIcon from '../common/AppIcon.vue'
 import AppModal from '../common/AppModal.vue'
-import { news as mockNews, policies as mockPolicies, type NewsItem } from '../../data/portal-news'
-import { fetchNews, fetchPolicies, type NewsWithHtml } from '../../api/portal'
+import { fetchNews, fetchPolicies, type NewsItem } from '../../api/portal'
 
 // 门户公开页 · 新闻政策：游客无需登录即可浏览
-// 数据优先来自后端（/api/portal/news/ 与 /policy/，见 src/api/portal.ts），
-// 后端未启动时自动回退到 src/data/portal-news.ts 的演示数据，与管理端同口径
-
-// 初始直接展示演示数据，接口返回后无缝替换
-const newsList = ref<NewsWithHtml[]>(mockNews)
-const policyList = ref<NewsWithHtml[]>(mockPolicies)
+// 数据来自后端（/api/portal/news/ 与 /policy/，见 src/api/portal.ts），与管理端同口径
+const newsList = ref<NewsItem[]>([])
+const policyList = ref<NewsItem[]>([])
 
 onMounted(async () => {
   newsList.value = await fetchNews()
@@ -41,7 +37,7 @@ function openItem(item: NewsItem) {
 
     <main class="container">
       <h3 class="section-title">赛事动态与战报</h3>
-      <div class="news-grid">
+      <div v-if="newsList.length" class="news-grid">
         <article v-for="item in newsList" :key="item.title" class="news-card" role="button" @click="openItem(item)">
           <span class="news-tag">{{ item.tag }}</span>
           <h4 class="news-title">{{ item.title }}</h4>
@@ -49,9 +45,10 @@ function openItem(item: NewsItem) {
           <p class="news-meta">{{ item.source }} · {{ item.date }}</p>
         </article>
       </div>
+      <p v-else class="page-tip">暂无赛事动态，内容由管理员端发布后在此公示。</p>
 
       <h3 class="section-title">政策文件</h3>
-      <div class="policy-list">
+      <div v-if="policyList.length" class="policy-list">
         <div v-for="item in policyList" :key="item.title" class="policy-row" role="button" @click="openItem(item)">
           <span class="policy-icon">
             <AppIcon name="scroll-text" :size="20" />
@@ -63,8 +60,9 @@ function openItem(item: NewsItem) {
           <span class="policy-more">查看全文</span>
         </div>
       </div>
+      <p v-else class="page-tip">暂无政策文件，内容由管理员端发布后在此公示。</p>
 
-      <p class="page-tip">新闻与政策由管理员端审核发布后在此公示；点击卡片或文件可查看全文（演示数据为示例）。</p>
+      <p class="page-tip">新闻与政策由管理员端审核发布后在此公示；点击卡片或文件可查看全文。</p>
     </main>
 
     <AppModal :open="activeItem !== null" :title="activeItem?.title ?? ''" @close="activeItem = null">
@@ -73,11 +71,8 @@ function openItem(item: NewsItem) {
           <span class="article-tag">{{ activeItem.tag }}</span>
           {{ activeItem.source }} · {{ activeItem.date }}
         </p>
-        <!-- 后端正文是富文本 HTML；演示数据只有 body 段落 -->
-        <div v-if="activeItem.html" class="article-html" v-html="activeItem.html"></div>
-        <div v-else class="article-body">
-          <p v-for="(para, index) in activeItem.body" :key="index">{{ para }}</p>
-        </div>
+        <!-- 正文为富文本 HTML -->
+        <div class="article-html" v-html="activeItem.html"></div>
       </template>
     </AppModal>
 
@@ -227,19 +222,7 @@ function openItem(item: NewsItem) {
   font-weight: 600;
 }
 
-.article-body {
-  margin-top: 14px;
-  display: grid;
-  gap: 12px;
-}
-
-.article-body p {
-  font-size: 14px;
-  line-height: 1.9;
-  color: var(--ink);
-}
-
-/* 后端富文本正文 */
+/* 富文本正文 */
 .article-html {
   margin-top: 14px;
   font-size: 14px;

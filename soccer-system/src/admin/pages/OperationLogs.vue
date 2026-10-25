@@ -40,13 +40,7 @@ const ROLE_DISPLAY: Record<string, string> = {
   coach: '教练员',
 }
 
-const rows = ref<LogRow[]>([
-  { time: '2026-10-16 14:20', account: 'szyds_zq01', role: '球队负责人', action: '提交球队报名表（中学组）', ip: '10.12.3.44' },
-  { time: '2026-10-16 11:05', account: 'gy_shi_zhen', role: '市州审核员', action: '驳回球队报名 1 份（材料不齐）', ip: '10.8.1.17' },
-  { time: '2026-10-16 09:30', account: 'admin', role: '系统管理员', action: '发布赛事新闻「秋季联赛开赛公告」', ip: '10.0.0.8' },
-  { time: '2026-10-15 17:12', account: 'admin', role: '系统管理员', action: '修改教练员身份信息（张建国）', ip: '10.0.0.8' },
-  { time: '2026-10-15 16:44', account: 'gzsfdx_fc', role: '高校负责人', action: '批量上传球员照片 22 张', ip: '10.20.7.9' },
-])
+const rows = ref<LogRow[]>([])
 
 async function refresh(params?: Record<string, string>) {
   const query: Record<string, unknown> = {}
@@ -54,7 +48,7 @@ async function refresh(params?: Record<string, string>) {
   if (params?.dateFrom) query.date_from = params.dateFrom.trim()
   if (params?.dateTo) query.date_to = params.dateTo.trim()
   const list = await fetchAuditLogs(query)
-  if (!list) return // 后端不可用：保留演示数据
+  if (!list) return
   rows.value = list.map((l) => ({
     time: l.created_at,
     account: l.account,

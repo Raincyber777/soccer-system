@@ -3,7 +3,7 @@ import { errMsg } from './manage'
 
 // 用户端球队/球员/教练管理：school 角色可写本人球队资源
 // （后端 IsStaffOrTeamOwner + 对象级 owner 校验双重把关）。
-// 读失败返回 null（页面保留演示数据），写失败抛 ApiError 由页面提示。
+// 读失败返回 null（页面展示空态），写失败抛 ApiError 由页面提示。
 
 export interface ApiTeam {
   id: number
@@ -59,7 +59,7 @@ export interface ApiCoach {
   status_display: string
 }
 
-/** 读失败回退 null：调用方据此决定是否保留本地演示行 */
+/** 读失败回退 null：调用方据此展示空态 */
 async function tryList<T>(fn: () => Promise<T>): Promise<T | null> {
   try {
     return await fn()

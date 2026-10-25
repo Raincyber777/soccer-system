@@ -4,9 +4,9 @@ import { errMsg } from './manage'
 // 门户内容管理：轮播图 / 合作方 / 精彩瞬间 / 最佳阵容。
 // 图片与 Logo 字段均为 CharField 存 URL：先经通用上传 POST /api/common/upload/
 // 拿到地址，再随表单写入（上传函数在 api/registration.ts 的 uploadCommonFile）。
-// 读失败返回 null（页面保留演示数据），写失败抛 ApiError 由页面提示。
+// 读失败返回 null（页面展示空态），写失败抛 ApiError 由页面提示。
 
-/** 读失败回退 null：调用方据此决定是否保留本地演示行 */
+/** 读失败回退 null：调用方据此展示空态 */
 async function tryList<T>(fn: () => Promise<T>): Promise<T | null> {
   try {
     return await fn()

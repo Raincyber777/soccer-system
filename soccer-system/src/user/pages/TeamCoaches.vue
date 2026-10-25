@@ -42,10 +42,7 @@ interface CoachRow {
   status: string
 }
 
-const rows = ref<CoachRow[]>([
-  { id: null, name: '张建国', gender: '男', idCard: '5101**********1011', cert: '亚足联C级', phone: '138****0000', status: '已生效' },
-  { id: null, name: '刘洋', gender: '男', idCard: '5101**********1022', cert: 'D级', phone: '139****1111', status: '待审核' },
-])
+const rows = ref<CoachRow[]>([])
 
 const teamReady = ref(false)
 const teamId = ref<number | null>(null)
@@ -141,7 +138,7 @@ async function onSubmit(data: Record<string, string>) {
 
 function startEdit(r: CoachRow) {
   if (r.id === null) {
-    alert('当前为离线演示数据，无法编辑')
+    alert('数据未加载，请刷新后重试')
     return
   }
   editingId.value = r.id
@@ -163,7 +160,7 @@ async function onAction(action: string, row: Record<string, unknown>) {
   }
   if (action === '删除') {
     if (r.id === null) {
-      alert('当前为离线演示数据，无法操作')
+      alert('数据未加载，请刷新后重试')
       return
     }
     if (!confirm(`确认删除教练员「${r.name}」的资料？`)) return

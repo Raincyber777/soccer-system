@@ -51,20 +51,7 @@ const columns: TableColumn[] = [
   { key: 'status', label: '状态', width: '90px' },
 ]
 
-const rows = ref<LineupRow[]>([
-  {
-    id: 0,
-    title: '中学组 第 3 轮最佳阵容',
-    group: '中学组',
-    groupKey: 'middle',
-    formation: '4-3-3',
-    playerCount: 11,
-    status: '已发布',
-    players: [],
-    description: '',
-    matchId: null,
-  },
-])
+const rows = ref<LineupRow[]>([])
 
 const filters = ref<Record<string, string>>({})
 const displayRows = computed(() =>
@@ -95,7 +82,7 @@ const formFields: FormField[] = [
 
 async function refresh() {
   const list = await fetchBestLineups()
-  if (!list) return // 后端不可用：保留演示数据
+  if (!list) return
   rows.value = list.map((l: ApiBestLineup) => ({
     id: l.id,
     title: l.title,

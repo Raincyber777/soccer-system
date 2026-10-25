@@ -38,11 +38,7 @@ const columns: TableColumn[] = [
   { key: 'status', label: '状态', width: '90px' },
 ]
 
-const rows = ref<PartnerRow[]>([
-  { id: 0, name: '省足球协会', link: 'https://fa.example.gov.cn', logo: '已上传', status: '已发布', logoUrl: '' },
-  { id: 0, name: '省学生体育协会', link: 'https://sfa.example.gov.cn', logo: '已上传', status: '已发布', logoUrl: '' },
-  { id: 0, name: '运动饮料品牌 X', link: 'https://brandx.example.com', logo: '未上传', status: '已下架', logoUrl: '' },
-])
+const rows = ref<PartnerRow[]>([])
 
 const editingId = ref<number | null>(null)
 const formInitial = ref<Record<string, string>>({})
@@ -51,7 +47,7 @@ const logo = ref('') // 已上传 Logo URL
 
 async function refresh() {
   const list = await fetchPartners()
-  if (!list) return // 后端不可用：保留演示数据
+  if (!list) return
   rows.value = list.map((p: ApiPartner) => ({
     id: p.id,
     name: p.name,

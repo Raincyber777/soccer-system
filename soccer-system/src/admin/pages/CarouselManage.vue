@@ -33,11 +33,7 @@ const columns: TableColumn[] = [
   { key: 'status', label: '状态', width: '90px' },
 ]
 
-const rows = ref<BannerRow[]>([
-  { id: 0, title: '秋季联赛开幕图', link: 'https://portal.example.com/news/101', sort: 1, status: '已发布', image: '' },
-  { id: 0, title: '最佳阵容第一期', link: 'https://portal.example.com/news/102', sort: 2, status: '已发布', image: '' },
-  { id: 0, title: '联赛赞助商联合海报', link: '', sort: 3, status: '已下架', image: '' },
-])
+const rows = ref<BannerRow[]>([])
 
 const editingId = ref<number | null>(null)
 const formInitial = ref<Record<string, string>>({})
@@ -52,7 +48,7 @@ const formFields: FormField[] = [
 
 async function refresh() {
   const list = await fetchBanners()
-  if (!list) return // 后端不可用：保留演示数据
+  if (!list) return
   rows.value = list.map((b: ApiBanner) => ({
     id: b.id,
     title: b.title || '未命名轮播图',

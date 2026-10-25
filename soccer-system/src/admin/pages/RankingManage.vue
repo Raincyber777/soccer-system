@@ -36,21 +36,13 @@ type RankRow = {
   matches: number
 }
 
-// 后端不可用时的演示行
-const demoRows: RankRow[] = [
-  { rank: 1, name: '王小磊', number: '9', team: '实验中学足球队', position: '前锋', goals: 9, assists: 4, matches: 5 },
-  { rank: 2, name: '周子豪', number: '11', team: '市二中足球队', position: '前锋', goals: 8, assists: 2, matches: 5 },
-  { rank: 3, name: '李泽宇', number: '7', team: '实验中学足球队', position: '中场', goals: 6, assists: 7, matches: 5 },
-  { rank: 4, name: '郑凯', number: '10', team: '师大附中队', position: '中场', goals: 5, assists: 3, matches: 4 },
-]
-
-const rows = ref<RankRow[]>(demoRows)
+const rows = ref<RankRow[]>([])
 const loaded = ref(false)
 const currentGroup = ref('')
 
 async function refresh(groupLabel = '') {
   const data = await fetchScorerRanking(GROUP_TO_API[groupLabel] ?? '')
-  if (!data) return // 后端不可用：保留演示数据
+  if (!data) return
   loaded.value = true
   rows.value = data.results.map((s) => ({
     rank: s.rank,

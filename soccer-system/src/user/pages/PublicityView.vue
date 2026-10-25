@@ -8,7 +8,7 @@ import { fetchPublicityCoaches, fetchPublicityPlayers } from '../../api/person'
 import type { ApiCoach, ApiPlayer } from '../../api/team'
 
 // 信息公示（公开数据）：仅展示注册已生效且开启公示的运动员 / 审核已生效的教练员。
-// 组别筛选随姓名一起传后端；后端不可用时保留演示数据。
+// 组别筛选随姓名一起传后端；后端不可用时展示空态。
 
 const GROUP_TO_API: Record<string, string> = {
   小学组: 'primary',
@@ -38,11 +38,7 @@ interface PlayerRow {
   status: string
 }
 
-const players = ref<PlayerRow[]>([
-  { name: '王小磊', team: '实验中学足球队', group: '中学组', position: '前锋', status: '已公示' },
-  { name: '李泽宇', team: '实验中学足球队', group: '中学组', position: '中场', status: '已公示' },
-  { name: '陈昊', team: '实验中学足球队', group: '中学组', position: '守门员', status: '已公示' },
-])
+const players = ref<PlayerRow[]>([])
 
 const coachSearch: SearchField[] = [{ key: 'name', label: '姓名', placeholder: '输入教练员姓名' }]
 
@@ -60,10 +56,7 @@ interface CoachRow {
   status: string
 }
 
-const coaches = ref<CoachRow[]>([
-  { name: '张建国', unit: '实验中学', level: '亚足联C级', status: '已公示' },
-  { name: '刘洋', unit: '实验中学', level: '中国足协D级', status: '已公示' },
-])
+const coaches = ref<CoachRow[]>([])
 
 async function refresh(filters?: Record<string, string>) {
   const playerQuery: Record<string, unknown> = { page_size: 100 }

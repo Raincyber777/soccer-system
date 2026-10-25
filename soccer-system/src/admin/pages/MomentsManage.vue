@@ -36,10 +36,7 @@ const columns: TableColumn[] = [
   { key: 'status', label: '状态', width: '90px' },
 ]
 
-const rows = ref<HighlightRow[]>([
-  { id: 0, title: '第 2 轮李泽宇远射世界波', match: '中学组 第 2 轮', image: '有', publishTime: '2026-10-13 20:10', status: '已发布' },
-  { id: 0, title: '小球员赛前 handshake', match: '小学组 第 1 轮', image: '有', publishTime: '2026-10-12 12:00', status: '已发布' },
-])
+const rows = ref<HighlightRow[]>([])
 
 const matches = ref<ApiMatch[]>([])
 const rawList = ref<ApiHighlight[]>([]) // 原始数据：编辑回填用
@@ -69,7 +66,7 @@ async function refresh() {
   const matchList = await fetchAdminMatches()
   if (matchList) matches.value = matchList
   const list = await fetchHighlights()
-  if (!list) return // 后端不可用：保留演示数据
+  if (!list) return
   rawList.value = list
   rows.value = list.map((h: ApiHighlight) => ({
     id: h.id,

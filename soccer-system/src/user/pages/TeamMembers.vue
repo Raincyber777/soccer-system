@@ -46,11 +46,7 @@ interface MemberRow {
   grade: string
 }
 
-const rows = ref<MemberRow[]>([
-  { id: null, name: '王小磊', idCard: '5101**********0011', birth: '2011-03-12', position: '前锋', number: '9', photo: '已上传', status: '已生效', gender: '男', grade: '初二' },
-  { id: null, name: '李泽宇', idCard: '5101**********0022', birth: '2011-07-25', position: '中场', number: '10', photo: '已上传', status: '已生效', gender: '男', grade: '初二' },
-  { id: null, name: '陈昊', idCard: '5101**********0033', birth: '2010-11-08', position: '守门员', number: '1', photo: '未上传', status: '待审核', gender: '男', grade: '初三' },
-])
+const rows = ref<MemberRow[]>([])
 
 const teamReady = ref(false)
 const teamId = ref<number | null>(null)
@@ -154,7 +150,7 @@ async function onSubmit(data: Record<string, string>) {
 
 function startEdit(r: MemberRow) {
   if (r.id === null) {
-    alert('当前为离线演示数据，无法编辑')
+    alert('数据未加载，请刷新后重试')
     return
   }
   editingId.value = r.id
@@ -184,7 +180,7 @@ async function onAction(action: string, row: Record<string, unknown>) {
   }
   if (action === '删除') {
     if (r.id === null) {
-      alert('当前为离线演示数据，无法操作')
+      alert('数据未加载，请刷新后重试')
       return
     }
     if (!confirm(`确认删除球员「${r.name}」的资料？`)) return

@@ -5,10 +5,9 @@ import { useAuth } from '../../stores/auth'
 import AppIcon from '../common/AppIcon.vue'
 import { apiLogin, mapBackendUser, saveAuthSession } from '../../api/auth'
 import { ApiError } from '../../api/client'
-import { dashboardPath, resolveAccount, roleTexts } from './accountStore'
+import { dashboardPath, roleTexts } from './accountStore'
 
 // 登录表单：账号密码即可，角色与身份由后端按账号自动识别
-// 优先请求后端换 JWT；网络失败（后端未启动）时回退本地演示账号，保证离线可演示
 const router = useRouter()
 const auth = useAuth()
 
@@ -40,26 +39,9 @@ async function handleLogin() {
       router.push(dashboardPath(mapped.role))
     }, 600)
   } catch (err) {
-    // 后端明确拒绝（密码错误/账号禁用）：如实提示，不回退本地
-    if (err instanceof ApiError && err.code === 20002) {
-      errorMsg.value = err.message
-      return
-    }
-    // 网络失败：回退本地演示账号（离线演示模式）
-    const found = resolveAccount(account)
-    if (!found) {
-      errorMsg.value = `无法连接服务器，且「${account}」不在演示账号库，请在「注册」页创建参赛账号`
-      return
-    }
-    if (found.password !== form.password) {
-      errorMsg.value = '密码错误，请重新输入'
-      return
-    }
-    auth.loginAs(found.role, account, found.role === 'user' ? found.persona : undefined)
-    successMsg.value = `（离线演示模式）登录成功：${found.label}，即将进入${roleTexts[found.role]}…`
-    setTimeout(() => {
-      router.push(dashboardPath(found.role))
-    }, 600)
+    // 后端明确拒绝（密码错误/账号禁用等）如实提示原因；网络失败统一提示
+    errorMsg.value = err instanceof ApiError ? err.message : '无法连接服务器，请检查网络后重试'
+    return
   } finally {
     loggingIn.value = false
   }

@@ -41,17 +41,14 @@ interface PlayerRow {
   isActive: boolean
 }
 
-const rows = ref<PlayerRow[]>([
-  { id: null, name: '王小磊', idCard: '5101**********0011', team: '实验中学足球队', group: '中学组', status: '已生效', public: '已公示', gender: '男', birth: '2011-03-12', position: '前锋', number: '9', grade: '初二', isActive: true },
-  { id: null, name: '陈昊', idCard: '5101**********0033', team: '实验中学足球队', group: '中学组', status: '待审核', public: '未公示', gender: '男', birth: '2010-11-08', position: '守门员', number: '1', grade: '初三', isActive: false },
-])
+const rows = ref<PlayerRow[]>([])
 
 async function refresh(params?: Record<string, string>) {
   const query: Record<string, unknown> = {}
   if (params?.name) query.name = params.name.trim()
   if (params?.idCard) query.id_card = params.idCard.trim()
   const list = await fetchPlayers(query)
-  if (!list) return // 后端不可用：保留演示数据
+  if (!list) return
   rows.value = list.map((p: ApiPlayer) => ({
     id: p.id,
     name: p.name,
@@ -111,7 +108,7 @@ async function onSubmit(data: Record<string, string>) {
 async function onAction(action: string, row: Record<string, unknown>) {
   const r = row as unknown as PlayerRow
   if (r.id === null) {
-    alert('当前为离线演示数据，无法操作')
+    alert('数据未加载，请刷新后重试')
     return
   }
   if (action === '编辑') {

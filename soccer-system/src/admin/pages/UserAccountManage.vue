@@ -78,7 +78,7 @@ const formKey = ref(0)
 
 async function refresh() {
   const list = await fetchUsers()
-  if (!list) return // 后端不可用：保留演示数据
+  if (!list) return
   rows.value = list
     .filter((u: ApiUser) => USER_ROLES.includes(u.role))
     .map((u: ApiUser) => ({

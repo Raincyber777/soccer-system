@@ -4,12 +4,11 @@ import { useRouter } from 'vue-router'
 import { useAuth, personaLabels, type UserPersona } from '../../stores/auth'
 import SchoolSelect from '../common/SchoolSelect.vue'
 import type { SchoolInfo } from '../../data/sichuan-schools'
-import { demoAccounts, loadRegistered, saveRegistered } from './accountStore'
 import { apiRegister, mapBackendUser, saveAuthSession } from '../../api/auth'
 import { ApiError } from '../../api/client'
 
 // 注册表单：只面向参赛人员；管理员/超管账号不开放注册，由超级管理员在后台创建
-// 优先提交后端注册接口（注册即返回 JWT 直接进入登录态）；网络失败回退本地注册表
+// 提交后端注册接口（注册即返回 JWT 直接进入登录态）
 const router = useRouter()
 const auth = useAuth()
 
@@ -89,35 +88,9 @@ async function handleRegister() {
       router.push('/user/dashboard')
     }, 800)
   } catch (err) {
-    // 后端校验失败（用户名已存在/学校不存在等）：展示后端原因
-    if (err instanceof ApiError) {
-      registerMsg.value = err.message
-      return
-    }
-    // 网络失败：写入本地注册表（离线演示模式）
-    const taken =
-      demoAccounts.some((d) => d.account.toLowerCase() === account.toLowerCase()) ||
-      loadRegistered().some((u) => u.account.toLowerCase() === account.toLowerCase())
-    if (taken) {
-      registerMsg.value = '该账号已被注册，请换一个用户名'
-      return
-    }
-    const list = loadRegistered()
-    list.push({
-      account,
-      password: registerForm.password,
-      school: registerSchool.value.name,
-      schoolCode: registerSchool.value.code,
-      email: registerForm.email.trim(),
-      persona: registerPersona.value,
-    })
-    saveRegistered(list)
-
-    auth.loginAs('user', account, registerPersona.value)
-    registerSuccess.value = `（离线演示模式）注册成功，正在以「${personaLabels[registerPersona.value]}」身份进入用户端…`
-    setTimeout(() => {
-      router.push('/user/dashboard')
-    }, 800)
+    // 后端校验失败（用户名已存在/学校不存在等）展示后端原因；网络失败统一提示
+    registerMsg.value = err instanceof ApiError ? err.message : '网络异常，注册失败，请稍后重试'
+    return
   } finally {
     registering.value = false
   }

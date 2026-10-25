@@ -5,14 +5,9 @@ import AppIcon from '../../components/common/AppIcon.vue'
 import type { TableColumn } from '../../components/common/types'
 
 // 球队履历（球队负责人）：历年参赛记录与荣誉墙
-// 成绩数据来源于管理员端「赛果发布」审核通过后的结果，演示阶段为静态 mock
+// 荣誉与履历数据待后端提供球队履历聚合接口后填充，当前展示空态
 
-const honors = [
-  { icon: 'star', season: '2026 秋季', event: '省青少年校园足球联赛（秋季）中学组', result: '进行中' },
-  { icon: 'trophy', season: '2025 春季', event: '成都市校园足球联赛（中学组）', result: '冠军' },
-  { icon: 'medal', season: '2025 秋季', event: '省青少年校园足球联赛 中学组', result: '亚军' },
-  { icon: 'medal', season: '2024 秋季', event: '成都市校园足球联赛（中学组）', result: '季军' },
-]
+const honors: { icon: string; season: string; event: string; result: string }[] = []
 
 const columns: TableColumn[] = [
   { key: 'season', label: '赛季', width: '110px' },
@@ -23,19 +18,15 @@ const columns: TableColumn[] = [
   { key: 'status', label: '状态', width: '90px' },
 ]
 
-const rows = [
-  { season: '2026 秋季', event: '省青少年校园足球联赛（秋季）', group: '中学组', players: 20, result: '待定', status: '进行中' },
-  { season: '2025 秋季', event: '省青少年校园足球联赛', group: '中学组', players: 20, result: '亚军', status: '已结束' },
-  { season: '2025 春季', event: '成都市校园足球联赛（中学组）', group: '中学组', players: 18, result: '冠军', status: '已结束' },
-  { season: '2024 秋季', event: '成都市校园足球联赛（中学组）', group: '中学组', players: 18, result: '八强', status: '已结束' },
-]
+const rows: Record<string, unknown>[] = []
 </script>
 
 <template>
-  <PageHeader title="球队履历" desc="实验中学足球队的历年参赛记录与荣誉，赛果审核发布后自动计入" />
+  <PageHeader title="球队履历" desc="本队历年参赛记录与荣誉，赛果审核发布后自动计入" />
 
   <h3 class="section-title">荣誉墙</h3>
-  <div class="honor-grid">
+  <p v-if="!honors.length" class="page-tip">暂无荣誉记录，赛事完赛并经管理员审核发布后自动写入。</p>
+  <div v-else class="honor-grid">
     <div v-for="h in honors" :key="h.event" class="honor-card">
       <span class="honor-icon" :class="{ gold: h.result === '冠军' }">
         <AppIcon :name="h.icon" :size="24" />

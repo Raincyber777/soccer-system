@@ -13,9 +13,9 @@ import {
   fetchTeamOptions,
   type MatchGroup,
 } from '../../api/manage'
-import { mockMatches, type MatchRow } from '../../data/portal-matches'
+import type { MatchRow } from '../../api/portal'
 
-// 比赛对阵信息管理：列表/新增/删除走后端（读失败回退演示数据），搜索为前端过滤
+// 比赛对阵信息管理：列表/新增/删除走后端，搜索为前端过滤
 
 const searchFields: SearchField[] = [
   { key: 'team', label: '球队名称', placeholder: '按球队名称查看' },
@@ -32,12 +32,11 @@ const columns: TableColumn[] = [
 ]
 
 type AdminMatchRow = MatchRow & { id: number | null }
-const rows = ref<AdminMatchRow[]>(mockMatches.map((m) => ({ ...m, id: null })))
+const rows = ref<AdminMatchRow[]>([])
 
 async function refresh() {
   const list = await fetchAdminMatches()
-  if (!list) return // 后端不可用：保留演示数据
-  rows.value = list.map((m) => ({
+  rows.value = (list ?? []).map((m) => ({
     id: m.id,
     match: `${m.group_type_display} ${m.round_name}`.trim(),
     group: m.group_type_display,
@@ -135,10 +134,7 @@ async function onSubmit(data: Record<string, string>) {
 async function onAction(action: string, row: Record<string, unknown>) {
   if (action === '删除') {
     const id = Number(row.id ?? 0)
-    if (!id) {
-      alert('当前为离线演示数据，无法操作')
-      return
-    }
+    if (!id) return
     if (!confirm(`确认删除对阵「${row.match}：${row.home} vs ${row.away}」？`)) return
     try {
       await deleteMatch(id)

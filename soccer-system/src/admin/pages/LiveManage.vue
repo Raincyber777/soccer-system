@@ -66,7 +66,7 @@ async function refresh() {
   const matchList = await fetchAdminMatches()
   if (matchList) matches.value = matchList
   const list = await fetchLiveStreams()
-  if (!list) return // 后端不可用：保留演示数据
+  if (!list) return
   rows.value = list.map((s: ApiLiveStream) => ({
     id: s.id,
     matchId: s.match,

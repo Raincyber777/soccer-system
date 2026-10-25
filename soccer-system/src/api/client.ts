@@ -4,7 +4,7 @@ import type { ApiEnvelope } from './types'
 // API 客户端：统一注入 token、解包 { code, data } 信封、把业务码/网络错误归一为 ApiError
 // 开发环境 /api 走 vite 代理到本地 Django；生产同域部署时 baseURL 留空即可
 
-/** 业务失败 / 网络失败统一抛这个，页面按需捕获或走 mock 兜底 */
+/** 业务失败 / 网络失败统一抛这个，页面按需捕获 */
 export class ApiError extends Error {
   constructor(
     public readonly code: number,
@@ -40,7 +40,7 @@ api.interceptors.response.use(
     return resp.data
   },
   (error) => {
-    // 网络层失败（后端未启动/超时/4xx/5xx）也归一为 ApiError，页面回退逻辑只认这一种
+    // 网络层失败（后端未启动/超时/4xx/5xx）也归一为 ApiError，页面错误处理只认这一种
     if (error instanceof ApiError) throw error
     const status = error?.response?.status as number | undefined
     const message = (error?.response?.data as ApiEnvelope<unknown> | undefined)?.message

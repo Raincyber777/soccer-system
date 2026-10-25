@@ -6,12 +6,10 @@ import PortalBanner from './PortalBanner.vue'
 import AppSelect from '../common/AppSelect.vue'
 import DataTable from '../common/DataTable.vue'
 import type { TableColumn } from '../common/types'
-import { mockScorers, mockStandings, type ScorerRow, type StandingRow } from '../../data/portal-rankings'
-import { fetchScorers, fetchStandings } from '../../api/portal'
+import { fetchScorers, fetchStandings, type ScorerRow, type StandingRow } from '../../api/portal'
 
 // 门户公开页 · 赛事榜单：组别积分榜与射手榜，游客无需登录
-// 数据优先来自后端聚合接口（/api/portal/stats/ranking|standings/，仅统计已发布赛果），
-// 见 src/api/portal.ts，失败回退演示数据
+// 数据来自后端聚合接口（/api/portal/stats/ranking|standings/，仅统计已发布赛果），见 src/api/portal.ts
 
 const groupOptions = ['全部组别', '小学组', '中学组', '高中组', '高校组']
 const groupFilter = ref('中学组')
@@ -30,9 +28,8 @@ const standingColumns: TableColumn[] = [
   { key: 'points', label: '积分', width: '70px' },
 ]
 
-// 初始展示演示数据，接口返回后无缝替换
-const standings = ref<StandingRow[]>(mockStandings)
-const scorers = ref<ScorerRow[]>(mockScorers)
+const standings = ref<StandingRow[]>([])
+const scorers = ref<ScorerRow[]>([])
 
 onMounted(async () => {
   standings.value = await fetchStandings()

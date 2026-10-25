@@ -2,7 +2,7 @@
 import { computed, ref, watch } from 'vue'
 import type { TableColumn } from './types'
 
-// 通用演示表格：传入列配置和行数据即可，状态列自动渲染成彩色标签
+// 通用数据表格：传入列配置和行数据即可，状态列自动渲染成彩色标签
 // 超过 pageSize 行自动出现分页器（纯前端分页，接入后端后可换成接口分页）
 const props = withDefaults(
   defineProps<{
@@ -75,7 +75,7 @@ function goTo(p: number) {
         <tbody>
           <tr v-if="!rows.length">
             <td class="empty-cell" :colspan="columns.length + (actions?.length ? 1 : 0)">
-              暂无数据（演示占位，接入后端后显示真实数据）
+              暂无数据
             </td>
           </tr>
           <tr v-for="(row, index) in pagedRows" :key="(page - 1) * props.pageSize + index">

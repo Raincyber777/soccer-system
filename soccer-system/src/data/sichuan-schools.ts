@@ -1,7 +1,7 @@
-// 四川省行政区划与学校基础数据（前端演示 mock）
+// 四川省行政区划与学校基础数据（前端内置参考数据）
 // 范围：本项目仅面向四川省，省级固定，市/区县用 GB/T 2260 行政区划代码做主键
 // 学校唯一标识用教育部「学校（机构）标识码」（10 位，全国唯一）；
-// 演示编码规则 = 区划代码(6位) + 4位序号，真实数据以省教育厅权威导入为准，接入后端时替换本文件
+// 编码规则 = 区划代码(6位) + 4位序号，权威数据以省教育厅导入为准
 export type SchoolStage = '小学' | '初中' | '高中' | '高校'
 
 export interface RegionOption {
@@ -43,10 +43,10 @@ export const SICHUAN_CITIES: RegionOption[] = [
   { code: '513400', name: '凉山州' },
 ]
 
-// 演示页通用市州下拉选项（完整 21 市州里挑常用 6 个；「省本级」由页面按需追加）
+// 通用市州下拉选项（完整 21 市州里挑常用 6 个；「省本级」由页面按需追加）
 export const SICHUAN_CITY_OPTIONS: string[] = ['成都市', '绵阳市', '德阳市', '宜宾市', '南充市', '达州市']
 
-// 市州 → 区县（演示子集，真实数据以后端行政区划表为准）
+// 市州 → 区县（常用子集，完整数据以后端行政区划表为准）
 export const CITY_DISTRICTS: Record<string, RegionOption[]> = {
   成都市: [
     { code: '510104', name: '锦江区' },
@@ -155,7 +155,7 @@ export const CITY_DISTRICTS: Record<string, RegionOption[]> = {
   ],
 }
 
-// 学校基础数据（演示）：接入后端前用本表模拟「学校代码精准定位」
+// 学校基础数据：用于「学校代码精准定位」
 export const SICHUAN_SCHOOLS: SchoolInfo[] = [
   { code: '5101050003', name: '成都市实验小学', city: '成都市', district: '青羊区', stage: '小学' },
   { code: '5101050002', name: '成都市石室联合中学', city: '成都市', district: '青羊区', stage: '初中' },

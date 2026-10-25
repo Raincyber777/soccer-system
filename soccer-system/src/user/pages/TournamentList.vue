@@ -29,10 +29,7 @@ interface TournamentRow {
   raw: ApiTournamentOption
 }
 
-const rows = ref<TournamentRow[]>([
-  { id: 0, name: '2026 省青少年校园足球联赛（秋季）', group: '中学组', organizer: '省教育厅', signTime: '10-15 ~ 11-05', status: '报名中', canSign: true, raw: null as unknown as ApiTournamentOption },
-  { id: 0, name: '2026 省大学生足球锦标赛', group: '高校组', organizer: '省体育局', signTime: '09-20 ~ 10-10', status: '进行中', canSign: false, raw: null as unknown as ApiTournamentOption },
-])
+const rows = ref<TournamentRow[]>([])
 
 function fmtGroups(t: ApiTournamentOption): string {
   const g = t.group_types
@@ -46,7 +43,7 @@ function fmtDate(s: string | null): string {
 
 async function refresh() {
   const list = await fetchTournaments()
-  if (!list) return // 后端不可用：保留演示数据
+  if (!list) return
   rows.value = list.map((t: ApiTournamentOption) => ({
     id: t.id,
     name: t.name,

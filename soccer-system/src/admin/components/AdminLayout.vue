@@ -2,15 +2,15 @@
 import type { RouteRecordRaw } from 'vue-router'
 import { useRouter } from 'vue-router'
 import { adminRoutes } from '../../routers/adminRoutes'
-import { useAuth, STAFF_IDENTITY } from '../../stores/auth'
+import { useAuth } from '../../stores/auth'
 import AppIcon from '../../components/common/AppIcon.vue'
 import SideNav from '../../components/common/SideNav.vue'
 
 const router = useRouter()
 const auth = useAuth()
 
-// 顶栏身份标签：优先后端登录返回的「角色 · 所属机构」，离线演示回退到演示账号映射
-const identity = auth.state.staffLabel || (STAFF_IDENTITY[auth.state.account] ?? '市州管理员')
+// 顶栏身份标签：后端登录返回的「角色 · 所属机构」
+const identity = auth.state.staffLabel || '市州管理员'
 
 function handleLogout() {
   auth.logout()

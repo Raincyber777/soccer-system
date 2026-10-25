@@ -44,10 +44,7 @@ type CoachRow = {
   status: string
 }
 
-const coachRows = ref<CoachRow[]>([
-  { id: -1, name: '张建国', idCard: '5101**********1011', unit: '实验中学', phone: '—', status: '已生效' },
-  { id: -2, name: '刘洋', idCard: '5101**********1022', unit: '第一实验小学', phone: '—', status: '已生效' },
-])
+const coachRows = ref<CoachRow[]>([])
 
 const coachEditingId = ref<number | null>(null)
 const coachInitial = ref<Record<string, string>>({})
@@ -78,10 +75,7 @@ type PlayerRow = {
   status: string
 }
 
-const playerRows = ref<PlayerRow[]>([
-  { id: -1, team: null, name: '王小磊', idCard: '5101**********0011', avatar: '已上传', status: '已生效' },
-  { id: -2, team: null, name: '李泽宇', idCard: '5101**********0022', avatar: '未上传', status: '已生效' },
-])
+const playerRows = ref<PlayerRow[]>([])
 
 const rawPlayers = ref<ApiPlayer[]>([])
 const teams = ref<ApiTeam[]>([])

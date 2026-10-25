@@ -1,7 +1,7 @@
 import { api } from './client'
 
 // 赛事统计（公开聚合接口，非分页）：射手榜 / 积分榜 / 组别进球统计。
-// 只统计「已发布赛果」的比赛；读失败返回 null，页面保留演示数据。
+// 只统计「已发布赛果」的比赛；读失败返回 null，页面展示空态。
 
 export interface ApiScorerRow {
   rank: number

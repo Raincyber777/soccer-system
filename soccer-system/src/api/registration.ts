@@ -2,7 +2,7 @@ import { api, getPage } from './client'
 import { errMsg } from './manage'
 
 // 报名与两级审核：列表按登录角色数据域返回（city 本区域 / school 本队 / admin 全省）。
-// 读失败（后端未启动）返回 null，页面保留演示数据；
+// 读失败（未登录/网络异常）返回 null，页面展示空态；
 // 审核/删除失败抛 ApiError，页面展示后端 message（驳回必填原因等）。
 
 /** 报名状态机：pending_city_review → pending_province_review → approved / rejected */
@@ -48,7 +48,7 @@ export interface RegistrationDetail extends RegistrationList {
   updated_at: string
 }
 
-/** 读失败回退 null：调用方据此决定是否保留本地演示行 */
+/** 读失败回退 null：调用方据此展示空态 */
 async function tryList<T>(fn: () => Promise<T>): Promise<T | null> {
   try {
     return await fn()

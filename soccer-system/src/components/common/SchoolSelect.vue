@@ -20,7 +20,7 @@ const keyword = ref('')
 const open = ref(false)
 const root = ref<HTMLElement | null>(null)
 
-// 搜索防抖：演示数据为本地过滤，接入后端时把这里换成防抖请求学校接口
+// 搜索为本地过滤：学校基础数据随前端打包，体量小无需请求后端
 const DEBOUNCE_MS = 250
 const debouncedKeyword = ref('')
 let timer: ReturnType<typeof setTimeout> | null = null

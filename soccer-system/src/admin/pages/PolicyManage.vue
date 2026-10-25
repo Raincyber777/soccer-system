@@ -14,7 +14,7 @@ import {
   type PolicyPayload,
 } from '../../api/manage'
 
-// 赛事政策发布管理：列表/新增/编辑/下架重新发布/删除全部走后端，读失败回退演示数据
+// 赛事政策发布管理：列表/新增/编辑/下架重新发布/删除全部走后端，读失败展示空态
 const auth = useAuth()
 
 const formFields: FormField[] = [
@@ -54,7 +54,7 @@ function makeSummary(content: string): string {
 
 async function refresh() {
   const list = await fetchAdminPolicies()
-  if (!list) return // 后端不可用：保留演示数据
+  if (!list) return
   rows.value = list.map((p) => ({
     id: p.id,
     title: p.title,
@@ -100,7 +100,7 @@ async function onSubmit(data: Record<string, string>) {
 
 function startEdit(row: PolicyRow) {
   if (row.id === null) {
-    alert('当前为离线演示数据，无法编辑')
+    alert('数据未加载，请刷新后重试')
     return
   }
   editingId.value = row.id
@@ -117,7 +117,7 @@ function cancelEdit() {
 async function onAction(action: string, row: Record<string, unknown>) {
   const r = row as unknown as PolicyRow
   if (action === '查看') {
-    alert(`${r.title}\n\n${r.content ? r.content.replace(/<[^>]+>/g, '').slice(0, 200) : '（离线演示数据，无正文）'}`)
+    alert(`${r.title}\n\n${r.content ? r.content.replace(/<[^>]+>/g, '').slice(0, 200) : '（无正文）'}`)
     return
   }
   if (action === '修改') {
@@ -126,7 +126,7 @@ async function onAction(action: string, row: Record<string, unknown>) {
   }
   if (action === '下架/发布') {
     if (r.id === null) {
-      alert('当前为离线演示数据，无法操作')
+      alert('数据未加载，请刷新后重试')
       return
     }
     try {
@@ -139,7 +139,7 @@ async function onAction(action: string, row: Record<string, unknown>) {
   }
   if (action === '删除') {
     if (r.id === null) {
-      alert('当前为离线演示数据，无法操作')
+      alert('数据未加载，请刷新后重试')
       return
     }
     if (!confirm(`确认删除政策「${r.title}」？删除后不可恢复`)) return

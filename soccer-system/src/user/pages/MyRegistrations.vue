@@ -54,7 +54,7 @@ const rows = ref<Row[]>([
 
 async function refresh() {
   const list = await fetchRegistrations()
-  if (!list) return // 后端不可用：保留演示数据
+  if (!list) return
   rows.value = list.map((r: RegistrationList) => ({
     id: r.id,
     team_name: r.team_name,
@@ -85,7 +85,7 @@ function onSearch(f: Record<string, string>) {
 /** 查看审核：完整审核链（市州初审 → 省级终审），驳回原因直接可见 */
 async function viewLogs(row: Row) {
   if (row.id === null) {
-    alert('当前为离线演示数据，无审核记录')
+    alert('审核记录获取失败，请稍后重试')
     return
   }
   const logs = await fetchReviewLogs(row.id)
@@ -109,7 +109,7 @@ async function onAction(action: string, row: Record<string, unknown>) {
   }
   if (action === '下载报名表') {
     if (r.id === null) {
-      alert('当前为离线演示数据，无法下载')
+      alert('附件获取失败，无法下载')
       return
     }
     try {
@@ -125,7 +125,7 @@ async function onAction(action: string, row: Record<string, unknown>) {
     return
   }
   if (r.id === null) {
-    alert('当前为离线演示数据，无法操作')
+    alert('数据未加载，请刷新后重试')
     return
   }
   if (action === '修改') {

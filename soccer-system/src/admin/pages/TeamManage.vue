@@ -11,7 +11,7 @@ import { fetchCoaches, fetchPlayers, fetchTeams, type ApiTeam } from '../../api/
 import { fetchSelectionScores, SELECTION_STAGE_DISPLAY, type ApiSelectionScore } from '../../api/selection'
 
 // 参赛管理：全省球队检索、查看成员/教练/比赛记录、球员遴选档案（名单×评分 join）。
-// 球队/球员/教练公开可读，评分需登录读取；失败时保留演示数据。
+// 球队/球员/教练公开可读，评分需登录读取；失败时展示空态。
 
 const teamSearch: SearchField[] = [
   { key: 'team', label: '球队名称', placeholder: '输入球队名称' },
@@ -34,11 +34,7 @@ interface TeamRow {
   group: string
 }
 
-const teams = ref<TeamRow[]>([
-  { id: 0, team: '实验中学足球队', city: '成都市', school: '实验中学', group: '中学组' },
-  { id: 0, team: '第一实验小学队', city: '绵阳市', school: '第一实验小学', group: '小学组' },
-  { id: 0, team: '川师大队', city: '成都市', school: '四川师范大学', group: '高校组' },
-])
+const teams = ref<TeamRow[]>([])
 
 const teamFilters = ref<Record<string, string>>({})
 const displayTeams = computed(() =>
@@ -72,10 +68,7 @@ interface ArchiveRow {
   score: ApiSelectionScore | null
 }
 
-const archives = ref<ArchiveRow[]>([
-  { playerId: 0, name: '王小磊', team: '实验中学足球队', idCard: '', updated: '2026-10-16 14:20', status: '已归档', score: null },
-  { playerId: 0, name: '李泽宇', team: '实验中学足球队', idCard: '', updated: '2026-10-15 09:40', status: '已归档', score: null },
-])
+const archives = ref<ArchiveRow[]>([])
 
 const archiveFilters = ref<Record<string, string>>({})
 const displayArchives = computed(() =>

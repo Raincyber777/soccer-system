@@ -41,14 +41,11 @@ interface CoachRow {
   years: string
 }
 
-const rows = ref<CoachRow[]>([
-  { id: null, name: '张建国', idCard: '5101**********1011', unit: '实验中学', category: '专职教练员', certLevel: '亚足联C级', status: '已生效', gender: '男', phone: '13800000001', years: '12' },
-  { id: null, name: '刘洋', idCard: '5101**********1022', unit: '第一实验小学', category: '体育教师兼任', certLevel: '中国足协D级', status: '待审核', gender: '男', phone: '13800000002', years: '3' },
-])
+const rows = ref<CoachRow[]>([])
 
 async function refresh(params?: Record<string, string>) {
   const list = await fetchCoaches(params?.name ? { name: params.name.trim() } : undefined)
-  if (!list) return // 后端不可用：保留演示数据
+  if (!list) return
   let mapped: CoachRow[] = list.map((c: ApiCoach) => ({
     id: c.id,
     name: c.name,
@@ -113,7 +110,7 @@ async function onSubmit(data: Record<string, string>) {
 async function onAction(action: string, row: Record<string, unknown>) {
   const r = row as unknown as CoachRow
   if (r.id === null) {
-    alert('当前为离线演示数据，无法操作')
+    alert('数据未加载，请刷新后重试')
     return
   }
   if (action === '编辑') {

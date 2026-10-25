@@ -3,7 +3,7 @@ import { errMsg } from './manage'
 
 // 账户管理 /api/admin/users/：city 只见本区域、admin 全省（后端 apply_region_scope）。
 // 删除账户仅 admin 角色可执行；重置密码与禁用/启用为独立 action（POST）。
-// 读失败返回 null（页面保留演示数据），写失败抛 ApiError 由页面提示。
+// 读失败返回 null（页面展示空态），写失败抛 ApiError 由页面提示。
 
 export interface ApiUser {
   id: number
@@ -40,7 +40,7 @@ export interface UserUpdatePayload {
   region_code?: string
 }
 
-/** 读失败回退 null：调用方据此决定是否保留本地演示行 */
+/** 读失败回退 null：调用方据此展示空态 */
 async function tryList<T>(fn: () => Promise<T>): Promise<T | null> {
   try {
     return await fn()
@@ -79,7 +79,7 @@ export function toggleUserActive(id: number) {
 
 // ---------- 本人资料（用户端个人中心 / 运动员·教练员信息页共用） ----------
 
-/** 当前登录用户 GET /api/auth/me/（读失败返回 null，页面回退演示数据） */
+/** 当前登录用户 GET /api/auth/me/（读失败返回 null） */
 export function fetchMe() {
   return tryList(() => api.get<never, ApiUser>('/api/auth/me/'))
 }

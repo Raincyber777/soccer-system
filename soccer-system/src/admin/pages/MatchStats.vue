@@ -26,19 +26,12 @@ type StatRow = {
   raw?: ApiGroupGoals
 }
 
-// 后端不可用时的演示行
-const demoRows: StatRow[] = [
-  { group: '高校组', teams: '4', players: '86', scorers: '31', goals: 78, top: '李昊（11 球）' },
-  { group: '中学组', teams: '6', players: '135', scorers: '52', goals: 135, top: '王小磊（14 球）' },
-  { group: '小学组', teams: '5', players: '98', scorers: '40', goals: 98, top: '张一诺（9 球）' },
-]
-
-const rows = ref<StatRow[]>(demoRows)
+const rows = ref<StatRow[]>([])
 const loaded = ref(false)
 
 onMounted(async () => {
   const data = await fetchGroupGoals()
-  if (!data) return // 后端不可用：保留演示数据
+  if (!data) return
   loaded.value = true
   rows.value = data.groups.map((g) => {
     const top = g.top_players[0]
@@ -57,10 +50,7 @@ onMounted(async () => {
 function onAction(action: string, row: Record<string, unknown>) {
   if (action !== '查看射手') return
   const r = row as unknown as StatRow
-  if (!r.raw) {
-    alert('【演示】查看射手：待接入后端')
-    return
-  }
+  if (!r.raw) return
   const lines = r.raw.top_players.map((p) => `${p.rank}. ${p.player_name}（${p.team_name}）：${p.total_goals} 球 ${p.assists} 助攻`)
   alert(`【${r.group}】射手榜 TOP ${r.raw.top_players.length}\n\n${lines.join('\n') || '暂无进球记录'}`)
 }

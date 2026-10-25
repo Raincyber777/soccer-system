@@ -27,7 +27,7 @@ const rows = ref<ScopeRow[]>([])
 
 async function refresh() {
   const list = await fetchUsers({ role: 'city' })
-  if (!list) return // 后端不可用：保留演示数据
+  if (!list) return
   const groups = new Map<string, ApiUser[]>()
   list.forEach((u: ApiUser) => {
     const key = u.region_name || '未分配市州'

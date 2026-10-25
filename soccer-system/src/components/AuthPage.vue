@@ -5,15 +5,12 @@ import { useAuth } from '../stores/auth'
 import AppIcon from './common/AppIcon.vue'
 import LoginForm from './auth/LoginForm.vue'
 import RegisterForm from './auth/RegisterForm.vue'
-import { dashboardPath, demoAccounts, type DemoAccount } from './auth/accountStore'
-import { apiLogin, mapBackendUser, saveAuthSession } from '../api/auth'
 
 // 统一登录/注册页：卡片外壳 + 登录/注册标签页，表单逻辑分别在 LoginForm / RegisterForm 中
 const route = useRoute()
 const router = useRouter()
-const auth = useAuth()
 
-// /register 路径进来时默认显示注册页
+// /register 路径进来时默认显示注册页；点击标签同步路由，刷新/分享不丢状态
 type Tab = 'login' | 'register'
 const activeTab = ref<Tab>(route.path === '/register' ? 'register' : 'login')
 watch(
@@ -22,21 +19,10 @@ watch(
     activeTab.value = p === '/register' ? 'register' : 'login'
   },
 )
-
-// 演示账号一键登录：与手动登录同一套后端接口，失败（后端未启动/种子未灌）回退本地演示
-function quickLogin(demo: DemoAccount) {
-  apiLogin(demo.account, demo.password)
-    .then((session) => {
-      saveAuthSession(session)
-      const mapped = mapBackendUser(session.user)
-      auth.loginAs(mapped.role, demo.account, mapped.persona ?? 'leader', mapped.staffLabel)
-      router.push(dashboardPath(mapped.role))
-    })
-    .catch(() => {
-      auth.loginAs(demo.role, demo.account, demo.role === 'user' ? (demo.persona ?? 'leader') : undefined)
-      router.push(dashboardPath(demo.role))
-    })
-}
+watch(activeTab, (tab) => {
+  const target = tab === 'register' ? '/register' : '/login'
+  if (route.path !== target) router.replace(target)
+})
 </script>
 
 <template>
@@ -71,26 +57,6 @@ function quickLogin(demo: DemoAccount) {
         >
           注册
         </button>
-      </div>
-
-      <!-- 演示账号区：点击一键登录 -->
-      <div class="demo-box">
-        <p class="demo-title">演示账号（点击一键登录）</p>
-        <div class="demo-list">
-          <button
-            v-for="demo in demoAccounts"
-            :key="demo.account"
-            type="button"
-            class="demo-item"
-            @click="quickLogin(demo)"
-          >
-            <span class="demo-icon">
-              <AppIcon :name="demo.icon" :size="15" />
-            </span>
-            <span class="demo-label">{{ demo.label }}</span>
-            <span class="demo-account">{{ demo.account }} / {{ demo.password }}</span>
-          </button>
-        </div>
       </div>
 
       <LoginForm v-if="activeTab === 'login'" />
@@ -201,61 +167,4 @@ function quickLogin(demo: DemoAccount) {
   border-bottom-color: var(--green-dark);
 }
 
-/* 演示账号 */
-.demo-box {
-  margin-top: 16px;
-  background: var(--green-light);
-  border-radius: 10px;
-  padding: 12px 14px;
-}
-
-.demo-title {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--green-dark);
-  letter-spacing: 1px;
-}
-
-.demo-list {
-  margin-top: 8px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.demo-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: #fff;
-  border: 1px solid #d9e6dc;
-  border-radius: 8px;
-  padding: 7px 10px;
-  font-size: 12px;
-  cursor: pointer;
-  transition: border-color 0.2s, box-shadow 0.2s;
-  text-align: left;
-}
-
-.demo-item:hover {
-  border-color: var(--green);
-  box-shadow: 0 2px 8px rgba(30, 122, 63, 0.12);
-}
-
-.demo-icon {
-  display: inline-flex;
-  align-items: center;
-  color: var(--green-dark);
-}
-
-.demo-label {
-  color: var(--ink);
-  font-weight: 600;
-  flex: 1;
-}
-
-.demo-account {
-  color: var(--muted);
-  font-family: Consolas, monospace;
-}
 </style>

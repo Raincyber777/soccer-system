@@ -14,7 +14,7 @@ import {
   type NewsPayload,
 } from '../../api/manage'
 
-// 赛事新闻发布管理：列表/新增/编辑/下架重新发布/删除全部走后端，读失败回退演示数据
+// 赛事新闻发布管理：列表/新增/编辑/下架重新发布/删除全部走后端，读失败展示空态
 const auth = useAuth()
 
 const formFields: FormField[] = [
@@ -53,11 +53,7 @@ interface NewsRow {
   content: string
 }
 
-const rows = ref<NewsRow[]>([
-  { id: null, title: '2026 省青少年校园足球联赛（秋季）开赛公告', category: '通知公告', source: '赛事组委会', publishTime: '2026-10-15 09:00', status: '已发布', content: '' },
-  { id: null, title: '第三轮战报：实验中学 3:1 市二中', category: '战报', source: '赛事组委会', publishTime: '2026-10-12 18:30', status: '已发布', content: '' },
-  { id: null, title: '联赛第二阶段赛程调整说明', category: '赛事动态', source: '赛事组委会', publishTime: '2026-10-10 11:20', status: '已下架', content: '' },
-])
+const rows = ref<NewsRow[]>([])
 
 const editingId = ref<number | null>(null)
 const editingLabel = ref('')
@@ -70,7 +66,7 @@ function makeSummary(content: string): string {
 
 async function refresh() {
   const list = await fetchAdminNews()
-  if (!list) return // 后端不可用：保留演示数据
+  if (!list) return
   rows.value = list.map((n) => ({
     id: n.id,
     title: n.title,
@@ -118,7 +114,7 @@ async function onSubmit(data: Record<string, string>) {
 
 function startEdit(row: NewsRow) {
   if (row.id === null) {
-    alert('当前为离线演示数据，无法编辑')
+    alert('数据未加载，请刷新后重试')
     return
   }
   editingId.value = row.id
@@ -135,7 +131,7 @@ function cancelEdit() {
 async function onAction(action: string, row: Record<string, unknown>) {
   const r = row as unknown as NewsRow
   if (action === '查看') {
-    alert(`${r.title}\n\n${r.content ? r.content.replace(/<[^>]+>/g, '').slice(0, 200) : '（离线演示数据，无正文）'}`)
+    alert(`${r.title}\n\n${r.content ? r.content.replace(/<[^>]+>/g, '').slice(0, 200) : '（无正文）'}`)
     return
   }
   if (action === '修改') {
@@ -144,7 +140,7 @@ async function onAction(action: string, row: Record<string, unknown>) {
   }
   if (action === '下架/发布') {
     if (r.id === null) {
-      alert('当前为离线演示数据，无法操作')
+      alert('数据未加载，请刷新后重试')
       return
     }
     try {
@@ -157,7 +153,7 @@ async function onAction(action: string, row: Record<string, unknown>) {
   }
   if (action === '删除') {
     if (r.id === null) {
-      alert('当前为离线演示数据，无法操作')
+      alert('数据未加载，请刷新后重试')
       return
     }
     if (!confirm(`确认删除新闻「${r.title}」？删除后不可恢复`)) return

@@ -68,7 +68,7 @@ function stepOf(r: RegistrationList): string {
 
 async function refresh() {
   const list = await fetchRegistrations()
-  if (!list) return // 后端不可用：保留演示数据
+  if (!list) return
   reviewRows.value = list.map((r: RegistrationList) => ({
     id: r.id,
     tournament: r.tournament_name,

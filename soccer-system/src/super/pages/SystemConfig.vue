@@ -22,15 +22,11 @@ interface ConfigRow {
   updated: string
 }
 
-const switchRows = ref<ConfigRow[]>([
-  { id: null, param: '报名通道', desc: '控制全省赛事报名入口开放/关闭', value: '开', updated: '2026-10-15 09:00' },
-  { id: null, param: '公示查询', desc: '控制运动员/教练员公示对外可见', value: '开', updated: '2026-10-12 14:30' },
-  { id: null, param: '注册审核', desc: '新注册信息是否需要人工审核', value: '开', updated: '2026-10-18 11:20' },
-])
+const switchRows = ref<ConfigRow[]>([])
 
 async function refresh() {
   const list = await fetchSystemConfigs()
-  if (!list) return // 后端不可用：保留演示数据
+  if (!list) return
   switchRows.value = list.map((c) => ({
     id: c.id,
     param: c.name,
@@ -59,7 +55,7 @@ async function onAction(action: string, row: Record<string, unknown>) {
   if (action !== '修改') return
   const r = row as unknown as ConfigRow
   if (r.id === null) {
-    alert('当前为离线演示数据，无法操作')
+    alert('数据未加载，请刷新后重试')
     return
   }
   const next = prompt(`修改参数「${r.param}」取值（当前：${r.value}）\n${r.desc}`, r.value)

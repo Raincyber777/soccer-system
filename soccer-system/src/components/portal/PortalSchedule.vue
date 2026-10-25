@@ -6,12 +6,11 @@ import PortalBanner from './PortalBanner.vue'
 import AppSelect from '../common/AppSelect.vue'
 import DataTable from '../common/DataTable.vue'
 import type { TableColumn } from '../common/types'
-import { mockMatches, type MatchRow } from '../../data/portal-matches'
-import { fetchMatches } from '../../api/portal'
+import { fetchMatches, type MatchRow } from '../../api/portal'
 
 // 门户公开页 · 赛程赛果：游客无需登录即可浏览
-// 数据优先来自后端 /api/portal/matches/（已发布赛果才返回 result，见 src/api/portal.ts），
-// 后端未启动时自动回退演示数据；与管理员端【对阵信息管理】【赛果发布管理】同口径
+// 数据来自后端 /api/portal/matches/（已发布赛果才返回 result，见 src/api/portal.ts），
+// 与管理员端【对阵信息管理】【赛果发布管理】同口径
 
 const groupOptions = ['全部组别', '小学组', '中学组', '高中组', '高校组']
 const groupFilter = ref('全部组别')
@@ -26,8 +25,7 @@ const columns: TableColumn[] = [
   { key: 'status', label: '状态', width: '90px' },
 ]
 
-// 初始展示演示数据，接口返回后无缝替换
-const matches = ref<MatchRow[]>(mockMatches)
+const matches = ref<MatchRow[]>([])
 
 onMounted(async () => {
   matches.value = await fetchMatches()

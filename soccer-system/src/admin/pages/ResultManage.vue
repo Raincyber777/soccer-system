@@ -36,11 +36,7 @@ interface ResultRow {
   status: string
 }
 
-const rows = ref<ResultRow[]>([
-  { id: null, matchId: null, match: '高校组 第 1 轮：四川大学 vs 川师大队', score: '2 : 0', group: '高校组', time: '2026-10-18 17:00', status: '已发布' },
-  { id: null, matchId: null, match: '小学组 第 1 轮：实小少年队 vs 城关小学', score: '5 : 2', group: '小学组', time: '2026-10-12 11:30', status: '已发布' },
-  { id: null, matchId: null, match: '中学组 第 2 轮：一中 vs 师大附中', score: '1 : 1', group: '中学组', time: '2026-10-19 17:10', status: '未发布' },
-])
+const rows = ref<ResultRow[]>([])
 
 function matchLabel(m: ApiMatch): string {
   return `${m.group_type_display} ${m.round_name}：${m.home_team_name} vs ${m.away_team_name}`.trim()
@@ -48,7 +44,7 @@ function matchLabel(m: ApiMatch): string {
 
 async function refresh() {
   const list = await fetchAdminMatches()
-  if (!list) return // 后端不可用：保留演示数据
+  if (!list) return
   const withResult = list.filter((m) => m.result)
   if (!withResult.length) {
     rows.value = []
@@ -109,7 +105,7 @@ async function onSubmit(data: Record<string, string>) {
 async function onAction(action: string, row: Record<string, unknown>) {
   const id = Number(row.id ?? 0)
   if (!id) {
-    alert('当前为离线演示数据，无法操作')
+    alert('数据未加载，请刷新后重试')
     return
   }
   if (action === '发布') {
