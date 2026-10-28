@@ -9,8 +9,9 @@ const adminChildren = adminRoutes[0]?.children ?? []
 
 // 复用管理端内容页：去掉管理端控制台（超级管理员端有全省数据总览），
 // 以及管理端的两个账户页（超级管理员端有自己的可编辑版账户管理页面）、
-// 管理端的使用说明（超管端用自己的版本），并去掉路由 name 避免与 /admin 重名
-const excludedPaths = ['dashboard', 'user-accounts', 'admin-accounts', 'usage-guide']
+// 管理端的使用说明（超管端用自己的版本）、管理端的报名初审
+// （两级审核制衡：初审仅市州管理员，超管只做终审），并去掉路由 name 避免与 /admin 重名
+const excludedPaths = ['dashboard', 'user-accounts', 'admin-accounts', 'usage-guide', 'registration-first-review']
 const reusedChildren: RouteRecordRaw[] = adminChildren
   .filter((child) => !excludedPaths.includes(child.path) && child.component)
   .map((child) => ({
