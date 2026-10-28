@@ -53,6 +53,43 @@ textarea {
   font-family: inherit;
 }
 
+/* ===== 表单控件统一观感：原生 input/select/textarea 也与自研组件同风格 ===== */
+/* 组件内部（DataForm/SearchBar/登录表单等）有自己的 scoped 样式，优先级更高不受影响 */
+input:not([type='checkbox']):not([type='radio']):not([type='file']):not([type='range']):not([type='button']):not([type='submit']):not([type='reset']),
+select,
+textarea {
+  border: 1.5px solid #d8e2da;
+  border-radius: 10px;
+  background: #fff;
+  color: var(--ink);
+  font-size: 14px;
+  padding: 9px 12px;
+  transition: border-color 0.18s, box-shadow 0.18s;
+}
+
+input:not([type='checkbox']):not([type='radio']):not([type='file']):not([type='range']):not([type='button']):not([type='submit']):not([type='reset']):hover,
+select:hover,
+textarea:hover {
+  border-color: #b9ccbd;
+}
+
+input:not([type='checkbox']):not([type='radio']):not([type='file']):not([type='range']):not([type='button']):not([type='submit']):not([type='reset']):focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(30, 122, 63, 0.13);
+}
+
+select {
+  cursor: pointer;
+}
+
+::placeholder {
+  color: #9fae9f;
+  opacity: 1;
+}
+
 /* ===== 后台系统通用工具类（user 端和 admin 端共用） ===== */
 .card {
   background: #fff;
@@ -118,6 +155,16 @@ textarea {
 
 .btn-primary:hover {
   box-shadow: 0 6px 16px rgba(30, 122, 63, 0.32);
+}
+
+.btn-danger {
+  background: linear-gradient(135deg, #d9534f, #c0392b);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(192, 57, 43, 0.25);
+}
+
+.btn-danger:hover {
+  box-shadow: 0 6px 16px rgba(192, 57, 43, 0.32);
 }
 
 .btn-ghost {

@@ -2,6 +2,7 @@
 import { onMounted, ref } from 'vue'
 import PageHeader from '../../components/common/PageHeader.vue'
 import DataTable from '../../components/common/DataTable.vue'
+import AppModal from '../../components/common/AppModal.vue'
 import type { TableColumn } from '../../components/common/types'
 import { deleteUser, errMsg, fetchUsers, updateUser, type ApiUser } from '../../api/account'
 import { fetchAuditLogs, type ApiAuditLog } from '../../api/system'
@@ -77,6 +78,37 @@ async function refresh() {
 
 onMounted(refresh)
 
+// 修改账号信息：居中弹窗（替代两连原生 prompt），留空表示保持不变
+const editing = ref<AccountRow | null>(null)
+const editName = ref('')
+const editPhone = ref('')
+
+function startEdit(r: AccountRow) {
+  editing.value = r
+  editName.value = r.raw.real_name || ''
+  editPhone.value = r.raw.phone || ''
+}
+
+async function saveEdit() {
+  const r = editing.value
+  if (!r) return
+  const payload: { real_name?: string; phone?: string } = {}
+  if (editName.value.trim()) payload.real_name = editName.value.trim()
+  if (editPhone.value.trim()) payload.phone = editPhone.value.trim()
+  if (!Object.keys(payload).length) {
+    alert('未做任何修改')
+    return
+  }
+  try {
+    await updateUser(r.id, payload)
+    alert(`账户 ${r.account} 已更新`)
+    editing.value = null
+    refresh()
+  } catch (err) {
+    alert(errMsg(err))
+  }
+}
+
 async function onAction(action: string, row: Record<string, unknown>) {
   const r = row as unknown as AccountRow
   const u = r.raw
@@ -89,24 +121,7 @@ async function onAction(action: string, row: Record<string, unknown>) {
     return
   }
   if (action === '修改') {
-    const name = prompt('修改姓名/单位名（留空保持不变）', u.real_name)
-    if (name === null) return
-    const phone = prompt('修改预留手机号（留空保持不变）', u.phone)
-    if (phone === null) return
-    const payload: { real_name?: string; phone?: string } = {}
-    if (name.trim()) payload.real_name = name.trim()
-    if (phone.trim()) payload.phone = phone.trim()
-    if (!Object.keys(payload).length) {
-      alert('未做任何修改')
-      return
-    }
-    try {
-      await updateUser(r.id, payload)
-      alert(`账户 ${r.account} 已更新`)
-      refresh()
-    } catch (err) {
-      alert(errMsg(err))
-    }
+    startEdit(r)
     return
   }
   if (action === '删除') {
@@ -130,4 +145,33 @@ async function onAction(action: string, row: Record<string, unknown>) {
 
   <h3 class="section-title">报名日志</h3>
   <DataTable :columns="logColumns" :rows="logs" />
+
+  <AppModal :open="!!editing" :title="editing ? `修改报名账号：${editing.account}` : ''" @close="editing = null">
+    <label class="edit-label" for="reg-edit-name">姓名 / 单位名</label>
+    <input id="reg-edit-name" v-model="editName" class="edit-input" type="text" placeholder="留空保持不变" />
+    <label class="edit-label" for="reg-edit-phone">预留手机号</label>
+    <input id="reg-edit-phone" v-model="editPhone" class="edit-input" type="text" maxlength="20" placeholder="留空保持不变" />
+    <template #footer>
+      <button type="button" class="btn btn-ghost" @click="editing = null">取消</button>
+      <button type="button" class="btn btn-primary" @click="saveEdit">保存</button>
+    </template>
+  </AppModal>
 </template>
+
+<style scoped>
+.edit-label {
+  display: block;
+  margin: 12px 0 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--green-dark);
+}
+
+.edit-label:first-child {
+  margin-top: 0;
+}
+
+.edit-input {
+  width: 100%;
+}
+</style>

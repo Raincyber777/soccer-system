@@ -155,7 +155,7 @@ async function onAction(action: string, row: Record<string, unknown>) {
 </script>
 
 <template>
-  <PageHeader title="赛事政策管理" desc="发布、修改、删除赛事相关政策文件（数据来自后端）" />
+  <PageHeader title="赛事政策管理" desc="发布、修改、删除赛事相关政策文件" />
 
   <h3 class="section-title">{{ editingId ? `编辑政策：${editingLabel}` : '发布政策' }}</h3>
   <DataForm

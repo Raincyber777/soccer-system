@@ -27,12 +27,12 @@ const searchFields: SearchField[] = [
 ]
 
 const columns: TableColumn[] = [
-  { key: 'team', label: '球队名称' },
-  { key: 'tournament', label: '赛事' },
-  { key: 'group', label: '组别', width: '90px' },
-  { key: 'players', label: '报名人数', width: '90px' },
-  { key: 'submitTime', label: '提交时间', width: '160px' },
-  { key: 'status', label: '审核状态', width: '100px' },
+  { key: 'team_name', label: '球队名称' },
+  { key: 'tournament_name', label: '赛事' },
+  { key: 'group_type_display', label: '组别', width: '90px' },
+  { key: 'player_count', label: '报名人数', width: '90px' },
+  { key: 'submit_time', label: '提交时间', width: '160px' },
+  { key: 'status_display', label: '审核状态', width: '100px' },
 ]
 
 type Row = {
@@ -46,11 +46,7 @@ type Row = {
   status_display: string
 }
 
-const rows = ref<Row[]>([
-  { id: null, team_name: '实验中学足球队', tournament_name: '省青少年校园足球联赛（秋季）', group_type_display: '初中组', player_count: 18, submit_time: '2026-10-16 14:20', status: 'pending_city_review', status_display: '待审核' },
-  { id: null, team_name: '实验中学足球队', tournament_name: '省青少年足球冠军杯', group_type_display: '初中组', player_count: 16, submit_time: '2026-09-28 10:05', status: 'approved', status_display: '已通过' },
-  { id: null, team_name: '实小少年队', tournament_name: '省青少年校园足球联赛（秋季）', group_type_display: '小学组', player_count: 12, submit_time: '2026-10-14 09:40', status: 'rejected', status_display: '已驳回' },
-])
+const rows = ref<Row[]>([])
 
 async function refresh() {
   const list = await fetchRegistrations()
@@ -146,7 +142,7 @@ async function onAction(action: string, row: Record<string, unknown>) {
 </script>
 
 <template>
-  <PageHeader title="我的报名" desc="查看本队报名审核状态，可按球队、组别、审核状态搜索，支持修改与删除（数据来自后端）" />
+  <PageHeader title="我的报名" desc="查看本队报名审核状态，可按球队、组别、审核状态搜索，支持修改与删除" />
 
   <SearchBar :fields="searchFields" @search="onSearch" @reset="onSearch" />
 

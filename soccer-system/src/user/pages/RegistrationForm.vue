@@ -90,7 +90,7 @@ function onUpload() {
 </script>
 
 <template>
-  <PageHeader title="赛事报名" desc="填写赛事报名表单并提交，进入市州初审 → 省级终审流程（数据来自后端）" />
+  <PageHeader title="赛事报名" desc="填写赛事报名表单并提交，进入市州初审 → 省级终审流程" />
 
   <p v-if="loaded && !myTeam" class="page-tip warn-tip">
     尚未创建球队：请先在「球队信息」页创建球队，再提交报名。

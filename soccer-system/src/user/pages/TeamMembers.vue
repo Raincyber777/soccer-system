@@ -200,7 +200,7 @@ function onUpload() {
 </script>
 
 <template>
-  <PageHeader title="球队成员" desc="添加、修改、删除球队成员信息，支持按姓名或身份证搜索（数据来自后端）" />
+  <PageHeader title="球队成员" desc="添加、修改、删除球队成员信息，支持按姓名或身份证搜索" />
 
   <p v-if="teamReady && teamId === null" class="page-tip warn-tip">
     尚未创建球队：请先在「球队信息」页创建球队，再报送球员。

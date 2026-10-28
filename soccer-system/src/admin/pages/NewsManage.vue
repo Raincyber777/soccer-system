@@ -169,7 +169,7 @@ async function onAction(action: string, row: Record<string, unknown>) {
 </script>
 
 <template>
-  <PageHeader title="赛事新闻管理" desc="发布、修改、下架赛事新闻，门户首页同步展示（数据来自后端）" />
+  <PageHeader title="赛事新闻管理" desc="发布、修改、下架赛事新闻，门户首页同步展示" />
 
   <h3 class="section-title">{{ editingId ? `编辑新闻：${editingLabel}` : '发布新闻' }}</h3>
   <DataForm

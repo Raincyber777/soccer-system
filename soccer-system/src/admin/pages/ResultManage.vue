@@ -131,7 +131,7 @@ async function onAction(action: string, row: Record<string, unknown>) {
 </script>
 
 <template>
-  <PageHeader title="赛果发布管理" desc="录入并发布比赛结果，门户同步更新积分与战绩（数据来自后端）" />
+  <PageHeader title="赛果发布管理" desc="录入并发布比赛结果，门户同步更新积分与战绩" />
 
   <h3 class="section-title">录入赛果</h3>
   <DataForm :fields="formFields" submit-text="提交赛果" @submit="onSubmit" />

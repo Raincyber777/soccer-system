@@ -12,6 +12,7 @@ import {
   finalReview,
   type RegistrationList,
 } from '../../api/registration'
+import { promptDialog } from '../../components/common/dialog'
 
 // 报名信息审核（省级终审）：复核经市州初审提交的报名件，
 // 列表为全省数据（后端按 admin 角色返回）；通过即 approved 并进入公示。
@@ -22,12 +23,12 @@ const searchFields: SearchField[] = [
 ]
 
 const columns: TableColumn[] = [
-  { key: 'team', label: '球队名称' },
-  { key: 'city', label: '市州/单位', width: '110px' },
-  { key: 'group', label: '组别', width: '90px' },
-  { key: 'players', label: '人数', width: '70px' },
-  { key: 'submitTime', label: '提交时间', width: '160px' },
-  { key: 'status', label: '审核状态', width: '100px' },
+  { key: 'team_name', label: '球队名称' },
+  { key: 'city_name', label: '市州/单位', width: '110px' },
+  { key: 'group_type_display', label: '组别', width: '90px' },
+  { key: 'player_count', label: '人数', width: '70px' },
+  { key: 'submit_time', label: '提交时间', width: '160px' },
+  { key: 'status_display', label: '审核状态', width: '100px' },
 ]
 
 type Row = {
@@ -41,11 +42,7 @@ type Row = {
   status_display: string
 }
 
-const rows = ref<Row[]>([
-  { id: null, team_name: '实验中学足球队', city_name: '成都市', group_type_display: '初中组', player_count: 18, submit_time: '2026-10-16 14:20', status: 'pending_province_review', status_display: '待终审' },
-  { id: null, team_name: '第一实验小学队', city_name: '绵阳市', group_type_display: '小学组', player_count: 12, submit_time: '2026-10-15 11:02', status: 'pending_province_review', status_display: '待终审' },
-  { id: null, team_name: '川师大队', city_name: '成都市', group_type_display: '高校组', player_count: 22, submit_time: '2026-10-14 16:45', status: 'approved', status_display: '已通过' },
-])
+const rows = ref<Row[]>([])
 
 async function refresh() {
   const list = await fetchRegistrations()
@@ -139,14 +136,20 @@ async function onAction(action: string, row: Record<string, unknown>) {
     return
   }
   if (action === '驳回') {
-    const reason = prompt(`驳回「${r.team_name}」的原因（必填，将推送给报送单位）：`)
+    const reason = await promptDialog({
+      title: '驳回报名',
+      message: `球队「${r.team_name}」的报名件将被驳回退回修改。`,
+      label: '驳回原因（必填，将推送给报送单位）',
+      multiline: true,
+      required: true,
+      requiredMsg: '驳回必须填写原因',
+      placeholder: '如：报名人数与球员名单不符，请核对后重新提交',
+      confirmText: '确认驳回',
+      maxlength: 200,
+    })
     if (reason === null) return
-    if (!reason.trim()) {
-      alert('驳回必须填写原因')
-      return
-    }
     try {
-      await finalReview(r.id, 'reject', reason.trim())
+      await finalReview(r.id, 'reject', reason)
       await refresh()
     } catch (err) {
       alert(errMsg(err))
@@ -156,7 +159,7 @@ async function onAction(action: string, row: Record<string, unknown>) {
 </script>
 
 <template>
-  <PageHeader title="报名信息审核" desc="省级终审：查询球队报名信息，执行通过/驳回，查看报名材料与审核记录（数据来自后端）" />
+  <PageHeader title="报名信息审核" desc="省级终审：查询球队报名信息，执行通过/驳回，查看报名材料与审核记录" />
 
   <p class="page-tip">
     本页复核经市州管理员初审（管理员端【报名初审】）提交的报名件；驳回时需填写驳回原因，原因将推送给报送单位；

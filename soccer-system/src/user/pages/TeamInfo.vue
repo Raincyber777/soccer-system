@@ -122,7 +122,7 @@ function onResetPwd() {
 </script>
 
 <template>
-  <PageHeader title="球队信息" desc="创建并维护球队基本信息、队旗队徽与球队资料（数据来自后端）" />
+  <PageHeader title="球队信息" desc="创建并维护球队基本信息、队旗队徽与球队资料" />
 
   <p class="page-tip">
     所属学校通过教育部「学校（机构）标识码」精准绑定，避免重名错填；选定学校后，参赛组别将按学校学段自动限定。

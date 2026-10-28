@@ -12,6 +12,7 @@ import {
   firstReview,
   type RegistrationList,
 } from '../../api/registration'
+import { promptDialog } from '../../components/common/dialog'
 
 // 报名初审（市州级）：核对本区域报名球队的报名信息与学籍材料。
 // 列表由后端按登录管理员的数据域（region_code）自动过滤；
@@ -23,12 +24,12 @@ const searchFields: SearchField[] = [
 ]
 
 const columns: TableColumn[] = [
-  { key: 'team', label: '球队名称' },
-  { key: 'tournament', label: '赛事', width: '200px' },
-  { key: 'group', label: '组别', width: '90px' },
-  { key: 'players', label: '人数', width: '70px' },
-  { key: 'submitTime', label: '提交时间', width: '160px' },
-  { key: 'status', label: '审核状态', width: '100px' },
+  { key: 'team_name', label: '球队名称' },
+  { key: 'tournament_name', label: '赛事', width: '200px' },
+  { key: 'group_type_display', label: '组别', width: '90px' },
+  { key: 'player_count', label: '人数', width: '70px' },
+  { key: 'submit_time', label: '提交时间', width: '160px' },
+  { key: 'status_display', label: '审核状态', width: '100px' },
 ]
 
 /** 表格展示行（列表接口字段的子集） */
@@ -43,12 +44,7 @@ type Row = {
   status_display: string
 }
 
-const rows = ref<Row[]>([
-  { id: null, tournament_name: '省青少年校园足球联赛（秋季）', team_name: '实验中学足球队', group_type_display: '初中组', player_count: 18, submit_time: '2026-10-16 14:20', status: 'pending_city_review', status_display: '待初审' },
-  { id: null, tournament_name: '省青少年校园足球联赛（秋季）', team_name: '成都七中球队', group_type_display: '高中组', player_count: 20, submit_time: '2026-10-16 09:10', status: 'pending_city_review', status_display: '待初审' },
-  { id: null, tournament_name: '省青少年足球冠军杯', team_name: '川师大队', group_type_display: '高校组', player_count: 22, submit_time: '2026-10-14 16:45', status: 'pending_province_review', status_display: '待终审' },
-  { id: null, tournament_name: '省青少年校园足球联赛（秋季）', team_name: '实小少年队', group_type_display: '小学组', player_count: 12, submit_time: '2026-10-12 10:30', status: 'rejected', status_display: '已驳回' },
-])
+const rows = ref<Row[]>([])
 
 async function refresh() {
   const list = await fetchRegistrations()
@@ -145,14 +141,20 @@ async function onAction(action: string, row: Record<string, unknown>) {
     return
   }
   if (action === '驳回') {
-    const reason = prompt(`驳回「${r.team_name}」的原因（必填，将推送给报送球队）：`)
+    const reason = await promptDialog({
+      title: '驳回报名',
+      message: `球队「${r.team_name}」的报名件将被驳回退回修改。`,
+      label: '驳回原因（必填，将推送给报送球队）',
+      multiline: true,
+      required: true,
+      requiredMsg: '驳回必须填写原因',
+      placeholder: '如：学籍材料不清晰，请重新上传盖章扫描件',
+      confirmText: '确认驳回',
+      maxlength: 200,
+    })
     if (reason === null) return // 取消
-    if (!reason.trim()) {
-      alert('驳回必须填写原因')
-      return
-    }
     try {
-      await firstReview(r.id, 'reject', reason.trim())
+      await firstReview(r.id, 'reject', reason)
       await refresh()
     } catch (err) {
       alert(errMsg(err))
@@ -162,7 +164,7 @@ async function onAction(action: string, row: Record<string, unknown>) {
 </script>
 
 <template>
-  <PageHeader title="报名初审" desc="市州初审：核对本区域报名球队的报名信息与学籍材料，通过后自动提交省级终审（数据来自后端）" />
+  <PageHeader title="报名初审" desc="市州初审：核对本区域报名球队的报名信息与学籍材料，通过后自动提交省级终审" />
 
   <p class="page-tip">
     初审要点：报名表信息完整性、球员学籍与注册状态、带队教练资质是否已生效。通过初审后自动提交超级管理员省级终审；

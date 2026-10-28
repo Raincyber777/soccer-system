@@ -149,9 +149,6 @@ async function onActionTeam(action: string, row: Record<string, unknown>) {
   if (action === '查看成员') await onViewMembers(r)
   else if (action === '查看教练') await onViewCoaches(r)
   else if (action === '查看比赛记录') await showMatchRecord(r)
-  else if (action === '重置密码') {
-    alert('球队账号密码请由超级管理员在「账户管理」中重置')
-  }
 }
 
 function onActionArchive(action: string, row: Record<string, unknown>) {
@@ -186,7 +183,7 @@ async function showMatchRecord(row: TeamRow) {
   <DataTable
     :columns="teamColumns"
     :rows="displayTeams"
-    :actions="['查看成员', '查看教练', '查看比赛记录', '重置密码']"
+    :actions="['查看成员', '查看教练', '查看比赛记录']"
     @action="onActionTeam"
   />
 

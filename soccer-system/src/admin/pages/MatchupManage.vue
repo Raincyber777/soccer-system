@@ -147,7 +147,7 @@ async function onAction(action: string, row: Record<string, unknown>) {
 </script>
 
 <template>
-  <PageHeader title="对阵信息管理" desc="发布、删除比赛对阵信息，可按比赛状态或球队名称查看（数据来自后端）" />
+  <PageHeader title="对阵信息管理" desc="发布、删除比赛对阵信息，可按比赛状态或球队名称查看" />
 
   <SearchBar :fields="searchFields" @search="onSearch" @reset="onSearch" />
 

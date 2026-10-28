@@ -176,7 +176,7 @@ async function onAction(action: string, row: Record<string, unknown>) {
 </script>
 
 <template>
-  <PageHeader title="球队教练员" desc="查询、添加、编辑、删除球队教练员，可按姓名与资质状态筛选（数据来自后端）" />
+  <PageHeader title="球队教练员" desc="查询、添加、编辑、删除球队教练员，可按姓名与资质状态筛选" />
 
   <p v-if="teamReady && teamId === null" class="page-tip warn-tip">
     尚未创建球队：请先在「球队信息」页创建球队，再报送教练员。

@@ -157,7 +157,7 @@ async function onAction(action: string, row: Record<string, unknown>) {
 </script>
 
 <template>
-  <PageHeader title="球员管理" desc="搜索球员信息，注册审核、公示/取消公示、编辑与删除（数据来自后端）" />
+  <PageHeader title="球员管理" desc="搜索球员信息，注册审核、公示/取消公示、编辑与删除" />
 
   <p class="page-tip">
     球队报送的球员默认「待审核」，核验学籍与注册信息后「通过」即生效并进入公示名单；「公示/取消公示」控制该球员是否对外可见。
