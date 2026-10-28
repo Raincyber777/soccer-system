@@ -67,7 +67,7 @@ function onSearch(f: Record<string, string>) {
 
 const GROUP_TO_API: Record<string, MatchGroup> = {
   小学组: 'primary',
-  初中组: 'middle',
+  中学组: 'middle',
   高中组: 'high',
   高校组: 'university',
 }

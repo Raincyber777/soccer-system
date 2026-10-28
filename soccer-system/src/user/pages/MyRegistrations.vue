@@ -23,7 +23,7 @@ const auth = useAuth()
 
 const searchFields: SearchField[] = [
   { key: 'team', label: '球队名称', placeholder: '输入球队名称' },
-  { key: 'group', label: '报名组别', type: 'select', options: ['小学组', '初中组', '高中组', '高校组'] },
+  { key: 'group', label: '报名组别', type: 'select', options: ['小学组', '中学组', '高中组', '高校组'] },
 ]
 
 const columns: TableColumn[] = [

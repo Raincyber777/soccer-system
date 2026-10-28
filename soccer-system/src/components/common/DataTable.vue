@@ -19,8 +19,8 @@ const emit = defineEmits<{
 }>()
 
 const OK_WORDS = ['已通过', '已发布', '已上架', '已生效', '已核验', '已归档', '已公示', '已结束']
-const PENDING_WORDS = ['待审核', '待初审', '待终审', '待市州初审', '待省级终审', '审核中', '报名中', '进行中', '待核验', '未开始']
-const FAIL_WORDS = ['已驳回', '未通过', '已下架', '已删除', '已失效']
+const PENDING_WORDS = ['待审核', '待初审', '待终审', '待市州初审', '待省级终审', '审核中', '报名中', '进行中', '待核验', '未开始', '直播中', '已延期']
+const FAIL_WORDS = ['已驳回', '未通过', '已下架', '已删除', '已失效', '已禁用']
 
 function isStatusColumn(label: string) {
   return label.includes('状态')

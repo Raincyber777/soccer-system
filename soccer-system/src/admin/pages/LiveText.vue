@@ -43,9 +43,9 @@ const liveMatch = ref<ApiMatch | null>(null) // 当前直播间场次
 
 const eventColumns: TableColumn[] = [
   { key: 'minute', label: '时间', width: '70px' },
-  { key: 'type', label: '类型', width: '90px' },
+  { key: 'type_display', label: '类型', width: '90px' },
   { key: 'content', label: '播报内容' },
-  { key: 'published', label: '发布时间', width: '150px' },
+  { key: 'published_at', label: '发布时间', width: '150px' },
 ]
 
 const eventFormFields: FormField[] = [
