@@ -17,9 +17,9 @@ import {
 } from '../../api/account'
 
 // 管理员账户管理（超级管理员专属）：创建/禁用/删除管理员账户、重置密码。
-// 角色对齐后端：市级审核员=city、省级管理员=admin；市州区划用 GB/T 2260 代码。
+// 角色对齐后端：市州管理员=city、省级管理员=admin；市州区划用 GB/T 2260 代码。
 
-const ROLE_TO_API: Record<string, string> = { 市级审核员: 'city', 省级管理员: 'admin' }
+const ROLE_TO_API: Record<string, string> = { 市州管理员: 'city', 省级管理员: 'admin' }
 const CITY_TO_CODE = new Map(SICHUAN_CITIES.map((c) => [c.name, c.code]))
 const ADMIN_ROLES = ['admin', 'city', 'province']
 
@@ -34,7 +34,7 @@ const formFields: FormField[] = [
 
 const searchFields: SearchField[] = [
   { key: 'keyword', label: '账号/姓名', placeholder: '输入账号或姓名' },
-  { key: 'role', label: '角色', type: 'select', options: ['全部', '市级审核员', '省级管理员', '省级内容发布'] },
+  { key: 'role', label: '角色', type: 'select', options: ['全部', '市州管理员', '省级管理员', '省级内容发布'] },
 ]
 
 const columns: TableColumn[] = [

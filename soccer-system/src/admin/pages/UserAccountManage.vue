@@ -19,9 +19,9 @@ import {
 // 数据域由后端按登录角色过滤（市州管理员仅本区域）；「删除账户」与管理员账户管理收口超管。
 
 const TYPE_TO_ROLE: Record<string, string> = {
-  球队账号: 'school',
-  运动员账号: 'athlete',
-  教练员账号: 'coach',
+  球队负责人: 'school',
+  学生运动员: 'athlete',
+  教练员: 'coach',
 }
 const USER_ROLES = ['school', 'athlete', 'coach', 'personal']
 

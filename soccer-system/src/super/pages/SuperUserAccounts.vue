@@ -20,20 +20,19 @@ import {
 // 登录 super 端的账户角色即省级管理员（admin），数据域覆盖全省。
 
 const TYPE_TO_ROLE: Record<string, string> = {
-  球队账号: 'school',
-  运动员账号: 'athlete',
-  教练员账号: 'coach',
-  高校账号: 'school',
-  市州账号: 'city',
+  球队负责人: 'school',
+  学生运动员: 'athlete',
+  教练员: 'coach',
 }
 const USER_ROLES = ['school', 'athlete', 'coach', 'personal']
-// 同为 school 的两种账户类型展示时无法区分，统一按后端角色显示
-const TYPE_ORDER = ['球队账号', '运动员账号', '教练员账号', '市州账号']
+// 类型筛选沿用后端 role_display 文案；市州管理员账户仅支持查看与筛选，
+// 开户走「管理员账户」页（需要选择所属市州）
+const TYPE_FILTERS = ['球队负责人', '学生运动员', '教练员', '市州管理员']
 
 const formFields: FormField[] = [
   { key: 'account', label: '登录账号', placeholder: '如：szyds_zq02' },
   { key: 'name', label: '姓名 / 单位名' },
-  { key: 'type', label: '账户类型', type: 'select', options: TYPE_ORDER, placeholder: '请选择账户类型' },
+  { key: 'type', label: '账户类型', type: 'select', options: Object.keys(TYPE_TO_ROLE), placeholder: '请选择账户类型' },
   { key: 'unit', label: '所属单位', placeholder: '学校 / 单位名称' },
   { key: 'phone', label: '预留手机号' },
   { key: 'password', label: '初始密码', placeholder: '至少 6 位；编辑时留空则不修改' },
@@ -41,7 +40,7 @@ const formFields: FormField[] = [
 
 const searchFields: SearchField[] = [
   { key: 'keyword', label: '账号/姓名', placeholder: '输入账号或姓名' },
-  { key: 'type', label: '账户类型', type: 'select', options: ['全部', ...TYPE_ORDER] },
+  { key: 'type', label: '账户类型', type: 'select', options: ['全部', ...TYPE_FILTERS] },
 ]
 
 const columns: TableColumn[] = [
