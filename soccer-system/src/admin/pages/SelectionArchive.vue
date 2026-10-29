@@ -8,7 +8,7 @@ import { fetchPlayers } from '../../api/person'
 import type { ApiPlayer } from '../../api/team'
 import {
   fetchSelectionScores,
-  SELECTION_STAGE_DISPLAY,
+  selectionStageDisplay,
   type ApiSelectionScore,
   type ScoreValue,
 } from '../../api/selection'
@@ -58,7 +58,7 @@ async function refresh() {
       team: p.team_name || '—',
       group: p.group_type_display,
       total: s ? s.total : '—',
-      status: s ? (SELECTION_STAGE_DISPLAY[s.status] ?? s.status) : '未评分',
+      status: s ? selectionStageDisplay(s.status) : '未评分',
       score: s,
     }
   })
@@ -83,7 +83,7 @@ function onAction(action: string, row: Record<string, unknown>) {
   }
   const s = r.score
   alert(
-    `${r.name} 遴选档案\n组别：${s.group_type_display}\n技评得分：${s.technical}｜体能得分：${s.physical}\n总分：${s.total}（自动合计）\n阶段：${SELECTION_STAGE_DISPLAY[s.status] ?? s.status}\n评分时间：${(s.created_at || '').slice(0, 16).replace('T', ' ')}`,
+    `${r.name} 遴选档案\n组别：${s.group_type_display}\n技评得分：${s.technical}｜体能得分：${s.physical}\n总分：${s.total}（自动合计）\n阶段：${selectionStageDisplay(s.status)}\n评分时间：${(s.created_at || '').slice(0, 16).replace('T', ' ')}`,
   )
 }
 </script>

@@ -12,7 +12,7 @@ import {
   deleteSelectionScore,
   errMsg,
   fetchSelectionScores,
-  SELECTION_STAGE_DISPLAY,
+  selectionStageDisplay,
   updateSelectionScore,
   type ApiSelectionScore,
   type ScoreValue,
@@ -96,7 +96,7 @@ async function refresh() {
     skill: s.technical,
     physical: s.physical,
     total: s.total,
-    status: SELECTION_STAGE_DISPLAY[s.status] ?? s.status,
+    status: selectionStageDisplay(s.status),
   }))
   applyFilter()
 }

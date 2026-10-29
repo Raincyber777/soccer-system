@@ -17,8 +17,21 @@ async function tryList<T>(fn: () => Promise<T>): Promise<T | null> {
 export const SELECTION_STAGE_DISPLAY: Record<string, string> = {
   pending: '初选评分',
   first_passed: '初选通过',
+  passed: '初选通过', // 历史演示数据写入的旧值，与 first_passed 同义
   second_passed: '复选通过',
   rejected: '未通过',
+}
+
+/** 遴选阶段中文文案：未知值兜底中文，不直出英文 code */
+export function selectionStageDisplay(status: string): string {
+  return SELECTION_STAGE_DISPLAY[status] ?? '未知状态'
+}
+
+const BEST_STATUS_DISPLAY: Record<string, string> = { pending: '待公示', publicized: '已公示' }
+
+/** 最佳球员公示状态中文文案：未知值兜底中文 */
+export function bestStatusDisplay(status: string): string {
+  return BEST_STATUS_DISPLAY[status] ?? '未知状态'
 }
 
 /** DecimalField 序列化为字符串，展示/比较时统一 Number() */

@@ -8,7 +8,7 @@ import { SICHUAN_CITY_OPTIONS } from '../../data/sichuan-schools'
 import { fetchAdminMatches } from '../../api/manage'
 import type { ApiMatch } from '../../api/types'
 import { fetchCoaches, fetchPlayers, fetchTeams, type ApiTeam } from '../../api/team'
-import { fetchSelectionScores, SELECTION_STAGE_DISPLAY, type ApiSelectionScore } from '../../api/selection'
+import { fetchSelectionScores, selectionStageDisplay, type ApiSelectionScore } from '../../api/selection'
 
 // 参赛管理：全省球队检索、查看成员/教练/比赛记录、球员遴选档案（名单×评分 join）。
 // 球队/球员/教练公开可读，评分需登录读取；失败时展示空态。
@@ -107,7 +107,7 @@ async function refresh() {
         team: p.team_name,
         idCard: p.id_card,
         updated: score ? (score.created_at || '').slice(0, 16).replace('T', ' ') : '—',
-        status: score ? (SELECTION_STAGE_DISPLAY[score.status] ?? score.status) : '未评分',
+        status: score ? selectionStageDisplay(score.status) : '未评分',
         score,
       }
     })
@@ -157,7 +157,7 @@ function onActionArchive(action: string, row: Record<string, unknown>) {
   const s = r.score
   alert(
     s
-      ? `${r.name}（${r.team}）\n技术评分：${s.technical}｜体能评分：${s.physical}\n总分：${s.total}｜阶段：${SELECTION_STAGE_DISPLAY[s.status] ?? s.status}`
+      ? `${r.name}（${r.team}）\n技术评分：${s.technical}｜体能评分：${s.physical}\n总分：${s.total}｜阶段：${selectionStageDisplay(s.status)}`
       : `${r.name}（${r.team}）暂无遴选评分记录`,
   )
 }

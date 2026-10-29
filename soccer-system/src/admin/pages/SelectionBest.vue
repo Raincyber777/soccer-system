@@ -10,6 +10,7 @@ import {
   errMsg,
   fetchSelectionBest,
   fetchSelectionScores,
+  bestStatusDisplay,
   scoreNum,
   updateSelectionBest,
   type ApiSelectionBest,
@@ -26,7 +27,6 @@ const GROUP_TO_API: Record<string, string> = {
   高校组: 'university',
 }
 
-const BEST_STATUS_DISPLAY: Record<string, string> = { pending: '待公示', publicized: '已公示' }
 
 const columns: TableColumn[] = [
   { key: 'group', label: '组别', width: '100px' },
@@ -78,7 +78,7 @@ async function refresh() {
     name: b.player_name,
     team: b.team_name || '—',
     score: b.total,
-    status: BEST_STATUS_DISPLAY[b.status] ?? b.status,
+    status: bestStatusDisplay(b.status),
     statusCode: b.status,
   }))
 }
