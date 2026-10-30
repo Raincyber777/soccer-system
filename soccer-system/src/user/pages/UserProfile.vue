@@ -6,6 +6,7 @@ import DataForm from '../../components/common/DataForm.vue'
 import type { FormField } from '../../components/common/types'
 import { changePassword, errMsg, fetchMe, updateMe } from '../../api/account'
 import { useAuth } from '../../stores/auth'
+import { confirmDialog } from '../../components/common/dialog'
 
 // 个人中心：基础资料（PATCH /api/auth/me/，后端仅接受姓名/电话/邮箱/单位四项）
 // 与登录密码（PUT /api/auth/password/，旧密码校验）。
@@ -73,7 +74,14 @@ async function onSubmitPassword(data: Record<string, string>) {
   }
 }
 
-function handleLogout() {
+async function handleLogout() {
+  const ok = await confirmDialog({
+    title: '退出登录',
+    message: '确定要退出当前账户吗？退出后需重新登录才能继续操作。',
+    confirmText: '确认退出',
+    danger: true,
+  })
+  if (!ok) return
   auth.logout()
   router.push('/')
 }

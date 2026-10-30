@@ -3,6 +3,7 @@ import type { RouteRecordRaw } from 'vue-router'
 import { useRouter } from 'vue-router'
 import { superRoutes } from '../../routers/superRoutes'
 import { useAuth } from '../../stores/auth'
+import { confirmDialog } from '../../components/common/dialog'
 import AppIcon from '../../components/common/AppIcon.vue'
 import SideNav from '../../components/common/SideNav.vue'
 
@@ -39,7 +40,14 @@ for (const child of children) {
   }
 }
 
-function handleLogout() {
+async function handleLogout() {
+  const ok = await confirmDialog({
+    title: '退出登录',
+    message: '确定要退出当前账户吗？退出后需重新登录才能继续操作。',
+    confirmText: '确认退出',
+    danger: true,
+  })
+  if (!ok) return
   auth.logout()
   router.push('/')
 }

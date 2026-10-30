@@ -3,6 +3,7 @@ import type { RouteRecordRaw } from 'vue-router'
 import { useRouter } from 'vue-router'
 import { adminRoutes } from '../../routers/adminRoutes'
 import { useAuth } from '../../stores/auth'
+import { confirmDialog } from '../../components/common/dialog'
 import AppIcon from '../../components/common/AppIcon.vue'
 import SideNav from '../../components/common/SideNav.vue'
 
@@ -12,7 +13,14 @@ const auth = useAuth()
 // 顶栏身份标签：后端登录返回的「角色 · 所属机构」
 const identity = auth.state.staffLabel || '市州管理员'
 
-function handleLogout() {
+async function handleLogout() {
+  const ok = await confirmDialog({
+    title: '退出登录',
+    message: '确定要退出当前账户吗？退出后需重新登录才能继续操作。',
+    confirmText: '确认退出',
+    danger: true,
+  })
+  if (!ok) return
   auth.logout()
   router.push('/')
 }
