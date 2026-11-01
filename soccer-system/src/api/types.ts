@@ -27,7 +27,7 @@ export interface ApiNews {
   cover: string | null
   /** 正文 HTML */
   content: string
-  category: 'news' | 'announcement' | 'report'
+  category: 'news' | 'announcement' | 'report' | 'ai_report'
   category_display: string
   is_top: boolean
   is_published: boolean
@@ -38,6 +38,8 @@ export interface ApiNews {
   /** 关联赛事（发布时选择 / 赛果自动战报自动带上），未关联为 null */
   tournament: number | null
   tournament_name: string
+  /** 比赛报告是否由系统 AI 生成 */
+  ai_generated?: boolean
   created_by_name: string
   created_at: string
   updated_at: string
