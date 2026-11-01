@@ -42,7 +42,10 @@ function openItem(item: NewsItem) {
           <span class="news-tag">{{ item.tag }}</span>
           <h4 class="news-title">{{ item.title }}</h4>
           <p class="news-summary">{{ item.summary }}</p>
-          <p class="news-meta">{{ item.source }} · {{ item.date }}</p>
+          <p class="news-meta">
+            <span v-if="item.tournament" class="news-tournament">{{ item.tournament }}</span>
+            {{ item.source }} · {{ item.date }}
+          </p>
         </article>
       </div>
       <p v-else class="page-tip">暂无赛事动态，内容由管理员端发布后在此公示。</p>
@@ -69,6 +72,7 @@ function openItem(item: NewsItem) {
       <template v-if="activeItem">
         <p class="article-meta">
           <span class="article-tag">{{ activeItem.tag }}</span>
+          <span v-if="activeItem.tournament" class="article-tournament">{{ activeItem.tournament }}</span>
           {{ activeItem.source }} · {{ activeItem.date }}
         </p>
         <!-- 正文为富文本 HTML -->
@@ -142,6 +146,14 @@ function openItem(item: NewsItem) {
   margin-top: 12px;
   font-size: 12px;
   color: var(--muted);
+}
+
+.news-tournament {
+  margin-right: 8px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--green-light);
+  color: var(--green-dark);
 }
 
 /* ===== 政策文件列表 ===== */
@@ -220,6 +232,14 @@ function openItem(item: NewsItem) {
   color: var(--green-dark);
   font-size: 12px;
   font-weight: 600;
+}
+
+.article-tournament {
+  padding: 2px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--green-light);
+  color: var(--green-dark);
+  font-size: 12px;
 }
 
 /* 富文本正文 */

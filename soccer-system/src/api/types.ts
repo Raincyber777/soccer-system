@@ -35,6 +35,9 @@ export interface ApiNews {
   view_count: number
   /** 发布来源（单位名），后端自研后新增 */
   source: string
+  /** 关联赛事（发布时选择 / 赛果自动战报自动带上），未关联为 null */
+  tournament: number | null
+  tournament_name: string
   created_by_name: string
   created_at: string
   updated_at: string

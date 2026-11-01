@@ -9,6 +9,8 @@ import type { ApiStandingRow } from './stats'
 export interface NewsItem {
   tag: string
   title: string
+  /** 关联赛事名（未关联为空串） */
+  tournament: string
   source: string
   date: string
   summary: string
@@ -55,6 +57,7 @@ function newsFromApi(item: ApiNews): NewsItem {
   return {
     tag: item.category_display,
     title: item.title,
+    tournament: item.tournament_name ?? '',
     // 后端 News.source 是发布来源（单位名），无来源时退回发布人
     source: item.source || item.created_by_name || '赛事组委会',
     date,
@@ -68,6 +71,7 @@ function policyFromApi(item: ApiPolicy): NewsItem {
   return {
     tag: '政策文件',
     title: item.title,
+    tournament: '',
     source: item.issuing_org || '四川省教育厅',
     date,
     summary: item.summary,
