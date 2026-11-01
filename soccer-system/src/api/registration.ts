@@ -101,6 +101,9 @@ export async function downloadRegistrationWord(id: number, teamName: string) {
 export interface ApiTournamentOption {
   id: number
   name: string
+  /** 赛事级别（school/city/province），决定报名审核层级 */
+  level?: string
+  level_display?: string
   /** 赛事覆盖的组别（JSON 数组，如 ['primary','middle']） */
   group_types: string[] | string
   organizer: string

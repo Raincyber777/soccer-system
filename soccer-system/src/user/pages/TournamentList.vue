@@ -6,12 +6,16 @@ import DataTable from '../../components/common/DataTable.vue'
 import type { TableColumn } from '../../components/common/types'
 import { fetchTournaments, type ApiTournamentOption } from '../../api/registration'
 
-// 赛事列表：浏览可报名赛事（组别/主办单位/报名窗口/状态），报名期可直达报名表单
+// 赛事列表：浏览可报名赛事（级别/组别/主办单位/报名窗口/状态），报名期可直达报名表单
 
 const router = useRouter()
 
+// 后端 group_types/level 存英文 code，展示统一转中文
+const GROUP_LABELS: Record<string, string> = { primary: '小学组', middle: '中学组', high: '高中组', university: '高校组' }
+
 const columns: TableColumn[] = [
   { key: 'name', label: '赛事名称' },
+  { key: 'level', label: '级别', width: '100px' },
   { key: 'group', label: '组别', width: '150px' },
   { key: 'organizer', label: '主办单位' },
   { key: 'signTime', label: '报名时间', width: '200px' },
@@ -21,6 +25,7 @@ const columns: TableColumn[] = [
 interface TournamentRow {
   id: number
   name: string
+  level: string
   group: string
   organizer: string
   signTime: string
@@ -33,8 +38,8 @@ const rows = ref<TournamentRow[]>([])
 
 function fmtGroups(t: ApiTournamentOption): string {
   const g = t.group_types
-  if (Array.isArray(g)) return g.join('、') || '—'
-  return String(g || '—')
+  const codes = Array.isArray(g) ? g : String(g || '').split(',').filter(Boolean)
+  return codes.map((c) => GROUP_LABELS[c] ?? c).join('、') || '—'
 }
 
 function fmtDate(s: string | null): string {
@@ -47,6 +52,7 @@ async function refresh() {
   rows.value = list.map((t: ApiTournamentOption) => ({
     id: t.id,
     name: t.name,
+    level: t.level_display || '—',
     group: fmtGroups(t),
     organizer: t.organizer || '—',
     signTime: `${fmtDate(t.sign_start_at)} ~ ${fmtDate(t.sign_end_at)}`,
@@ -61,7 +67,7 @@ onMounted(refresh)
 function onView(row: TournamentRow) {
   const t = row.raw
   alert(
-    `赛事：${t.name}\n组别：${row.group}\n主办单位：${row.organizer}` +
+    `赛事：${t.name}\n级别：${row.level}\n组别：${row.group}\n主办单位：${row.organizer}` +
       `\n报名时间：${(t.sign_start_at || '—').slice(0, 10)} ~ ${(t.sign_end_at || '—').slice(0, 10)}` +
       `\n当前状态：${t.status_display}`,
   )

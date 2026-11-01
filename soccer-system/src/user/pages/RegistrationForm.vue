@@ -24,7 +24,7 @@ const loaded = ref(false)
 const submitting = ref(false)
 
 const formFields = computed<FormField[]>(() => [
-  { key: 'tournament', label: '报名赛事', type: 'select', options: tournaments.value.map((t) => t.name) },
+  { key: 'tournament', label: '报名赛事', type: 'select', options: tournaments.value.map((t) => (t.level_display ? `${t.name}（${t.level_display}）` : t.name)) },
   { key: 'teamName', label: '参赛球队', type: 'text', placeholder: myTeam.value ? myTeam.value.name : '请先在「球队信息」创建球队' },
   { key: 'group', label: '报名组别（随球队带出）', type: 'text', placeholder: myTeam.value ? myTeam.value.group_type_display : '—' },
   { key: 'leader', label: '领队姓名' },
@@ -47,7 +47,10 @@ async function onSubmit(data: Record<string, string>) {
     return
   }
   const tName = data.tournament ?? ''
-  const tournament = tournaments.value.find((t) => t.name === tName)
+  // 下拉文案带级别后缀（如「XX联赛（省级赛事）」），兼容纯名称匹配
+  const tournament =
+    tournaments.value.find((t) => tName === (t.level_display ? `${t.name}（${t.level_display}）` : t.name)) ??
+    tournaments.value.find((t) => t.name === tName)
   if (!tournament) {
     alert('请选择报名赛事（后端不可用时无法提交）')
     return
@@ -75,7 +78,7 @@ async function onSubmit(data: Record<string, string>) {
       coach_name: (data.coach ?? '').trim(),
       remark: (data.remark ?? '').trim(),
     })
-    alert('报名表提交成功！已进入市州初审流程，可在「我的报名」查看审核进度')
+    alert('报名表提交成功！已进入上级审核流程，可在「我的报名」查看审核进度')
     router.push('/user/registrations')
   } catch (err) {
     alert(errMsg(err))
@@ -90,10 +93,14 @@ function onUpload() {
 </script>
 
 <template>
-  <PageHeader title="赛事报名" desc="填写赛事报名表单并提交，进入市州初审 → 省级终审流程" />
+  <PageHeader title="赛事报名" desc="填写赛事报名表单并提交，进入上级审核流程：校级赛事一审核，市州级 / 省级赛事为初审 + 终审两级" />
 
   <p v-if="loaded && !myTeam" class="page-tip warn-tip">
     尚未创建球队：请先在「球队信息」页创建球队，再提交报名。
+  </p>
+
+  <p class="page-tip">
+    报名门槛：球队需先完善球员与教练信息（各至少 1 人）方可报名，提交后将由上级管理员审核，不再直接通过。
   </p>
 
   <DataForm :fields="formFields" submit-text="提交报名表" @submit="onSubmit" />
