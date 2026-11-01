@@ -3,9 +3,8 @@ import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuth } from '../../stores/auth'
 import AppIcon from '../common/AppIcon.vue'
-import { apiLogin, mapBackendUser, saveAuthSession } from '../../api/auth'
+import { apiLogin, mapBackendUser, saveAuthSession, clearAuthSession } from '../../api/auth'
 import { ApiError } from '../../api/client'
-import { dashboardPath, roleTexts } from './accountStore'
 
 // 登录表单：账号密码即可，角色与身份由后端按账号自动识别
 const router = useRouter()
@@ -29,14 +28,20 @@ async function handleLogin() {
 
   loggingIn.value = true
   try {
-    // 真实登录：JWT 存 sessionStorage，按后端角色映射前端三端
+    // 真实登录：JWT 存 sessionStorage；用户项目只接受参赛人员（用户端角色）
     const session = await apiLogin(account, form.password)
-    saveAuthSession(session)
     const mapped = mapBackendUser(session.user)
-    auth.loginAs(mapped.role, account, mapped.persona ?? 'leader', mapped.staffLabel)
-    successMsg.value = `登录成功：${session.user.role_display}，即将进入${roleTexts[mapped.role]}…`
+    if (mapped.role !== 'user') {
+      // 管理端账号走独立管理后台登录入口，不留任何登录态
+      clearAuthSession()
+      errorMsg.value = '管理员账号请使用管理后台登录入口登录'
+      return
+    }
+    saveAuthSession(session)
+    auth.loginAs('user', account, mapped.persona ?? 'leader', '')
+    successMsg.value = `登录成功：${session.user.role_display}，即将进入用户端…`
     setTimeout(() => {
-      router.push(dashboardPath(mapped.role))
+      router.push('/user/dashboard')
     }, 600)
   } catch (err) {
     // 后端明确拒绝（密码错误/账号禁用等）如实提示原因；网络失败统一提示
@@ -83,7 +88,7 @@ async function handleLogin() {
       </button>
     </div>
 
-    <p class="login-hint">统一登录入口：系统按账号自动进入对应端——参赛人员进用户端，管理人员进管理后台，菜单权限随身份加载。</p>
+    <p class="login-hint">参赛人员统一登录入口：系统按账号自动识别身份（球队负责人/学生运动员/教练员）。管理员请使用独立管理后台登录入口。</p>
 
     <p v-if="errorMsg" class="form-error">{{ errorMsg }}</p>
     <p v-if="successMsg" class="form-success">{{ successMsg }}</p>

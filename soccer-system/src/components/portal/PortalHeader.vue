@@ -31,12 +31,8 @@ const navItems: NavItem[] = [
 ]
 
 // 已登录用户右侧换成「进入工作台」，未登录显示登录 / 注册
-const workbenchPath = computed(() => {
-  if (auth.state.role === 'super') return '/super/dashboard'
-  if (auth.state.role === 'admin') return '/admin/dashboard'
-  if (auth.state.role) return '/user/dashboard'
-  return ''
-})
+// 管理端（管理员/超管）登录入口已拆分至独立管理后台项目，门户仅服务参赛用户
+const workbenchPath = computed(() => (auth.state.role === 'user' ? '/user/dashboard' : ''))
 
 const activeModal = ref<ModalKey | null>(null)
 const mobileOpen = ref(false)
