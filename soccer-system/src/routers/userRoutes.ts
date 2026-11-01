@@ -26,6 +26,7 @@ export const userRoutes: RouteRecordRaw[] = [
       // 运动员中心（学生本人自助：注册、学籍/证书/获奖等个人履历）
       { path: 'athlete-profile', name: 'user-athlete-profile', component: () => import('../user/pages/AthleteProfile.vue'), meta: { title: '注册与信息', group: '运动员中心', personas: ['student'] } },
       { path: 'athlete-resume', name: 'user-athlete-resume', component: () => import('../user/pages/AthleteResume.vue'), meta: { title: '运动员履历', group: '运动员中心', personas: ['student'] } },
+      { path: 'my-stats', name: 'user-my-stats', component: () => import('../user/pages/MyMatchStats.vue'), meta: { title: '我的参赛数据', group: '运动员中心', personas: ['student'] } },
       // 教练员中心（教练本人自助：执教资质、个人信息维护）
       { path: 'coach-profile', name: 'user-coach-profile', component: () => import('../user/pages/CoachProfile.vue'), meta: { title: '注册与信息', group: '教练员中心', personas: ['coach'] } },
       { path: 'coach-resume', name: 'user-coach-resume', component: () => import('../user/pages/CoachResume.vue'), meta: { title: '教练员履历', group: '教练员中心', personas: ['coach'] } },

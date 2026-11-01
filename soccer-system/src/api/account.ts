@@ -17,6 +17,8 @@ export interface ApiUser {
   region_code: string | null
   region_name: string
   unit_name: string
+  /** 实名认证状态：脱敏身份证（保留前 6 位与后 4 位），未认证为空串 */
+  id_card_masked?: string
   is_active: boolean
   is_superuser: boolean
   date_joined: string
@@ -85,7 +87,13 @@ export function fetchMe() {
 }
 
 /** 本人维护基础资料 PATCH /api/auth/me/（后端仅接受 real_name/phone/email/unit_name） */
-export function updateMe(payload: { real_name?: string; phone?: string; email?: string; unit_name?: string }) {
+export function updateMe(payload: {
+  real_name?: string
+  phone?: string
+  email?: string
+  unit_name?: string
+  id_card?: string
+}) {
   return api.patch<never, ApiUser>('/api/auth/me/', payload)
 }
 

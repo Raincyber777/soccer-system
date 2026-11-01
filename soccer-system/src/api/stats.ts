@@ -77,3 +77,52 @@ export function fetchGroupGoals(groupType?: string, limit = 5) {
     }),
   )
 }
+
+// ---------- 我的参赛数据（登录态）：GET /api/portal/player-stats/mine/ ----------
+// 后端按当前账号实名身份证匹配注册球员；未实名时 player 为 null 并返回 hint
+
+export interface MyMatchInfo {
+  time: string
+  tournament: string
+  home: string
+  away: string
+  score: string
+  status_display: string
+}
+
+export interface MyMatchStatItem {
+  id: number
+  match_info: MyMatchInfo
+  goals: number
+  assists: number
+  yellow_cards: number
+  red_cards: number
+  fouls: number
+  minutes: number | null
+  remark: string
+}
+
+export interface MyMatchStatSummary {
+  matches: number
+  goals: number
+  assists: number
+  yellow_cards: number
+  red_cards: number
+  fouls: number
+  minutes: number
+}
+
+export interface MyMatchStatsResp {
+  player: { id: number; name: string; team: string } | null
+  items: MyMatchStatItem[]
+  summary: MyMatchStatSummary
+  hint?: string
+}
+
+export async function fetchMyMatchStats(): Promise<MyMatchStatsResp | null> {
+  try {
+    return await api.get<never, MyMatchStatsResp>('/api/portal/player-stats/mine/')
+  } catch {
+    return null
+  }
+}

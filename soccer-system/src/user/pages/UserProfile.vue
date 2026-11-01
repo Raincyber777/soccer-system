@@ -8,8 +8,8 @@ import { changePassword, errMsg, fetchMe, updateMe } from '../../api/account'
 import { useAuth } from '../../stores/auth'
 import { confirmDialog } from '../../components/common/dialog'
 
-// 个人中心：基础资料（PATCH /api/auth/me/，后端仅接受姓名/电话/邮箱/单位四项）
-// 与登录密码（PUT /api/auth/password/，旧密码校验）。
+// 个人中心：基础资料 + 实名认证（PATCH /api/auth/me/，后端仅接受姓名/电话/邮箱/单位/身份证白名单，
+// 身份证仅回显脱敏形式）与登录密码（PUT /api/auth/password/，旧密码校验）。
 
 const router = useRouter()
 const auth = useAuth()
@@ -19,6 +19,7 @@ const baseFields: FormField[] = [
   { key: 'phone', label: '手机号' },
   { key: 'email', label: '邮箱' },
   { key: 'unit', label: '所属学校 / 单位' },
+  { key: 'idCard', label: '身份证号（实名认证）', placeholder: '18 位；用于关联个人参赛数据，已认证则无需重复填写' },
 ]
 
 const passwordFields: FormField[] = [
@@ -28,6 +29,7 @@ const passwordFields: FormField[] = [
 ]
 
 const baseInitial = ref<Record<string, string>>({})
+const idCardMasked = ref('')
 const formKey = ref(0)
 
 onMounted(async () => {
@@ -39,18 +41,27 @@ onMounted(async () => {
     email: me.email,
     unit: me.unit_name,
   }
+  idCardMasked.value = me.id_card_masked ?? ''
   formKey.value++
 })
 
 async function onSubmitBase(data: Record<string, string>) {
+  const idCard = (data.idCard ?? '').trim()
+  if (idCard && !/^\d{17}[\dXx]$/.test(idCard)) {
+    alert('身份证号格式不正确（应为 18 位）')
+    return
+  }
   try {
     await updateMe({
       real_name: data.name?.trim() ?? '',
       phone: data.phone?.trim() ?? '',
       email: data.email?.trim() ?? '',
       unit_name: data.unit?.trim() ?? '',
+      ...(idCard ? { id_card: idCard } : {}),
     })
     alert('基础信息已保存')
+    const me = await fetchMe()
+    idCardMasked.value = me?.id_card_masked ?? ''
   } catch (err) {
     alert(errMsg(err))
   }
@@ -88,7 +99,12 @@ async function handleLogout() {
 </script>
 
 <template>
-  <PageHeader title="个人中心" desc="维护账户基础信息、修改登录密码" />
+  <PageHeader title="个人中心" desc="维护账户基础信息、完成实名认证、修改登录密码" />
+
+  <p class="page-tip">
+    实名认证：{{ idCardMasked ? `已认证（${idCardMasked}）` : '未认证——填写身份证号保存后完成认证，认证后可在「我的参赛数据」查看个人技术统计' }}。
+    身份证仅用于与注册球员信息匹配，系统只展示脱敏形式（保留前 6 位与后 4 位）。
+  </p>
 
   <h3 class="section-title">基础信息</h3>
   <DataForm
