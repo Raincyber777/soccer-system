@@ -87,6 +87,11 @@ export interface ApiMatch {
   venue: string
   status: 'scheduled' | 'ongoing' | 'finished' | 'postponed'
   status_display: string
+  /** 计分板对接：进行中对阵的实时比分与阶段（校级/未开启为空） */
+  live_home_score?: number | null
+  live_away_score?: number | null
+  live_phase?: string
+  live_phase_display?: string
   remark: string
   result: ApiMatchResult | null
   created_by_name: string

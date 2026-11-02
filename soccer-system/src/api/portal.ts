@@ -98,15 +98,24 @@ export async function fetchPolicies(): Promise<NewsItem[]> {
 }
 
 function matchFromApi(m: ApiMatch): MatchRow {
+  // 比分口径：已发布赛果显示终局比分；进行中且计分板已推送实时比分时显示实时比分
+  const live = m.status === 'ongoing' && m.live_home_score !== null && m.live_home_score !== undefined
   return {
     match: `${m.group_type_display} ${m.round_name}`.trim(),
     group: m.group_type_display,
     home: m.home_team_name,
-    score: m.result ? `${m.result.home_score} : ${m.result.away_score}` : '—',
+    score: m.result
+      ? `${m.result.home_score} : ${m.result.away_score}`
+      : live
+        ? `${m.live_home_score} : ${m.live_away_score}`
+        : '—',
     away: m.away_team_name,
     time: m.match_time,
     venue: m.venue,
-    status: m.status_display,
+    status:
+      m.status === 'ongoing' && m.live_phase_display
+        ? `${m.status_display} · ${m.live_phase_display}`
+        : m.status_display,
   }
 }
 
