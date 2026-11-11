@@ -1,23 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <!-- 绿茵汇站点图标：渐变绿徽章底 + 金色冠军奖杯
-       省级赛事气质，大色块粗形状，16px 下轮廓清晰不糊 -->
-  <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#2f9e5f"/>
-      <stop offset="1" stop-color="#17402c"/>
-    </linearGradient>
-    <linearGradient id="cup" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#f7d97c"/>
-      <stop offset="1" stop-color="#e3a233"/>
-    </linearGradient>
-  </defs>
-  <rect width="32" height="32" rx="7" fill="url(#bg)"/>
-  <path d="M10 7 H22 V12 C22 16.2 19.4 19 16 19 C12.6 19 10 16.2 10 12 Z" fill="url(#cup)"/>
-  <g stroke="url(#cup)" stroke-width="1.8" fill="none" stroke-linecap="round">
-    <path d="M10 9 H8.2 C7 9 6.4 10.2 6.9 11.4 C7.4 12.6 8.8 13.4 10.3 13.6"/>
-    <path d="M22 9 H23.8 C25 9 25.6 10.2 25.1 11.4 C24.6 12.6 23.2 13.4 21.7 13.6"/>
+  <!-- 绿茵汇站点图标：透明底 + 扁平双色足球与草坪弧线
+       白球体 + 深绿描边贴皮（呼应全站线性图标语言），底部草绿弧线点题「绿茵」；
+       亮色标签栏靠绿线显形、深色标签栏靠白球显形，无渐变无底板 -->
+  <circle cx="16" cy="14" r="10" fill="#f7f3ea" stroke="#17402c" stroke-width="2.6"/>
+  <path d="M16 9.8 20 12.7 18.5 17.4 13.5 17.4 12 12.7Z" fill="#17402c"/>
+  <g stroke="#17402c" stroke-width="2.2" stroke-linecap="round">
+    <path d="M16 9.8 16 7.4"/>
+    <path d="M20 12.7 22.3 11.9"/>
+    <path d="M18.5 17.4 19.9 19.4"/>
+    <path d="M13.5 17.4 12.1 19.4"/>
+    <path d="M12 12.7 9.7 11.9"/>
   </g>
-  <rect x="14.6" y="19" width="2.8" height="2.4" fill="url(#cup)"/>
-  <rect x="11" y="21.4" width="10" height="2" rx="1" fill="url(#cup)"/>
-  <rect x="9.8" y="23.4" width="12.4" height="2.2" rx="1.1" fill="#f7d97c"/>
+  <path d="M7 26.5 Q16 24.5 25 26.5" stroke="#1e7a3f" stroke-width="2.6" fill="none" stroke-linecap="round"/>
 </svg>
