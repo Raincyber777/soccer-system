@@ -1,20 +1,23 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <!-- 绿茵汇站点图标：渐变绿徽章底 + 白色足球（中央五边形贴皮 + 放射缝线）
-       大色块粗形状设计，16px 下轮廓依然清晰不糊 -->
+  <!-- 绿茵汇站点图标：渐变绿徽章底 + 金色冠军奖杯
+       省级赛事气质，大色块粗形状，16px 下轮廓清晰不糊 -->
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="#2f9e5f"/>
       <stop offset="1" stop-color="#17402c"/>
     </linearGradient>
+    <linearGradient id="cup" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f7d97c"/>
+      <stop offset="1" stop-color="#e3a233"/>
+    </linearGradient>
   </defs>
   <rect width="32" height="32" rx="7" fill="url(#bg)"/>
-  <circle cx="16" cy="16" r="10.5" fill="#f7f3ea"/>
-  <path d="M16 11.2 20.6 14.5 18.8 19.9 13.2 19.9 11.4 14.5Z" fill="#17402c"/>
-  <g stroke="#17402c" stroke-width="1.7" stroke-linecap="round" fill="none">
-    <path d="M16 11.2 16 7"/>
-    <path d="M20.6 14.5 23.9 13.1"/>
-    <path d="M18.8 19.9 21.3 23.1"/>
-    <path d="M13.2 19.9 10.7 23.1"/>
-    <path d="M11.4 14.5 8.1 13.1"/>
+  <path d="M10 7 H22 V12 C22 16.2 19.4 19 16 19 C12.6 19 10 16.2 10 12 Z" fill="url(#cup)"/>
+  <g stroke="url(#cup)" stroke-width="1.8" fill="none" stroke-linecap="round">
+    <path d="M10 9 H8.2 C7 9 6.4 10.2 6.9 11.4 C7.4 12.6 8.8 13.4 10.3 13.6"/>
+    <path d="M22 9 H23.8 C25 9 25.6 10.2 25.1 11.4 C24.6 12.6 23.2 13.4 21.7 13.6"/>
   </g>
+  <rect x="14.6" y="19" width="2.8" height="2.4" fill="url(#cup)"/>
+  <rect x="11" y="21.4" width="10" height="2" rx="1" fill="url(#cup)"/>
+  <rect x="9.8" y="23.4" width="12.4" height="2.2" rx="1.1" fill="#f7d97c"/>
 </svg>
