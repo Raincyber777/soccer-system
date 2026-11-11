@@ -13,6 +13,8 @@ const props = defineProps<{
   clearText?: string
   /** 紧凑尺寸（搜索栏等小空间场景） */
   compact?: boolean
+  /** 只读态：比赛已结束等场景禁止修改 */
+  disabled?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -23,10 +25,12 @@ const open = ref(false)
 const root = ref<HTMLElement | null>(null)
 
 function toggle() {
+  if (props.disabled) return
   open.value = !open.value
 }
 
 function choose(option: string) {
+  if (props.disabled) return
   emit('update:modelValue', option)
   open.value = false
 }
@@ -53,6 +57,7 @@ const display = computed(() => (hasValue.value ? current.value : (props.placehol
       class="select-trigger"
       :aria-expanded="open"
       :aria-label="placeholder ?? '下拉选择'"
+      :disabled="disabled"
       @click="toggle"
       @keydown.esc="open = false"
     >
@@ -121,6 +126,12 @@ const display = computed(() => (hasValue.value ? current.value : (props.placehol
   padding: 8px 10px;
   border-radius: 6px;
   font-size: 13px;
+}
+
+.select-trigger:disabled {
+  background: #f5f7f6;
+  color: var(--muted);
+  cursor: not-allowed;
 }
 
 .select-text.placeholder {

@@ -9,16 +9,24 @@ const props = withDefaults(
     columns: TableColumn[]
     rows: Record<string, unknown>[]
     actions?: string[]
+    /** 按行计算可用操作：不同状态显示不同按钮 */
+    rowActions?: (row: Record<string, unknown>) => string[]
     pageSize?: number
   }>(),
   { pageSize: 10 },
 )
 
+const hasActions = computed(() => Boolean(props.actions?.length || props.rowActions))
+
+function actionsFor(row: Record<string, unknown>) {
+  return props.rowActions ? props.rowActions(row) : props.actions ?? []
+}
+
 const emit = defineEmits<{
   (e: 'action', action: string, row: Record<string, unknown>): void
 }>()
 
-const OK_WORDS = ['已通过', '已发布', '已上架', '已生效', '已核验', '已归档', '已公示', '已结束']
+const OK_WORDS = ['已通过', '已发布', '已上架', '已生效', '已核验', '已归档', '已公示', '已结束', '已确认']
 const PENDING_WORDS = ['待审核', '待初审', '审核中', '报名中', '进行中', '待核验', '未开始']
 const FAIL_WORDS = ['已驳回', '未通过', '已下架', '已删除', '已失效']
 
@@ -69,25 +77,27 @@ function goTo(p: number) {
             >
               {{ c.label }}
             </th>
-            <th v-if="actions && actions.length" class="th-actions">操作</th>
+            <th v-if="hasActions" class="th-actions">操作</th>
           </tr>
         </thead>
         <tbody>
           <tr v-if="!rows.length">
-            <td class="empty-cell" :colspan="columns.length + (actions?.length ? 1 : 0)">
+            <td class="empty-cell" :colspan="columns.length + (hasActions ? 1 : 0)">
               暂无数据（演示占位，接入后端后显示真实数据）
             </td>
           </tr>
           <tr v-for="(row, index) in pagedRows" :key="(page - 1) * props.pageSize + index">
             <td v-for="c in columns" :key="c.key">
-              <span v-if="isStatusColumn(c.label)" :class="badgeClass(row[c.key])">
-                {{ row[c.key] }}
-              </span>
-              <template v-else>{{ row[c.key] }}</template>
+              <slot :name="`cell-${c.key}`" :row="row" :value="row[c.key]">
+                <span v-if="isStatusColumn(c.label)" :class="badgeClass(row[c.key])">
+                  {{ row[c.key] }}
+                </span>
+                <template v-else>{{ row[c.key] }}</template>
+              </slot>
             </td>
-            <td v-if="actions?.length" class="td-actions">
+            <td v-if="hasActions" class="td-actions">
               <button
-                v-for="a in actions"
+                v-for="a in actionsFor(row)"
                 :key="a"
                 type="button"
                 class="table-btn"

@@ -24,7 +24,6 @@ const rows = [
 ]
 
 function onSubmit(data: Record<string, string>) {
-  console.log('政策数据：', data)
   alert('【演示】政策已发布，待接入后端')
 }
 

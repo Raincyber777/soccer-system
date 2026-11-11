@@ -5,17 +5,22 @@ import AppSelect from './AppSelect.vue'
 import AppDatePicker from './AppDatePicker.vue'
 
 // 通用表单：传入字段配置，点提交时把整个表单数据抛给父页面
-const props = defineProps<{
-  fields: FormField[]
-  submitText?: string
-}>()
+const props = withDefaults(
+  defineProps<{
+    fields: FormField[]
+    submitText?: string
+    /** 初始值：用于按路由参数预填报名赛事等场景 */
+    initial?: Record<string, string>
+  }>(),
+  { initial: () => ({}) },
+)
 
 const emit = defineEmits<{
   (e: 'submit', data: Record<string, string>): void
 }>()
 
 const form = reactive<Record<string, string>>({})
-props.fields.forEach((f) => (form[f.key] = ''))
+props.fields.forEach((f) => (form[f.key] = props.initial[f.key] ?? ''))
 
 function onSubmit() {
   emit('submit', { ...form })

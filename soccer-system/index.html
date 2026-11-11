@@ -6,6 +6,11 @@
     <!-- 老浏览器回退：与 SVG 同款的足球图标 -->
     <link rel="alternate icon" href="/favicon.ico">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- 基础内容安全策略：脚本仅允许同源，禁止 object/嵌入；生产网关还需补充 frame-ancestors 等响应头 -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self' ws: wss: https:; object-src 'none'; base-uri 'self'; form-action 'self'"
+    >
     <title>绿茵汇 · 省级中小学足球赛事平台</title>
   </head>
   <body>

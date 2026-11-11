@@ -39,12 +39,10 @@ const rows = [
 ]
 
 function onSubmit(data: Record<string, string>) {
-  console.log('新用户账户：', data)
   alert('【演示】用户账户已创建（自动归属本区域成都市），待接入后端')
 }
 
 function onSearch(filters: Record<string, string>) {
-  console.log('搜索条件：', filters)
   alert('【演示】搜索：待接入后端')
 }
 

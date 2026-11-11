@@ -25,7 +25,6 @@ const rows = [
 ]
 
 function onSubmit(data: Record<string, string>) {
-  console.log('新闻数据：', data)
   alert('【演示】新闻已发布，待接入后端')
 }
 

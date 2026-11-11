@@ -42,12 +42,10 @@ const rows = [
 ]
 
 function onSubmit(data: Record<string, string>) {
-  console.log('新管理员账户：', data)
   alert('【演示】管理员账户已创建，待接入后端')
 }
 
 function onSearch(filters: Record<string, string>) {
-  console.log('搜索条件：', filters)
   alert('【演示】搜索：待接入后端')
 }
 

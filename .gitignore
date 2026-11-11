@@ -1,0 +1,48 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+soccer-database-main/.venv/
+soccer-database-main/venv/
+
+# 本地数据库与上传文件
+soccer-database-main/db.sqlite3
+soccer-database-main/db.sqlite3-journal
+*.sqlite3
+soccer-database-main/storage/
+soccer-database-main/media/
+soccer-database-main/.private/
+soccer-database-main/.env
+
+# 后端运行日志
+soccer-database-main/server.out.log
+soccer-database-main/server.err.log
+soccer-database-main/*.log
+
+# Node
+soccer-system/node_modules/
+soccer-system/dist/
+soccer-system/dist-ssr/
+soccer-system/coverage/
+soccer-system/*.local
+soccer-system/.env.local
+
+# 前端运行日志
+soccer-system/vite.out.log
+soccer-system/vite.err.log
+soccer-system/*.log
+
+# 演示产物
+demo/
+soccer-system/demo-output/
+
+# 历史重复目录（保留在本地，不再提交）
+soccer-system/soccer-system/
+
+# 编辑器与系统文件
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+*.swp
+*.tsbuildinfo

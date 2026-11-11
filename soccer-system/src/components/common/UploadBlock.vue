@@ -5,6 +5,8 @@ import AppIcon from './AppIcon.vue'
 defineProps<{
   title: string
   desc?: string
+  /** 已上传状态：用于球队资料等需要展示完成进度的场景 */
+  uploaded?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -13,13 +15,16 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <div class="upload-block" @click="emit('select')">
+  <div class="upload-block" :class="{ uploaded }" @click="emit('select')">
     <span class="upload-icon">
-      <AppIcon name="upload" :size="26" />
+      <AppIcon :name="uploaded ? 'circle-check' : 'upload'" :size="26" />
     </span>
     <p class="upload-title">{{ title }}</p>
     <p v-if="desc" class="upload-desc">{{ desc }}</p>
-    <button type="button" class="upload-btn" @click.stop="emit('select')">选择文件</button>
+    <p v-if="uploaded" class="upload-state">已上传（点击可重新上传）</p>
+    <button type="button" class="upload-btn" @click.stop="emit('select')">
+      {{ uploaded ? '重新上传' : '选择文件' }}
+    </button>
   </div>
 </template>
 
@@ -37,6 +42,19 @@ const emit = defineEmits<{
 .upload-block:hover {
   border-color: var(--green);
   background: #fbfdfb;
+}
+
+.upload-block.uploaded {
+  border-style: solid;
+  border-color: rgba(30, 122, 63, 0.35);
+  background: #fbfefc;
+}
+
+.upload-state {
+  margin-top: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--green);
 }
 
 .upload-icon {

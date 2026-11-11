@@ -19,7 +19,6 @@ const formFields: FormField[] = [
 ]
 
 function onSubmit(data: Record<string, string>) {
-  console.log('教练员信息：', data)
   alert('【演示】信息已保存，待接入后端')
 }
 </script>

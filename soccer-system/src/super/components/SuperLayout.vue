@@ -26,6 +26,8 @@ interface MenuGroup {
 
 const groups: MenuGroup[] = []
 for (const child of children) {
+  // meta.hidden 的详情页不进菜单（如单个球员全量统计）
+  if (child.meta?.hidden) continue
   const label = String(child.meta?.group ?? '功能')
   const item: MenuItem = {
     path: `/super/${child.path}`,
@@ -41,7 +43,8 @@ for (const child of children) {
 
 function handleLogout() {
   auth.logout()
-  router.push('/')
+  // 超管与普通管理员共用管理员登录入口
+  router.push('/admin/login')
 }
 </script>
 

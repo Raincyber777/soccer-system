@@ -24,7 +24,6 @@ const rows = [
 ]
 
 function onSubmit(data: Record<string, string>) {
-  console.log('直播链接：', data)
   alert('【演示】直播链接已保存，待接入后端')
 }
 

@@ -131,6 +131,48 @@ textarea {
   color: var(--green);
 }
 
+/* 兼容各业务页沿用的按钮类，统一外观，避免出现浏览器原生按钮 */
+.primary-btn,
+.refresh-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: 1px solid #d9e6dc;
+  border-radius: 8px;
+  background: #fff;
+  color: var(--green-dark);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  line-height: 1.4;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, color 0.15s, opacity 0.15s;
+}
+
+.primary-btn {
+  background: var(--green);
+  border-color: var(--green);
+  color: #fff;
+}
+
+.primary-btn:hover:not(:disabled) {
+  background: var(--green-dark);
+  border-color: var(--green-dark);
+}
+
+.refresh-btn:hover:not(:disabled) {
+  border-color: var(--green);
+  background: var(--green-light);
+}
+
+.primary-btn:disabled,
+.refresh-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .badge {
   display: inline-block;
   padding: 2px 10px;

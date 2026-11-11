@@ -5,14 +5,16 @@ import { adminRoutes } from './adminRoutes'
 // 超级管理员端 = 管理员端全部功能（直接复用 admin 的页面组件，不复制代码）
 // + 省级审核专属（报名审核/报名信息管理/报名账号管理/赛事身份核验）
 // + 系统管理专属（系统参数配置/跨区数据权限）
+// + 门户新闻管理（市州管理员不可见，仅超级管理员可访问）
 const adminChildren = adminRoutes[0]?.children ?? []
 
 // 复用管理端内容页：去掉管理端控制台（超级管理员端有全省数据总览），
 // 以及管理端的两个账户页（超级管理员端有自己的可编辑版账户管理页面）、
-// 管理端的使用说明（超管端用自己的版本），并去掉路由 name 避免与 /admin 重名
-const excludedPaths = ['dashboard', 'user-accounts', 'admin-accounts', 'usage-guide']
+// 管理端的使用说明（超管端用自己的版本），以及市州初审页（超管端只用省级终审页），
+// 并去掉路由 name 避免与 /admin 重名
+const excludedPaths = ['dashboard', 'user-accounts', 'admin-accounts', 'registration-first-review', 'identity-review', 'usage-guide']
 const reusedChildren: RouteRecordRaw[] = adminChildren
-  .filter((child) => !excludedPaths.includes(child.path) && child.component)
+  .filter((child) => !excludedPaths.includes(child.path) && child.component && !child.meta?.schoolOnly)
   .map((child) => ({
     path: child.path,
     component: child.component!,
@@ -31,13 +33,16 @@ export const superRoutes: RouteRecordRaw[] = [
       { path: 'admin-accounts', name: 'super-admin-accounts', component: () => import('../super/pages/SuperAdminAccounts.vue'), meta: { title: '管理员账户管理', group: '账户管理' } },
       { path: 'user-accounts', name: 'super-user-accounts', component: () => import('../super/pages/SuperUserAccounts.vue'), meta: { title: '用户账户管理', group: '账户管理' } },
       // 省级审核（省级审核端专属：报名资格终审等高权限功能）
-      { path: 'registration-review', name: 'super-registration-review', component: () => import('../super/pages/RegistrationReview.vue'), meta: { title: '报名信息审核', group: '省级审核' } },
+      // 省级终审复用同一报名审核页：页面按当前角色切换市州初审 / 省级反向审核
+      { path: 'registration-review', name: 'super-registration-review', component: () => import('../admin/pages/RegistrationFirstReview.vue'), meta: { title: '报名信息审核', group: '省级审核' } },
       { path: 'registration-manage', name: 'super-registration-manage', component: () => import('../super/pages/RegistrationManage.vue'), meta: { title: '报名信息管理', group: '省级审核' } },
       { path: 'registration-accounts', name: 'super-registration-accounts', component: () => import('../super/pages/RegistrationAccounts.vue'), meta: { title: '报名账号管理', group: '省级审核' } },
       { path: 'identity-verify', name: 'super-identity-verify', component: () => import('../super/pages/IdentityVerify.vue'), meta: { title: '赛事身份核验', group: '省级审核' } },
       // 系统管理（超级管理员专属）
       { path: 'system-config', name: 'super-system-config', component: () => import('../super/pages/SystemConfig.vue'), meta: { title: '系统参数配置', group: '系统管理' } },
       { path: 'data-permission', name: 'super-data-permission', component: () => import('../super/pages/DataPermission.vue'), meta: { title: '跨区数据权限', group: '系统管理' } },
+      // 门户新闻管理（superOnly：市州管理员端不提供该入口）
+      { path: 'news-manage', name: 'super-news-manage', component: () => import('../admin/pages/NewsManage.vue'), meta: { title: '新闻管理', group: '赛事门户管理', superOnly: true } },
       // 以下全部复用管理端页面
       ...reusedChildren,
       // 帮助（超管端自己的使用说明，放在侧栏最底部）

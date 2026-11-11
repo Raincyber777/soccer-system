@@ -33,6 +33,8 @@ export const userRoutes: RouteRecordRaw[] = [
       { path: 'publicity', name: 'user-publicity', component: () => import('../user/pages/PublicityView.vue'), meta: { title: '信息公示', group: '信息公示' } },
       // 个人中心
       { path: 'profile', name: 'user-profile', component: () => import('../user/pages/UserProfile.vue'), meta: { title: '个人中心', group: '个人中心' } },
+      { path: 'my-stats', name: 'user-my-stats', component: () => import('../user/pages/MyStats.vue'), meta: { title: '我的参赛记录', group: '个人中心' } },
+      { path: 'identity', name: 'user-identity', component: () => import('../user/pages/IdentityVerify.vue'), meta: { title: '实名认证', group: '个人中心' } },
       // 帮助（使用说明按身份拆成三份，meta.personas 限定每个人只看到自己那份）
       { path: 'usage-guide', name: 'user-usage-guide-leader', component: () => import('../user/pages/UsageGuide.vue'), meta: { title: '使用说明', group: '帮助', personas: ['leader'], persona: 'leader' } },
       { path: 'usage-guide-student', name: 'user-usage-guide-student', component: () => import('../user/pages/UsageGuide.vue'), meta: { title: '使用说明', group: '帮助', personas: ['student'], persona: 'student' } },

@@ -25,7 +25,6 @@ const rows = [
 ]
 
 function onSubmit(data: Record<string, string>) {
-  console.log('合作方：', data)
   alert('【演示】合作方已保存，待接入后端')
 }
 

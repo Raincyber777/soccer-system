@@ -249,4 +249,65 @@ watch(
     width: 170px;
   }
 }
+
+/* 移动端：侧栏改为顶部横向菜单，避免挤压正文导致横向溢出 */
+@media (max-width: 640px) {
+  .sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .side-scroll {
+    position: static;
+    max-height: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 8px 12px;
+    scrollbar-width: none;
+  }
+
+  .side-scroll::-webkit-scrollbar {
+    display: none;
+  }
+
+  .side-scroll > * + * {
+    margin-top: 0;
+  }
+
+  .menu-group {
+    display: contents;
+  }
+
+  .group-toggle {
+    display: none;
+  }
+
+  .group-items,
+  .group-items.closed {
+    display: contents;
+    grid-template-rows: none;
+  }
+
+  .group-clip {
+    display: flex;
+    gap: 8px;
+    overflow: visible;
+  }
+
+  .menu-item,
+  .group-clip .menu-item {
+    padding: 7px 12px;
+    border-radius: 999px;
+    white-space: nowrap;
+    font-size: 13px;
+  }
+
+  .group-clip .menu-item + .menu-item {
+    margin-top: 0;
+  }
+}
 </style>

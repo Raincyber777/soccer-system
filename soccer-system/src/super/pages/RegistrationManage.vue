@@ -48,7 +48,6 @@ const cityStatColumns: TableColumn[] = [
 ]
 
 function onSearch(filters: Record<string, string>) {
-  console.log('搜索条件：', filters)
   alert('【演示】搜索：待接入后端')
 }
 

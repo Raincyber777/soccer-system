@@ -1,29 +1,20 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import PortalHeader from './PortalHeader.vue'
 import PortalFooter from './PortalFooter.vue'
 import AppSelect from '../common/AppSelect.vue'
 import DataTable from '../common/DataTable.vue'
 import type { TableColumn } from '../common/types'
+import { portalApi, ApiError, type PortalMatch } from '../../api'
 
 // 门户公开页 · 赛程赛果：游客无需登录即可浏览
 // 与管理员端【对阵信息管理】【赛果发布管理】同口径：赛果经审核「已发布」才对外，
 // 管理端待审核的场次（如中学组第 2 轮一中 vs 师大附中）不会出现在公开页
 
-// 用 type 而非 interface：type 别名带隐式索引签名，可直接传给 DataTable 的 rows（Record<string, unknown>[]）
-type MatchRow = {
-  match: string
-  group: string
-  home: string
-  score: string
-  away: string
-  time: string
-  venue: string
-  status: string
-}
-
 const groupOptions = ['全部组别', '小学组', '中学组', '高校组']
 const groupFilter = ref('全部组别')
+const router = useRouter()
 
 const columns: TableColumn[] = [
   { key: 'match', label: '场次' },
@@ -35,21 +26,38 @@ const columns: TableColumn[] = [
   { key: 'status', label: '状态', width: '90px' },
 ]
 
-const matches: MatchRow[] = [
-  { match: '小学组 第 1 轮', group: '小学组', home: '实小少年队', score: '5 : 2', away: '城关小学', time: '2026-10-12 10:00', venue: '市体育中心副场', status: '已结束' },
-  { match: '高校组 第 1 轮', group: '高校组', home: '成都体育学院', score: '1 : 0', away: '西南交通大学', time: '2026-10-17 15:00', venue: '成都体育学院足球场', status: '已结束' },
-  { match: '高校组 第 1 轮', group: '高校组', home: '四川大学', score: '2 : 0', away: '川师大队', time: '2026-10-18 15:00', venue: '四川大学足球场', status: '已结束' },
-  { match: '中学组 第 1 轮', group: '中学组', home: '实验中学', score: '2 : 0', away: '一中', time: '2026-10-13 15:00', venue: '省青少年足球基地 2 号场', status: '已结束' },
-  { match: '中学组 第 3 轮', group: '中学组', home: '实验中学', score: '3 : 1', away: '市二中', time: '2026-10-22 15:00', venue: '省青少年足球基地 1 号场', status: '已结束' },
-  { match: '小学组 第 2 轮', group: '小学组', home: '实小少年队', score: '—', away: '朝阳小学', time: '2026-10-23 14:00', venue: '市体育中心副场', status: '进行中' },
-  { match: '中学组 第 4 轮', group: '中学组', home: '师大附中', score: '—', away: '实验中学', time: '2026-10-25 15:00', venue: '省青少年足球基地 1 号场', status: '未开始' },
-  { match: '高校组 第 2 轮', group: '高校组', home: '川师大队', score: '—', away: '西南交通大学', time: '2026-10-26 15:00', venue: '四川师范大学足球场', status: '未开始' },
-  { match: '小学组 第 3 轮', group: '小学组', home: '城关小学', score: '—', away: '朝阳小学', time: '2026-10-27 10:00', venue: '市体育中心副场', status: '未开始' },
-]
+// 赛程与赛果由接口提供，页面只做组别筛选
+const matches = ref<PortalMatch[]>([])
+const loading = ref(false)
+const error = ref('')
+
+async function load() {
+  loading.value = true
+  error.value = ''
+  try {
+    matches.value = await portalApi.schedule()
+  } catch (err) {
+    error.value = err instanceof ApiError ? err.message : '赛程加载失败'
+  } finally {
+    loading.value = false
+  }
+}
 
 const visibleRows = computed(() =>
-  groupFilter.value === '全部组别' ? matches : matches.filter((m) => m.group === groupFilter.value),
+  groupFilter.value === '全部组别' ? matches.value : matches.value.filter((m) => m.group === groupFilter.value),
 )
+
+// 每场比赛可进入详情页查看已确认的进球记录（公开端不展示机位与置信度）
+function rowActions() {
+  return ['比赛详情']
+}
+
+function onAction(_action: string, row: Record<string, unknown>) {
+  const id = Number(row.id)
+  if (Number.isFinite(id)) router.push(`/matches/${id}`)
+}
+
+onMounted(load)
 </script>
 
 <template>
@@ -70,7 +78,10 @@ const visibleRows = computed(() =>
         <AppSelect v-model="groupFilter" :options="groupOptions" />
       </div>
 
-      <DataTable :columns="columns" :rows="visibleRows" />
+      <DataTable :columns="columns" :rows="visibleRows" :row-actions="rowActions" @action="onAction" />
+      <p v-if="error" class="page-tip error">{{ error }}</p>
+      <p v-if="loading" class="page-tip">正在加载赛程…</p>
+      <p v-else-if="!visibleRows.length" class="page-tip">该组别暂无已发布的赛程。</p>
 
       <p class="page-tip" style="margin-top: 16px">
         本页展示近期重点场次，完整赛程以赛事组委会发布为准。
@@ -131,5 +142,9 @@ const visibleRows = computed(() =>
 .toolbar-label {
   font-size: 14px;
   color: var(--muted);
+}
+
+.page-tip.error {
+  color: #a3312a;
 }
 </style>

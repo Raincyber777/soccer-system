@@ -12,7 +12,8 @@ const auth = useAuth()
 
 function handleLogout() {
   auth.logout()
-  router.push('/')
+  // 按端登出：用户端退出后回到用户端登录入口，不跳公共首页
+  router.push('/login')
 }
 
 // 从路由配置里读出菜单，保证菜单和路由只有一份配置来源
@@ -217,6 +218,18 @@ const personaLabel = computed(() => (auth.state.persona ? personaLabels[auth.sta
 @media (max-width: 600px) {
   .brand-identity {
     display: none;
+  }
+
+  .topbar-inner {
+    padding: 0 14px;
+  }
+
+  .layout-body {
+    flex-direction: column;
+  }
+
+  .main-area {
+    padding: 16px;
   }
 }
 </style>

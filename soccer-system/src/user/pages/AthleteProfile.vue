@@ -26,7 +26,6 @@ const formFields: FormField[] = [
 ]
 
 function onSubmit(data: Record<string, string>) {
-  console.log('运动员信息：', { ...data, schoolCode: school.value?.code ?? '' })
   alert('【演示】信息已提交，学籍数据匹配与确认流程待接入后端')
 }
 </script>

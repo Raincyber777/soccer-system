@@ -1,9 +1,9 @@
 import { reactive } from 'vue'
+import { authApi, type LoginResult } from '../api'
 
-// 全局模拟登录状态（没有后端，先用模块级变量保存当前登录角色）
-// 接入后端后可替换为真实登录接口 + token
-// 状态写入 sessionStorage：刷新页面后登录态不丢，路由守卫才能正常工作
-export type UserRole = 'user' | 'admin' | 'super'
+// 全局登录状态：由认证接口恢复，页面只读取这里的 role / persona
+// 登录态不再把 role 直接写进 sessionStorage，避免通过 DevTools 改字段直接提权
+export type UserRole = 'user' | 'admin' | 'super' | 'school'
 
 // 用户端登录身份：决定用户端菜单可见性（运动员中心/教练员中心按身份显示）
 export type UserPersona = 'leader' | 'student' | 'coach'
@@ -12,6 +12,7 @@ export const roleLabels: Record<UserRole, string> = {
   user: '用户端用户',
   admin: '普通管理员',
   super: '超级管理员',
+  school: '校级管理员',
 }
 
 export const personaLabels: Record<UserPersona, string> = {
@@ -25,37 +26,47 @@ export const personaLabels: Record<UserPersona, string> = {
 export const STAFF_IDENTITY: Record<string, string> = {
   admin001: '市州管理员 · 成都市教育局',
   super001: '省级管理员 · 省本级',
+  school001: '校级管理员 · 成都市实验中学',
 }
 
 interface AuthState {
   role: UserRole | null
   persona: UserPersona | null
   account: string
+  /** 校级管理员绑定的学校 */
+  schoolCode: string
+  schoolName: string
+  /** 生效权限点：校级菜单与接口按权限点放行 */
+  permissions: string[]
+  /** 数据范围：市州 / 区县 */
+  city: string
+  district: string
 }
 
-const STORAGE_KEY = 'soccer-auth'
+const state = reactive<AuthState>({
+  role: null,
+  persona: null,
+  account: '',
+  schoolCode: '',
+  schoolName: '',
+  permissions: [],
+  city: '',
+  district: '',
+})
 
-function loadState(): AuthState {
-  try {
-    const raw = sessionStorage.getItem(STORAGE_KEY)
-    if (raw) {
-      return JSON.parse(raw) as AuthState
-    }
-  } catch {
-    // 解析失败按未登录处理
-  }
-  return { role: null, persona: null, account: '' }
+function applyResult(result: LoginResult) {
+  state.role = result.role
+  state.persona = result.role === 'user' ? result.persona ?? 'leader' : null
+  state.account = result.account
+  state.schoolCode = result.schoolCode ?? ''
+  state.schoolName = result.schoolName ?? ''
+  state.permissions = result.permissions ?? []
+  state.city = result.city ?? ''
+  state.district = result.district ?? ''
 }
 
-const state = reactive<AuthState>(loadState())
-
-function saveState() {
-  try {
-    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(state))
-  } catch {
-    // 隐私模式等场景下允许失败，仅影响刷新后的登录态
-  }
-}
+let restored = false
+let restoring: Promise<void> | null = null
 
 export function useAuth() {
   function loginAs(role: UserRole, account: string, persona: UserPersona = 'leader') {
@@ -63,15 +74,51 @@ export function useAuth() {
     state.account = account
     // 只有用户端区分身份，管理端身份清空
     state.persona = role === 'user' ? persona : null
-    saveState()
+    state.schoolCode = ''
+    state.schoolName = ''
+    state.permissions = []
+    restored = true
+  }
+
+  /** 登录接口返回后写入完整登录态（含学校绑定与权限点） */
+  function loginWith(result: LoginResult) {
+    applyResult(result)
+    restored = true
+  }
+
+  /** 首次路由守卫前恢复登录态；之后复用同一个 Promise，避免重复请求 */
+  function restore(): Promise<void> {
+    if (restored) return Promise.resolve()
+    if (!restoring) {
+      restoring = authApi
+        .restore()
+        .then((session) => {
+          if (session) applyResult(session)
+          // 清掉旧版本可能残留的 role 缓存
+          sessionStorage.removeItem('soccer-auth')
+        })
+        .catch(() => {
+          // 恢复失败按未登录处理，不阻塞页面访问
+        })
+        .finally(() => {
+          restored = true
+        })
+    }
+    return restoring
   }
 
   function logout() {
+    authApi.clearSession()
     state.role = null
     state.persona = null
     state.account = ''
-    saveState()
+    state.schoolCode = ''
+    state.schoolName = ''
+    state.permissions = []
+    state.city = ''
+    state.district = ''
+    restored = true
   }
 
-  return { state, roleLabels, personaLabels, loginAs, logout }
+  return { state, roleLabels, personaLabels, loginAs, loginWith, logout, restore }
 }

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import type { RouteRecordRaw } from 'vue-router'
 import { useRouter } from 'vue-router'
 import { adminRoutes } from '../../routers/adminRoutes'
@@ -9,16 +10,29 @@ import SideNav from '../../components/common/SideNav.vue'
 const router = useRouter()
 const auth = useAuth()
 
-// 顶栏身份标签：演示账号映射「角色 · 所属机构」，便于使用者确认自己的身份与辖区
-const identity = STAFF_IDENTITY[auth.state.account] ?? '市州管理员'
+const isSchool = computed(() => auth.state.role === 'school')
+
+// 顶栏身份标签：校级账号显示本校名称，普通/超管显示演示账号映射的机构
+const identity = computed(() =>
+  isSchool.value
+    ? `${auth.state.schoolName || '本校'} · 校级管理员`
+    : STAFF_IDENTITY[auth.state.account] ?? '市州管理员',
+)
 
 function handleLogout() {
   auth.logout()
-  router.push('/')
+  // 管理端退出后回到管理员登录入口（校级、普通、超管共用）
+  router.push('/admin/login')
 }
 
 // 从路由配置里读出菜单，保证菜单和路由只有一份配置来源
-const children = (adminRoutes[0]?.children ?? []) as RouteRecordRaw[]
+// 校级账号只看 schoolOnly 页面，普通/超管看不到校级页面
+const children = computed(() =>
+  ((adminRoutes[0]?.children ?? []) as RouteRecordRaw[]).filter((child) => {
+    const schoolOnly = Boolean(child.meta?.schoolOnly)
+    return isSchool.value ? schoolOnly : !schoolOnly
+  }),
+)
 
 interface MenuItem {
   path: string
@@ -29,20 +43,25 @@ interface MenuGroup {
   items: MenuItem[]
 }
 
-const groups: MenuGroup[] = []
-for (const child of children) {
-  const label = String(child.meta?.group ?? '功能')
-  const item: MenuItem = {
-    path: `/admin/${child.path}`,
-    title: String(child.meta?.title ?? String(child.name)),
+const groups = computed<MenuGroup[]>(() => {
+  const result: MenuGroup[] = []
+  for (const child of children.value) {
+    // meta.hidden 的详情页不进菜单（如单个球员全量统计）
+    if (child.meta?.hidden) continue
+    const label = String(child.meta?.group ?? '功能')
+    const item: MenuItem = {
+      path: `/admin/${child.path}`,
+      title: String(child.meta?.title ?? String(child.name)),
+    }
+    const group = result.find((g) => g.label === label)
+    if (group) {
+      group.items.push(item)
+    } else {
+      result.push({ label, items: [item] })
+    }
   }
-  const group = groups.find((g) => g.label === label)
-  if (group) {
-    group.items.push(item)
-  } else {
-    groups.push({ label, items: [item] })
-  }
-}
+  return result
+})
 </script>
 
 <template>
@@ -54,13 +73,13 @@ for (const child of children) {
             <AppIcon name="ball" :size="20" class="brand-ball" />
             绿茵汇
           </span>
-          <span class="brand-tag admin-tag">管理端</span>
+          <span class="brand-tag admin-tag">{{ isSchool ? '校级管理端' : '管理端' }}</span>
           <span class="brand-identity">{{ identity }}</span>
         </router-link>
         <div class="topbar-right">
           <span class="user-name">
             <AppIcon name="shield" :size="15" />
-            当前用户：{{ auth.state.account || '普通管理员' }}
+            当前用户：{{ auth.state.account || (isSchool ? '校级管理员' : '普通管理员') }}
           </span>
           <a href="/" class="exit-link" @click.prevent="handleLogout">退出系统</a>
         </div>

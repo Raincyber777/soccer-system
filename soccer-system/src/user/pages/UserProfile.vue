@@ -23,7 +23,6 @@ const passwordFields: FormField[] = [
 ]
 
 function onSubmitBase(data: Record<string, string>) {
-  console.log('基础信息：', data)
   alert('【演示】保存基础信息：待接入后端')
 }
 
@@ -41,7 +40,7 @@ function onSubmitPassword(data: Record<string, string>) {
 
 function handleLogout() {
   auth.logout()
-  router.push('/')
+  router.push('/login')
 }
 </script>
 
