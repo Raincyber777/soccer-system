@@ -112,5 +112,5 @@ const personaLabel = computed(() => personaLabels[persona.value])
   <h3 class="section-title">操作流程（{{ personaLabel }}）</h3>
   <GuideSteps :steps="guide.steps" />
 
-  <p class="page-tip">提示：使用中遇到账号或审核问题，可联系学校管理员协助处理。</p>
+  <p class="page-tip">提示：使用中遇到账号或审核问题，可联系球队负责人或赛事管理员协助处理。</p>
 </template>

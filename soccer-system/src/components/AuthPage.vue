@@ -27,15 +27,18 @@ watch(activeTab, (tab) => {
 
 <template>
   <div class="auth-page">
+    <!-- 页面左上角：返回门户首页 -->
+    <router-link to="/" class="auth-back" aria-label="返回首页">
+      <AppIcon name="chevron-left" :size="16" />
+      返回首页
+    </router-link>
+
     <div class="auth-card">
-      <!-- 顶部：品牌 + 关闭按钮 -->
+      <!-- 顶部：品牌 -->
       <div class="auth-head">
         <router-link to="/" class="auth-brand">
           <AppIcon name="ball" :size="22" class="brand-ball" />
           绿茵汇
-        </router-link>
-        <router-link to="/" class="auth-close" title="返回首页" aria-label="返回首页">
-          <AppIcon name="x" :size="16" />
         </router-link>
       </div>
 
@@ -82,6 +85,28 @@ watch(activeTab, (tab) => {
   overflow: hidden;
 }
 
+/* 左上角返回门户首页 */
+.auth-back {
+  position: absolute;
+  top: 22px;
+  left: 22px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 9px 18px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  font-size: 14px;
+  backdrop-filter: blur(4px);
+  transition: background 0.2s;
+  z-index: 2;
+}
+
+.auth-back:hover {
+  background: rgba(255, 255, 255, 0.26);
+}
+
 /* 背景装饰的大足球（线性图标） */
 .bg-ball {
   position: absolute;
@@ -121,24 +146,6 @@ watch(activeTab, (tab) => {
 
 .brand-ball {
   color: var(--green);
-}
-
-.auth-close {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  background: #f1f4f1;
-  color: var(--muted);
-  font-size: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.2s, color 0.2s;
-}
-
-.auth-close:hover {
-  background: var(--green-light);
-  color: var(--green-dark);
 }
 
 /* 标签页 */

@@ -95,13 +95,6 @@ async function handleLogin() {
 
     <button type="submit" class="auth-submit" :disabled="loggingIn">{{ loggingIn ? '登录中…' : '登 录' }}</button>
   </form>
-
-  <div class="or-divider"><span>或</span></div>
-
-  <router-link to="/" class="guest-btn">
-    <AppIcon name="user" :size="16" class="guest-icon" />
-    游客一键浏览首页
-  </router-link>
 </template>
 
 <style scoped src="./authForm.css"></style>
@@ -117,49 +110,4 @@ async function handleLogin() {
   line-height: 1.6;
 }
 
-/* 或 分隔线 */
-.or-divider {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  color: var(--muted);
-  font-size: 12px;
-  margin: 18px 0 12px;
-}
-
-.or-divider::before,
-.or-divider::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: var(--line);
-}
-
-.guest-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  border: 1.5px solid #d8e2da;
-  border-radius: 8px;
-  padding: 11px;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--ink);
-  transition: border-color 0.2s, color 0.2s;
-}
-
-.guest-icon {
-  color: var(--muted);
-  transition: color 0.2s;
-}
-
-.guest-btn:hover .guest-icon {
-  color: var(--green);
-}
-
-.guest-btn:hover {
-  border-color: var(--green);
-  color: var(--green);
-}
 </style>
