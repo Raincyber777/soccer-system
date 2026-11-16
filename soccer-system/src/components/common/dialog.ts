@@ -42,12 +42,15 @@ export const dialogState = reactive<{ current: DialogRequest | null }>({ current
 
 export function confirmDialog(opts: ConfirmOptions): Promise<boolean> {
   return new Promise((resolve) => {
+    // 并发弹窗时先结算前一个（按取消处理），避免其 Promise 永不 resolve
+    settleDialog(false)
     dialogState.current = { kind: 'confirm', resolve, ...opts }
   })
 }
 
 export function promptDialog(opts: PromptOptions): Promise<string | null> {
   return new Promise((resolve) => {
+    settleDialog(null)
     dialogState.current = { kind: 'prompt', resolve, ...opts }
   })
 }

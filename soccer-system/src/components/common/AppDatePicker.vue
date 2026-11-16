@@ -47,13 +47,19 @@ interface DayCell {
   disabled: boolean
 }
 
+// 当天字符串：每次现取，避免组件跨天后「今天」仍指向创建日
+function todayDate() {
+  const t = new Date()
+  return toStr(t.getFullYear(), t.getMonth(), t.getDate())
+}
+
 function makeCell(y: number, m: number, d: number, inMonth: boolean): DayCell {
   const date = toStr(y, m, d)
   return {
     date,
     day: d,
     inMonth,
-    isToday: date === toStr(now.getFullYear(), now.getMonth(), now.getDate()),
+    isToday: date === todayDate(),
     selected: props.modelValue === date,
     disabled: (props.min !== '' && date < props.min) || (props.max !== '' && date > props.max),
   }
@@ -113,8 +119,8 @@ function nextMonth() {
 
 function toggle() {
   if (!open.value) {
-    // 打开时定位到已选日期所在月份，未选则定位当月
-    const base = props.modelValue || toStr(now.getFullYear(), now.getMonth(), now.getDate())
+    // 打开时定位到已选日期所在月份，未选则定位当月（当月每次现取，跨天正确）
+    const base = props.modelValue || todayDate()
     const parts = base.split('-').map(Number)
     viewYear.value = parts[0] ?? now.getFullYear()
     viewMonth.value = (parts[1] ?? 1) - 1
@@ -129,7 +135,7 @@ function pick(cell: DayCell) {
 }
 
 function pickToday() {
-  const t = toStr(now.getFullYear(), now.getMonth(), now.getDate())
+  const t = todayDate()
   if ((props.min !== '' && t < props.min) || (props.max !== '' && t > props.max)) return
   emit('update:modelValue', t)
   open.value = false

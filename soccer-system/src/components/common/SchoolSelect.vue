@@ -60,10 +60,13 @@ const matchedSchools = computed<SchoolInfo[]>(() => {
 })
 
 // 编辑回显：已有值时自动带出所在市/区县
+// skipDistrictClear：程序赋值的 city 变化（回显）不清空 district，只有用户手动切换市州才清
+let skipDistrictClear = false
 watch(
   () => props.modelValue,
   (v) => {
     if (v) {
+      skipDistrictClear = true
       city.value = v.city
       district.value = v.district
     }
@@ -73,6 +76,10 @@ watch(
 
 // 切换市州后清空区县，需要重新搜索学校
 watch(city, () => {
+  if (skipDistrictClear) {
+    skipDistrictClear = false
+    return
+  }
   district.value = ''
   open.value = false
 })

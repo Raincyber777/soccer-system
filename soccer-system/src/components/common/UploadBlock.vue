@@ -4,11 +4,13 @@ import AppIcon from './AppIcon.vue'
 
 // 通用上传块：点击选择文件后 emit('select', file)；
 // 旧页面回调不接收参数仍兼容。
-defineProps<{
+const props = defineProps<{
   title: string
   desc?: string
   /** 原生 accept，如 .pdf,.jpg 或 image/* */
   accept?: string
+  /** 文件大小上限（MB），默认 25 */
+  maxMB?: number
 }>()
 
 const emit = defineEmits<{
@@ -17,6 +19,9 @@ const emit = defineEmits<{
 
 const inputEl = ref<HTMLInputElement | null>(null)
 
+/** 大小上限（MB）：默认 25MB 与 nginx client_max_body_size 对齐，超限直接拦在前端 */
+const maxBytes = (props.maxMB ?? 25) * 1024 * 1024
+
 function pick() {
   inputEl.value?.click()
 }
@@ -24,7 +29,27 @@ function pick() {
 function onChange(e: Event) {
   const input = e.target as HTMLInputElement
   const file = input.files?.[0]
-  if (file) emit('select', file)
+  if (file) {
+    if (file.size > maxBytes) {
+      alert(`文件大小超过上限（最大 ${props.maxMB ?? 25}MB），请压缩后重新选择`)
+      input.value = ''
+      return
+    }
+    // accept 为具体扩展名清单（.pdf,.jpg 形式）时校验扩展名；image/* 等通配形式不校验
+    const exts = (props.accept ?? '')
+      .split(',')
+      .map((s) => s.trim().toLowerCase())
+      .filter((s) => s.startsWith('.'))
+    if (exts.length) {
+      const name = file.name.toLowerCase()
+      if (!exts.some((ext) => name.endsWith(ext))) {
+        alert(`仅支持以下格式：${exts.join(' / ')}`)
+        input.value = ''
+        return
+      }
+    }
+    emit('select', file)
+  }
   input.value = '' // 允许重复选择同一文件
 }
 </script>

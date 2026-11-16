@@ -15,23 +15,35 @@ function onKeydown(e: KeyboardEvent) {
   if (e.key === 'Escape') emit('close')
 }
 
+// 滚动锁用引用计数：多个弹窗叠加时，任一关闭都不能解开其他弹窗的滚动锁
+let modalLockCount = 0
+function lockScroll() {
+  modalLockCount++
+  if (modalLockCount === 1) document.body.style.overflow = 'hidden'
+}
+function unlockScroll() {
+  modalLockCount = Math.max(0, modalLockCount - 1)
+  if (modalLockCount === 0) document.body.style.overflow = ''
+}
+
 // 打开期间锁定背景滚动，并监听 Esc 关闭
 watch(
   () => props.open,
   (open) => {
     if (open) {
       document.addEventListener('keydown', onKeydown)
-      document.body.style.overflow = 'hidden'
+      lockScroll()
     } else {
       document.removeEventListener('keydown', onKeydown)
-      document.body.style.overflow = ''
+      unlockScroll()
     }
   },
+  { immediate: true },
 )
 
 onBeforeUnmount(() => {
   document.removeEventListener('keydown', onKeydown)
-  document.body.style.overflow = ''
+  if (props.open) unlockScroll()
 })
 </script>
 

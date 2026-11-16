@@ -87,13 +87,17 @@ export function deleteRegistration(id: number) {
 
 /** 报名信息表下载（后端输出 CSV，Excel/WPS 可开）：带 token 拉流后触发浏览器保存 */
 export async function downloadRegistrationWord(id: number, teamName: string) {
-  const blob = await api.get<never, Blob>(`/api/registrations/${id}/download/word/`, { responseType: 'blob' })
+  // 导出较慢，单独放宽超时；revokeObjectURL 延迟释放，避免部分浏览器中断下载
+  const blob = await api.get<never, Blob>(`/api/registrations/${id}/download/word/`, {
+    responseType: 'blob',
+    timeout: 60000,
+  })
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.href = url
   a.download = `报名信息表-${teamName || id}.csv`
   a.click()
-  URL.revokeObjectURL(url)
+  setTimeout(() => URL.revokeObjectURL(url), 3000)
 }
 
 // ---------- 赛事下拉与报名提交 ----------
