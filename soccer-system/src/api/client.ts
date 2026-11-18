@@ -18,6 +18,14 @@ export class ApiError extends Error {
 /** 登录 token 的 sessionStorage key（登录接入后由 auth 流程写入） */
 export const TOKEN_KEY = 'soccer-token'
 
+/** 登录态失效兜底：清 token 与本地登录态并回登录页，避免 token 过期后页面"假在线" */
+function handleAuthExpired() {
+  if (!sessionStorage.getItem(TOKEN_KEY)) return
+  sessionStorage.removeItem(TOKEN_KEY)
+  sessionStorage.removeItem('soccer-auth')
+  if (!location.pathname.startsWith('/login')) location.href = '/login'
+}
+
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE || '',
   timeout: 8000,
@@ -35,6 +43,8 @@ api.interceptors.response.use(
     // 统一响应信封：code=0 解包返回 data，其余按业务失败处理
     if (body && typeof body === 'object' && 'code' in body) {
       if (body.code === 0) return body.data
+      // 未登录（token 过期/无效）：清登录态回登录页
+      if (body.code === 20001) handleAuthExpired()
       throw new ApiError(body.code, body.message || '请求失败')
     }
     return resp.data
@@ -43,6 +53,7 @@ api.interceptors.response.use(
     // 网络层失败（后端未启动/超时/4xx/5xx）也归一为 ApiError，页面错误处理只认这一种
     if (error instanceof ApiError) throw error
     const status = error?.response?.status as number | undefined
+    if (status === 401) handleAuthExpired()
     const message = (error?.response?.data as ApiEnvelope<unknown> | undefined)?.message
     throw new ApiError(status ?? -1, message || '网络异常，请稍后重试')
   },

@@ -57,7 +57,7 @@ async function refresh() {
     organizer: t.organizer || '—',
     signTime: `${fmtDate(t.sign_start_at)} ~ ${fmtDate(t.sign_end_at)}`,
     status: t.status_display,
-    canSign: t.status_display.includes('报名'),
+    canSign: (t.status_display || '').includes('报名'),
     raw: t,
   }))
 }

@@ -24,7 +24,7 @@ const loaded = ref(false)
 const submitting = ref(false)
 
 const formFields = computed<FormField[]>(() => [
-  { key: 'tournament', label: '报名赛事', type: 'select', options: tournaments.value.map((t) => (t.level_display ? `${t.name}（${t.level_display}）` : t.name)) },
+  { key: 'tournament', label: '报名赛事', type: 'select', options: tournaments.value.map((t) => ({ label: t.level_display ? `${t.name}（${t.level_display}）` : t.name, value: String(t.id) })) },
   { key: 'teamName', label: '参赛球队', type: 'text', placeholder: myTeam.value ? myTeam.value.name : '请先在「球队信息」创建球队' },
   { key: 'group', label: '报名组别（随球队带出）', type: 'text', placeholder: myTeam.value ? myTeam.value.group_type_display : '—' },
   { key: 'leader', label: '领队姓名' },
@@ -46,11 +46,8 @@ async function onSubmit(data: Record<string, string>) {
     alert('尚未创建球队：请先在「球队信息」页创建球队，再提交报名')
     return
   }
-  const tName = data.tournament ?? ''
-  // 下拉文案带级别后缀（如「XX联赛（省级赛事）」），兼容纯名称匹配
-  const tournament =
-    tournaments.value.find((t) => tName === (t.level_display ? `${t.name}（${t.level_display}）` : t.name)) ??
-    tournaments.value.find((t) => t.name === tName)
+  // 下拉直接存赛事 id，避免同名赛事按名称反查时选错
+  const tournament = tournaments.value.find((t) => String(t.id) === (data.tournament ?? ''))
   if (!tournament) {
     alert('请选择报名赛事（后端不可用时无法提交）')
     return

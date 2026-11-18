@@ -7,7 +7,8 @@ import AppIcon from './AppIcon.vue'
 const props = defineProps<{
   /** 允许 undefined：调用方常以 Record 索引取值（noUncheckedIndexedAccess 下为 string | undefined） */
   modelValue?: string
-  options: string[]
+  /** 字符串项 = 值即文案；对象项 = { label, value }（值与展示分离，用于按 id 提交） */
+  options: (string | { label: string; value: string })[]
   placeholder?: string
   /** 有值时在菜单顶部显示一个清空选项（如搜索栏的「全部」），点击后置空 */
   clearText?: string
@@ -22,12 +23,20 @@ const emit = defineEmits<{
 const open = ref(false)
 const root = ref<HTMLElement | null>(null)
 
+function optionValue(o: string | { label: string; value: string }) {
+  return typeof o === 'string' ? o : o.value
+}
+
+function optionLabel(o: string | { label: string; value: string }) {
+  return typeof o === 'string' ? o : o.label
+}
+
 function toggle() {
   open.value = !open.value
 }
 
-function choose(option: string) {
-  emit('update:modelValue', option)
+function choose(option: string | { label: string; value: string }) {
+  emit('update:modelValue', optionValue(option))
   open.value = false
 }
 
@@ -43,7 +52,11 @@ onBeforeUnmount(() => document.removeEventListener('pointerdown', onDocPointerDo
 
 const current = computed(() => props.modelValue ?? '')
 const hasValue = computed(() => current.value !== '')
-const display = computed(() => (hasValue.value ? current.value : (props.placeholder ?? '请选择')))
+const display = computed(() => {
+  if (!hasValue.value) return props.placeholder ?? '请选择'
+  const matched = props.options.find((o) => optionValue(o) === current.value)
+  return matched ? optionLabel(matched) : current.value
+})
 </script>
 
 <template>
@@ -72,14 +85,14 @@ const display = computed(() => (hasValue.value ? current.value : (props.placehol
         </li>
         <li
           v-for="option in options"
-          :key="option"
+          :key="optionValue(option)"
           class="select-option"
-          :class="{ selected: option === current }"
+          :class="{ selected: optionValue(option) === current }"
           role="option"
-          :aria-selected="option === current"
+          :aria-selected="optionValue(option) === current"
           @click="choose(option)"
         >
-          {{ option }}
+          {{ optionLabel(option) }}
         </li>
       </ul>
     </Transition>

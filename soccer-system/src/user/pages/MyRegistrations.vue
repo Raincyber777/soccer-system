@@ -57,7 +57,7 @@ async function refresh() {
     tournament_name: r.tournament_name,
     group_type_display: r.group_type_display,
     player_count: r.player_count,
-    submit_time: r.submit_time.slice(0, 16),
+    submit_time: (r.submit_time || '').slice(0, 16),
     status: r.status,
     status_display: r.status_display,
   }))
@@ -91,7 +91,7 @@ async function viewLogs(row: Row) {
   }
   const text = logs.length
     ? logs
-        .map((l) => `· [${l.created_at.slice(0, 16)}] ${l.stage === 'city' ? '市州初审' : '省级终审'}${l.result === 'approve' ? '通过' : '驳回'}（${l.operator_name}）${l.reason ? '：' + l.reason : ''}`)
+        .map((l) => `· [${(l.created_at || '').slice(0, 16)}] ${l.stage === 'city' ? '市州初审' : '省级终审'}${l.result === 'approve' ? '通过' : '驳回'}（${l.operator_name}）${l.reason ? '：' + l.reason : ''}`)
         .join('\n')
     : '（暂无审核记录，等待市州管理员初审）'
   alert(`${row.team_name} 的审核记录：\n\n${text}`)

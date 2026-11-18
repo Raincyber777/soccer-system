@@ -65,7 +65,7 @@ onMounted(async () => {
   // fetchMyTeam 无法区分「后端不可用」与「暂无球队」：一律按 0 支提示
   stats.value[0] = { icon: 'shield', label: '我的球队', value: team ? '1 支' : '0 支', hint: team?.name ?? '可在「球队信息」创建' }
   if (tournaments) {
-    const signing = tournaments.filter((t) => t.status_display.includes('报名')).length
+    const signing = tournaments.filter((t) => (t.status_display || '').includes('报名')).length
     stats.value[1] = {
       icon: 'trophy',
       label: '赛事总数',

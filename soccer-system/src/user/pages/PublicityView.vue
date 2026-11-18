@@ -58,7 +58,7 @@ interface CoachRow {
 
 const coaches = ref<CoachRow[]>([])
 
-async function refresh(filters?: Record<string, string>) {
+async function loadPlayers(filters?: Record<string, string>) {
   const playerQuery: Record<string, unknown> = { page_size: 100 }
   if (filters?.name) playerQuery.name = filters.name.trim()
   if (filters?.group) playerQuery.group_type = GROUP_TO_API[filters.group] ?? ''
@@ -71,7 +71,12 @@ async function refresh(filters?: Record<string, string>) {
       position: p.position || '—',
       status: '已公示', // 公示接口仅返回已生效且开启公示的球员
     }))
+  } else {
+    players.value = [] // 接口失败清空，避免展示过期数据
   }
+}
+
+async function loadCoaches(filters?: Record<string, string>) {
   const clist = await fetchPublicityCoaches(filters?.name ? { name: filters.name.trim() } : undefined)
   if (clist) {
     coaches.value = clist.map((c: ApiCoach) => ({
@@ -80,13 +85,23 @@ async function refresh(filters?: Record<string, string>) {
       level: c.cert_level || '—',
       status: '已公示', // 教练公示名单 = 审核已生效
     }))
+  } else {
+    coaches.value = [] // 接口失败清空，避免展示过期数据
   }
 }
 
-onMounted(() => refresh())
+onMounted(() => {
+  loadPlayers()
+  loadCoaches()
+})
 
-function onSearch(filters: Record<string, string>) {
-  refresh(filters)
+// 两个搜索栏分开处理，避免搜索教练时把姓名条件也套到球员列表上
+function onSearchPlayers(filters: Record<string, string>) {
+  loadPlayers(filters)
+}
+
+function onSearchCoaches(filters: Record<string, string>) {
+  loadCoaches(filters)
 }
 </script>
 
@@ -94,10 +109,10 @@ function onSearch(filters: Record<string, string>) {
   <PageHeader title="信息公示" desc="查询运动员与教练员的公示信息，公示名单即审核生效名单" />
 
   <h3 class="section-title">运动员公示</h3>
-  <SearchBar :fields="playerSearch" @search="onSearch" @reset="onSearch" />
+  <SearchBar :fields="playerSearch" @search="onSearchPlayers" @reset="onSearchPlayers" />
   <DataTable :columns="playerColumns" :rows="players" />
 
   <h3 class="section-title">教练员公示</h3>
-  <SearchBar :fields="coachSearch" @search="onSearch" @reset="onSearch" />
+  <SearchBar :fields="coachSearch" @search="onSearchCoaches" @reset="onSearchCoaches" />
   <DataTable :columns="coachColumns" :rows="coaches" />
 </template>

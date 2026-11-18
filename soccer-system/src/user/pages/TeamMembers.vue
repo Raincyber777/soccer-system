@@ -82,7 +82,7 @@ const filters = ref<Record<string, string>>({})
 const filteredRows = computed(() =>
   rows.value.filter((r) => {
     if (filters.value.name && !r.name.includes(filters.value.name.trim())) return false
-    if (filters.value.idCard && !r.idCard.includes(filters.value.idCard.trim())) return false
+    if (filters.value.idCard && !(r.idCard || '').includes(filters.value.idCard.trim())) return false
     return true
   }),
 )
