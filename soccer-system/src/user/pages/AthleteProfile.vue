@@ -6,6 +6,7 @@ import UploadBlock from '../../components/common/UploadBlock.vue'
 import type { FormField } from '../../components/common/types'
 import { errMsg, fetchMe, updateMe } from '../../api/account'
 import { uploadCommonFile } from '../../api/registration'
+import { addMaterial, loadMaterials } from '../../utils/materialStore'
 
 // 运动员信息：账户基础资料由本人维护（PATCH /api/auth/me/）；
 // 注册信息（身份证/年级/位置等）由所在学校球队负责人在「队员列表」录入，
@@ -21,7 +22,7 @@ const baseFields: FormField[] = [
 const baseInitial = ref<Record<string, string>>({})
 const formKey = ref(0)
 const uploading = ref(false)
-const files = ref<{ name: string; url: string }[]>([])
+const files = ref(loadMaterials('athlete-files'))
 
 onMounted(async () => {
   const me = await fetchMe()
@@ -48,7 +49,7 @@ async function onUpload(file: File) {
   uploading.value = true
   try {
     const r = await uploadCommonFile(file, 'athlete-files')
-    files.value.unshift({ name: file.name, url: r.url })
+    files.value.unshift(addMaterial('athlete-files', { name: file.name, url: r.url }))
     alert(`材料已上传：${r.url}\n可把链接提供给所在学校球队负责人，供注册与资格审核查验`)
   } catch (err) {
     alert(errMsg(err))

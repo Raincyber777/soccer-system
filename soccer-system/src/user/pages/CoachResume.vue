@@ -3,13 +3,14 @@ import { ref } from 'vue'
 import PageHeader from '../../components/common/PageHeader.vue'
 import UploadBlock from '../../components/common/UploadBlock.vue'
 import { uploadCommonFile } from '../../api/registration'
+import { addMaterial, loadMaterials } from '../../utils/materialStore'
 import { errMsg } from '../../api/registration'
 
 // 教练员履历：执教记录与各类证书上传留存（通用文件接口），
 // 资质审核对照证书进行，通过后进入教练员信息公示。
 
 const uploading = ref(false)
-const files = ref<{ name: string; url: string; label: string }[]>([])
+const files = ref(loadMaterials('coach-resume'))
 
 const SLOTS = [
   { key: 'record', title: '执教记录', desc: '执教队伍、时间与成绩说明' },
@@ -26,7 +27,7 @@ async function onUpload(slot: { key: string; title: string }, file: File) {
   uploading.value = true
   try {
     const r = await uploadCommonFile(file, `coach-${slot.key}`)
-    files.value.unshift({ name: file.name, url: r.url, label: slot.title })
+    files.value.unshift(addMaterial('coach-resume', { name: file.name, url: r.url, label: slot.title }))
     alert(`「${slot.title}」已上传：${r.url}`)
   } catch (err) {
     alert(errMsg(err))

@@ -1,14 +1,17 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import PageHeader from '../../components/common/PageHeader.vue'
 import DataTable from '../../components/common/DataTable.vue'
 import type { TableColumn } from '../../components/common/types'
 import { fetchTournaments, type ApiTournamentOption } from '../../api/registration'
+import { useAuth } from '../../stores/auth'
 
 // 赛事列表：浏览可报名赛事（级别/组别/主办单位/报名窗口/状态），报名期可直达报名表单
+// 报名是球队级操作仅负责人可见（ZQ014/015）：学生/教练只浏览，避免点报名被守卫踢回工作台
 
 const router = useRouter()
+const auth = useAuth()
 
 // 后端 group_types/level 存英文 code，展示统一转中文
 const GROUP_LABELS: Record<string, string> = { primary: '小学组', middle: '中学组', high: '高中组', university: '高校组' }
@@ -85,10 +88,14 @@ function onAction(action: string, row: Record<string, unknown>) {
     router.push('/user/registration-form')
   }
 }
+// 报名按钮仅球队负责人可见（报名由负责人统一办理）
+const rowActions = computed(() =>
+  auth.state.persona === 'leader' ? ['查看详情', '报名'] : ['查看详情'],
+)
 </script>
 
 <template>
-  <PageHeader title="赛事列表" desc="浏览正在报名和进行中的赛事，报名期可点击报名进入报名表单" />
+  <PageHeader title="赛事列表" desc="浏览正在报名和进行中的赛事，报名由球队负责人在「赛事报名」统一办理" />
 
-  <DataTable :columns="columns" :rows="rows" :actions="['查看详情', '报名']" @action="onAction" />
+  <DataTable :columns="columns" :rows="rows" :actions="rowActions" @action="onAction" />
 </template>

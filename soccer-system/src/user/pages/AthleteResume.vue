@@ -4,13 +4,14 @@ import PageHeader from '../../components/common/PageHeader.vue'
 import UploadBlock from '../../components/common/UploadBlock.vue'
 import { errMsg } from '../../api/registration'
 import { uploadCommonFile } from '../../api/registration'
+import { addMaterial, loadMaterials } from '../../utils/materialStore'
 
 // 运动员履历：所属队伍由学校球队负责人维护（本页展示说明）；
 // 必传材料关系报名资格与上场审核，选传材料用于履历与球员遴选参考。
 // 材料经通用文件接口上传留存，上传后可把链接提供给球队负责人或审核人员。
 
 const uploading = ref(false)
-const files = ref<{ name: string; url: string; label: string }[]>([])
+const files = ref(loadMaterials('athlete-resume'))
 
 const MUST_SLOTS = [
   { key: 'xueji', title: '学生学籍证明', desc: '学籍表或学校开具的学籍证明扫描件' },
@@ -30,7 +31,7 @@ async function onUpload(slot: { key: string; title: string }, file: File) {
   uploading.value = true
   try {
     const r = await uploadCommonFile(file, `athlete-${slot.key}`)
-    files.value.unshift({ name: file.name, url: r.url, label: slot.title })
+    files.value.unshift(addMaterial('athlete-resume', { name: file.name, url: r.url, label: slot.title }))
     alert(`「${slot.title}」已上传：${r.url}`)
   } catch (err) {
     alert(errMsg(err))
