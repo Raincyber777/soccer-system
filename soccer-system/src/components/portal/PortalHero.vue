@@ -9,23 +9,18 @@ import heroFocus from '../../assets/hero-focus.jpg'
 
 const router = useRouter()
 const news = ref<NewsItem[]>([])
-
-onMounted(async () => {
-  news.value = (await fetchNews()).slice(0, 5)
-})
-
 const focus = ref<NewsItem | null>(null)
 const restNews = ref<NewsItem[]>([])
 
-function splitNews() {
+onMounted(async () => {
+  // 拉取后拆分：第一条做焦点大图，后续 4 条进右侧动态列表
+  news.value = await fetchNews()
   const first = news.value[0]
   if (first) {
     focus.value = first
     restNews.value = news.value.slice(1, 5)
   }
-}
-
-onMounted(splitNews)
+})
 
 function goNews() {
   router.push('/news')
@@ -150,6 +145,7 @@ function goNews() {
 .focus-card {
   position: relative;
   display: block;
+  min-height: 560px;
   border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 18px;
   overflow: hidden;
