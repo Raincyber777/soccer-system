@@ -129,6 +129,26 @@ export async function fetchMatches(): Promise<MatchRow[]> {
   }
 }
 
+/** 门户照片行（公开仅见已发布） */
+export interface PortalPhotoRow {
+  id: number
+  title: string
+  image: string
+  tournament_name: string
+}
+
+/** 门户照片墙：按赛事发布的照片（公开接口，无需登录） */
+export async function fetchPortalPhotos(): Promise<PortalPhotoRow[]> {
+  try {
+    const data = await api.get<never, { results: PortalPhotoRow[] }>('/api/portal/photos/', {
+      params: { page_size: 60 },
+    })
+    return data.results ?? []
+  } catch {
+    return []
+  }
+}
+
 /** 遴选公示行：省级确认并公布的球员（门户"最佳球员公示"区） */
 export interface PublicSelectionRow {
   id: number

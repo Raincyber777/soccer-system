@@ -32,6 +32,7 @@ const router = createRouter({
     { path: '/news', name: 'portal-news', component: () => import('../components/portal/PortalNews.vue'), meta: { title: '新闻政策' } },
     { path: '/schedule', name: 'portal-schedule', component: () => import('../components/portal/PortalSchedule.vue'), meta: { title: '赛程赛果' } },
     { path: '/rankings', name: 'portal-rankings', component: () => import('../components/portal/PortalRankings.vue'), meta: { title: '赛事榜单' } },
+    { path: '/photos', name: 'portal-photos', component: () => import('../components/portal/PortalPhotos.vue'), meta: { title: '赛事照片' } },
     ...userRoutes,
     // 未匹配的路径统一回到首页
     { path: '/:pathMatch(.*)*', redirect: '/' },

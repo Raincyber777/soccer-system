@@ -25,6 +25,7 @@ const navItems: NavItem[] = [
   { label: '新闻政策', to: '/news' },
   { label: '赛程赛果', to: '/schedule' },
   { label: '榜单', to: '/rankings' },
+  { label: '赛事照片', to: '/photos' },
   { label: '赛事报名', modal: 'registration' },
   { label: '球队管理', modal: 'team' },
   { label: '信息公示', modal: 'publicity' },
