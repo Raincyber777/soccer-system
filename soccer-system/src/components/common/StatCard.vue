@@ -55,6 +55,19 @@ defineProps<{
   box-shadow: 0 8px 18px rgba(30, 122, 63, 0.28);
 }
 
+/* 同排第 2/3/4 张统计卡轮换金 / 蓝 / 珊瑚，数据面板不再单调 */
+:global(.stat-grid) .stat-card:nth-child(4n + 2) .stat-icon-wrap {
+  background: var(--grad-gold);
+}
+
+:global(.stat-grid) .stat-card:nth-child(4n + 3) .stat-icon-wrap {
+  background: var(--grad-blue);
+}
+
+:global(.stat-grid) .stat-card:nth-child(4n + 4) .stat-icon-wrap {
+  background: var(--grad-coral);
+}
+
 .stat-label {
   font-size: 13px;
   color: var(--muted);

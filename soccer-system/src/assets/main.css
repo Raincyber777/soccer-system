@@ -16,6 +16,10 @@
   --shadow-sm: 0 1px 2px rgba(20, 60, 40, 0.04), 0 4px 14px rgba(20, 60, 40, 0.05);
   --shadow-md: 0 4px 10px rgba(20, 60, 40, 0.06), 0 12px 28px rgba(20, 60, 40, 0.1);
   --grad-green: linear-gradient(135deg, var(--green), var(--green-bright));
+  /* 辅助强调色渐变：给卡片/图标加色彩层次（绿主金辅蓝点） */
+  --grad-gold: linear-gradient(135deg, #d3a52e, #b98a1c);
+  --grad-blue: linear-gradient(135deg, #3b82c4, #2c6aa0);
+  --grad-coral: linear-gradient(135deg, #e07b4f, #c25a2f);
 }
 
 * {
@@ -49,27 +53,27 @@ body::after {
   position: fixed;
   z-index: -1;
   border-radius: 50%;
-  filter: blur(60px);
+  filter: blur(46px);
   pointer-events: none;
   will-change: transform;
 }
 
 body::before {
-  width: 620px;
-  height: 620px;
+  width: 760px;
+  height: 760px;
   left: -160px;
   top: 12vh;
-  background: radial-gradient(circle, rgba(46, 158, 82, 0.13), transparent 68%);
-  animation: glow-drift-a 46s ease-in-out infinite alternate;
+  background: radial-gradient(circle, rgba(46, 158, 82, 0.26), transparent 70%);
+  animation: glow-drift-a 26s ease-in-out infinite alternate;
 }
 
 body::after {
-  width: 540px;
-  height: 540px;
+  width: 660px;
+  height: 660px;
   right: -140px;
   bottom: -120px;
-  background: radial-gradient(circle, rgba(23, 64, 44, 0.11), transparent 66%);
-  animation: glow-drift-b 58s ease-in-out infinite alternate;
+  background: radial-gradient(circle, rgba(23, 64, 44, 0.22), transparent 68%);
+  animation: glow-drift-b 34s ease-in-out infinite alternate;
 }
 
 @keyframes glow-drift-a {

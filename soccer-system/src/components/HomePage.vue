@@ -98,6 +98,17 @@ const features: { key: FeatureKey; icon: string; title: string; desc: string }[]
   transition: transform 0.25s;
 }
 
+/* 三张功能卡图标各用一色（绿 / 金 / 蓝），增加页面色彩层次 */
+.feature-card:nth-child(2) .feature-icon {
+  background: var(--grad-gold);
+  box-shadow: 0 10px 20px rgba(185, 138, 28, 0.25);
+}
+
+.feature-card:nth-child(3) .feature-icon {
+  background: var(--grad-blue);
+  box-shadow: 0 10px 20px rgba(44, 106, 160, 0.25);
+}
+
 /* 悬停时图标轻轻放大，呼应卡片上浮 */
 .feature-card:hover .feature-icon {
   transform: scale(1.08);
