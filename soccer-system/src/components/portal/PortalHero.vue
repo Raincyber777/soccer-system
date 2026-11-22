@@ -1,12 +1,35 @@
 <script setup lang="ts">
-import AppIcon from '../common/AppIcon.vue'
-import soccerHeroArt from '../../assets/soccer-hero.svg'
+import { onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { fetchNews, type NewsItem } from '../../api/portal'
+import heroFocus from '../../assets/hero-focus.jpg'
 
-// 门户首页首屏：整幅深绿背景 + 左文案右图片 + 底部双层波浪
-// 按钮点击通过 open 事件交由父级（HomePage）打开对应功能说明弹窗
-const emit = defineEmits<{
-  (e: 'open', key: 'registration' | 'team' | 'publicity'): void
-}>()
+// 门户首页首屏（参考体育协会官网布局）：左侧赛事焦点大图（图上叠加最新战报），
+// 右侧最新动态列表，底部金色荣誉饰带。焦点图可在 assets/hero-focus.jpg 整体替换。
+
+const router = useRouter()
+const news = ref<NewsItem[]>([])
+
+onMounted(async () => {
+  news.value = (await fetchNews()).slice(0, 5)
+})
+
+const focus = ref<NewsItem | null>(null)
+const restNews = ref<NewsItem[]>([])
+
+function splitNews() {
+  const first = news.value[0]
+  if (first) {
+    focus.value = first
+    restNews.value = news.value.slice(1, 5)
+  }
+}
+
+onMounted(splitNews)
+
+function goNews() {
+  router.push('/news')
+}
 </script>
 
 <template>
@@ -19,35 +42,72 @@ const emit = defineEmits<{
     </svg>
 
     <div class="hero-inner">
-      <div class="hero-copy">
-        <p class="hero-kicker">省级中小学足球赛事服务平台</p>
-        <h1 class="hero-title">从校园球场<br />到省级赛场</h1>
-        <span class="hero-bar" aria-hidden="true"></span>
-        <p class="hero-desc">
-          学校在线报名组队，运动员、教练员注册信息一站维护，赛程赛果与政策文件及时公示，让每一场比赛都规范、公开、精彩。
-        </p>
-        <div class="hero-actions">
-          <button type="button" class="hero-btn primary" @click="emit('open', 'registration')">赛事报名</button>
-          <button type="button" class="hero-btn primary" @click="emit('open', 'team')">球队管理</button>
-          <button type="button" class="hero-btn primary" @click="emit('open', 'publicity')">信息公示</button>
-        </div>
-      </div>
+      <!-- 左：赛事焦点大图（图上叠加标题与入口） -->
+      <button type="button" class="focus-card" @click="goNews">
+        <img :src="heroFocus" alt="赛事焦点" class="focus-img" />
+        <div class="focus-shade" aria-hidden="true"></div>
 
-      <div class="hero-media">
-        <img :src="soccerHeroArt" alt="绿茵场上的胜利庆祝时刻" />
-      </div>
+        <div class="focus-top">
+          <span class="focus-badge">省级中小学足球赛事服务平台</span>
+        </div>
+
+        <div class="focus-body">
+          <span class="focus-tag">{{ focus?.tag || '赛事焦点' }}</span>
+          <h1 class="focus-title">
+            {{ focus ? focus.title : '从校园球场，到省级赛场 —— 省级中小学足球赛事服务平台' }}
+          </h1>
+          <p class="focus-meta">
+            <span v-if="focus?.tournament" class="focus-tournament">{{ focus.tournament }}</span>
+            <span>{{ focus?.source || '赛事组委会' }} · {{ focus?.date || '' }}</span>
+          </p>
+        </div>
+
+        <div class="focus-actions" @click.stop>
+          <button type="button" class="hero-btn primary" @click="router.push('/schedule')">赛程赛果</button>
+          <button type="button" class="hero-btn ghost" @click="router.push('/news')">新闻政策</button>
+          <button type="button" class="hero-btn ghost" @click="router.push('/rankings')">赛事榜单</button>
+        </div>
+      </button>
+
+      <!-- 右：最新动态列表 -->
+      <aside class="news-rail">
+        <div class="rail-head">
+          <span class="rail-title">最新动态</span>
+          <button type="button" class="rail-more" @click="goNews">查看全部 →</button>
+        </div>
+        <ul class="rail-list">
+          <li v-for="item in restNews" :key="item.title">
+            <button type="button" class="rail-item" @click="goNews">
+              <span class="rail-tag">{{ item.tag }}</span>
+              <span class="rail-text">{{ item.title }}</span>
+              <span class="rail-date">{{ item.date }}</span>
+            </button>
+          </li>
+          <li v-if="restNews.length === 0" class="rail-empty">暂无动态，发布新闻后在此展示。</li>
+        </ul>
+      </aside>
     </div>
 
-    <!-- 底部双层波浪：盖住图片下缘，与下方奶白区域自然衔接 -->
-    <!-- 奶白波浪中间特意留了一段浅凹槽，正好避开图片里的足球位置 -->
+    <!-- 金色荣誉饰带 -->
+    <div class="honor-band" aria-hidden="false">
+      <span class="honor-item">省级青少年校园足球联赛</span>
+      <span class="honor-dot">★</span>
+      <span class="honor-item">覆盖全省 21 个市州</span>
+      <span class="honor-dot">★</span>
+      <span class="honor-item">校园足球特色学校 187 所</span>
+      <span class="honor-dot">★</span>
+      <span class="honor-item">注册运动员 400 余人</span>
+    </div>
+
+    <!-- 底部波浪：衔接奶白内容区 -->
     <div class="hero-wave" aria-hidden="true">
-      <svg viewBox="0 0 1440 110" preserveAspectRatio="none">
+      <svg viewBox="0 0 1440 90" preserveAspectRatio="none">
         <path
-          d="M0 58 C 240 22 480 92 720 64 C 960 36 1200 88 1440 52 L1440 110 L0 110 Z"
+          d="M0 46 C 240 18 480 74 720 50 C 960 28 1200 66 1440 40 L1440 90 L0 90 Z"
           fill="rgba(255, 255, 255, 0.12)"
         />
         <path
-          d="M0 54 C 120 44 240 40 380 48 C 500 56 560 84 700 92 C 800 96 1000 96 1120 88 C 1220 80 1300 48 1440 50 L1440 110 L0 110 Z"
+          d="M0 42 C 200 36 420 58 720 62 C 1020 66 1240 34 1440 44 L1440 90 L0 90 Z"
           fill="#f7f3ea"
         />
       </svg>
@@ -63,7 +123,6 @@ const emit = defineEmits<{
   overflow: hidden;
 }
 
-/* 背景装饰：球场中圈线稿 */
 .hero-lines {
   position: absolute;
   top: -210px;
@@ -78,60 +137,136 @@ const emit = defineEmits<{
 .hero-inner {
   position: relative;
   z-index: 1;
-  max-width: 1200px;
+  max-width: 1240px;
   margin: 0 auto;
-  padding: 84px 24px 150px;
+  padding: 56px 24px 120px;
   display: grid;
-  grid-template-columns: 1.05fr 0.95fr;
-  gap: 56px;
-  align-items: center;
+  grid-template-columns: 1.62fr 0.98fr;
+  gap: 28px;
+  align-items: stretch;
 }
 
-.hero-kicker {
-  font-size: 14px;
-  font-weight: 600;
-  letter-spacing: 0.32em;
-  color: #9fd4b5;
-}
-
-.hero-title {
-  margin-top: 16px;
-  font-size: 46px;
-  line-height: 1.28;
-  font-weight: 800;
-}
-
-/* 标题下的高亮短杠 */
-.hero-bar {
+/* ===== 左：焦点大图 ===== */
+.focus-card {
+  position: relative;
   display: block;
-  width: 76px;
-  height: 5px;
-  margin-top: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 18px;
+  overflow: hidden;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.focus-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.34);
+}
+
+.focus-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* 底部渐变遮罩：保证叠加文字可读 */
+.focus-shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(10, 36, 24, 0.42) 0%,
+    rgba(10, 36, 24, 0.05) 34%,
+    rgba(10, 36, 24, 0.05) 55%,
+    rgba(10, 36, 24, 0.82) 100%
+  );
+}
+
+.focus-top {
+  position: absolute;
+  top: 20px;
+  left: 24px;
+}
+
+.focus-badge {
+  display: inline-block;
+  padding: 6px 14px;
   border-radius: 999px;
-  background: linear-gradient(90deg, var(--green-bright), #7ddba6);
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.26);
+  backdrop-filter: blur(4px);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  color: #eaf6ee;
 }
 
-.hero-desc {
-  margin-top: 22px;
-  max-width: 460px;
-  font-size: 15px;
-  line-height: 1.9;
-  color: #d7e7dc;
+.focus-body {
+  position: absolute;
+  left: 24px;
+  right: 24px;
+  bottom: 76px;
 }
 
-.hero-actions {
-  margin-top: 32px;
+.focus-tag {
+  display: inline-block;
+  padding: 3px 12px;
+  border-radius: 999px;
+  background: var(--green-bright);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
+.focus-title {
+  margin-top: 12px;
+  font-size: 26px;
+  line-height: 1.42;
+  font-weight: 800;
+  color: #fff;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+}
+
+.focus-meta {
+  margin-top: 10px;
   display: flex;
-  gap: 14px;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: #cfe5d6;
+}
+
+.focus-tournament {
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: rgba(242, 193, 78, 0.2);
+  border: 1px solid rgba(242, 193, 78, 0.5);
+  color: #ffe1a1;
+  font-size: 12px;
+}
+
+.focus-actions {
+  position: absolute;
+  left: 24px;
+  right: 24px;
+  bottom: 20px;
+  display: flex;
+  gap: 12px;
   flex-wrap: wrap;
 }
 
 .hero-btn {
-  display: inline-block;
   border: none;
   border-radius: 999px;
-  padding: 12px 30px;
-  font-size: 15px;
+  padding: 10px 24px;
+  font-size: 14px;
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
@@ -141,35 +276,149 @@ const emit = defineEmits<{
 .hero-btn.primary {
   background: var(--green-bright);
   color: #fff;
-  box-shadow: 0 4px 14px rgba(46, 158, 82, 0.35);
+  box-shadow: 0 4px 14px rgba(46, 158, 82, 0.4);
 }
 
 .hero-btn.primary:hover {
   background: #3cb768;
   transform: translateY(-2px);
-  box-shadow: 0 10px 22px rgba(46, 158, 82, 0.4);
 }
 
-/* 右侧比赛图片：向下探入波浪区，让波浪盖住图片下缘 */
-.hero-media {
-  align-self: end;
-  margin-bottom: -150px;
-  position: relative;
-  z-index: 1;
+.hero-btn.ghost {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #fff;
+  backdrop-filter: blur(4px);
 }
 
-.hero-media img {
+.hero-btn.ghost:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+/* ===== 右：最新动态列表 ===== */
+.news-rail {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 18px;
+  padding: 18px 18px 12px;
+  color: var(--ink);
+  backdrop-filter: blur(6px);
+  display: flex;
+  flex-direction: column;
+}
+
+.rail-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2px 4px 10px;
+  border-bottom: 2px solid var(--green);
+}
+
+.rail-title {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--green-dark);
+}
+
+.rail-more {
+  border: none;
+  background: none;
+  font-size: 13px;
+  color: var(--green);
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.rail-more:hover {
+  text-decoration: underline;
+}
+
+.rail-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.rail-item {
   width: 100%;
-  height: 520px;
-  object-fit: cover;
-  object-position: center bottom; /* 锚定底部：保证图片下缘的足球留在画面里 */
-  display: block;
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.28);
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 12px 6px;
+  border: none;
+  background: none;
+  border-bottom: 1px dashed var(--line);
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  transition: background 0.15s;
 }
 
-/* 底部双层波浪：盖在图片下缘上，与下方奶白区域衔接 */
+.rail-item:hover {
+  background: rgba(46, 158, 82, 0.06);
+}
+
+.rail-tag {
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--green-dark);
+  background: var(--green-light);
+  border-radius: 999px;
+  padding: 2px 8px;
+}
+
+.rail-text {
+  flex: 1;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.rail-date {
+  flex-shrink: 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.rail-empty {
+  padding: 18px 6px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* ===== 金色荣誉饰带 ===== */
+.honor-band {
+  position: relative;
+  z-index: 3;
+  background: linear-gradient(90deg, #b98a1c, #d3a52e 50%, #b98a1c);
+  color: #fff;
+  text-align: center;
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  flex-wrap: wrap;
+  box-shadow: 0 -6px 24px rgba(10, 36, 24, 0.25);
+}
+
+.honor-dot {
+  font-size: 11px;
+  opacity: 0.85;
+}
+
+/* ===== 底部波浪 ===== */
 .hero-wave {
   position: absolute;
   left: 0;
@@ -183,31 +432,31 @@ const emit = defineEmits<{
 .hero-wave svg {
   display: block;
   width: 100%;
-  height: 110px;
+  height: 70px;
 }
 
 @media (max-width: 900px) {
   .hero-inner {
     grid-template-columns: 1fr;
-    gap: 40px;
-    padding: 64px 20px 150px;
+    gap: 20px;
+    padding: 40px 20px 110px;
   }
 
-  .hero-media {
-    align-self: auto;
-    margin-bottom: -150px;
+  .focus-card {
+    min-height: 380px;
   }
 
-  .hero-media img {
-    height: 340px;
+  .focus-title {
+    font-size: 20px;
   }
 
-  .hero-title {
-    font-size: 32px;
+  .focus-body {
+    bottom: 68px;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .focus-card,
   .hero-btn {
     transition: none;
   }
