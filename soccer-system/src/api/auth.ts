@@ -35,7 +35,7 @@ export interface AuthSession {
 export interface RegisterPayload {
   username: string
   password: string
-  role: 'school' | 'athlete' | 'coach'
+  role: 'school' | 'athlete' | 'coach' | 'school_admin'
   school_code: string
   email?: string
   phone?: string
@@ -88,6 +88,9 @@ export function mapBackendUser(user: ApiUser): MappedLogin {
     case 'province':
       return { role: 'super', staffLabel: org ? staffLabel : '省级管理员 · 省本级', realName }
     case 'city':
+      return { role: 'admin', staffLabel, realName }
+    case 'school_admin':
+      // 校级管理员属于管理角色：门户不开放登录（注册后待市州审核，走管理后台入口）
       return { role: 'admin', staffLabel, realName }
     case 'athlete':
       return { role: 'user', persona: 'student', staffLabel: '', realName }

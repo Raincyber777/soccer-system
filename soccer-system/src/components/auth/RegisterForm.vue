@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router'
 import { useAuth, personaLabels, type UserPersona } from '../../stores/auth'
 import SchoolSelect from '../common/SchoolSelect.vue'
 import type { SchoolInfo } from '../../data/sichuan-schools'
-import { apiRegister, mapBackendUser, saveAuthSession } from '../../api/auth'
+import { apiRegister, mapBackendUser, saveAuthSession, clearAuthSession } from '../../api/auth'
 import { ApiError } from '../../api/client'
 
 // 注册表单：只面向参赛人员；管理员/超管账号不开放注册，由超级管理员在后台创建
@@ -12,18 +12,22 @@ import { ApiError } from '../../api/client'
 const router = useRouter()
 const auth = useAuth()
 
-const registerPersona = ref<UserPersona>('leader')
-const personaOptions: { value: UserPersona; label: string }[] = [
+// 注册身份：参赛三身份进入用户端；校级管理员是管理角色，注册后待市州审核激活
+type RegisterPersona = UserPersona | 'schoolAdmin'
+const registerPersona = ref<RegisterPersona>('leader')
+const personaOptions: { value: RegisterPersona; label: string }[] = [
   { value: 'leader', label: '球队负责人' },
   { value: 'student', label: '学生运动员' },
   { value: 'coach', label: '教练员' },
+  { value: 'schoolAdmin', label: '校级管理员' },
 ]
 
 // 前端身份 → 后端注册角色
-const personaToRole: Record<UserPersona, 'school' | 'athlete' | 'coach'> = {
+const personaToRole: Record<RegisterPersona, 'school' | 'athlete' | 'coach' | 'school_admin'> = {
   leader: 'school',
   student: 'athlete',
   coach: 'coach',
+  schoolAdmin: 'school_admin',
 }
 
 const registerForm = reactive({
@@ -80,8 +84,15 @@ async function handleRegister() {
       school_code: registerSchool.value.code,
       email: registerForm.email.trim(),
     })
-    saveAuthSession(session)
     const mapped = mapBackendUser(session.user)
+    if (registerPersona.value === 'schoolAdmin') {
+      // 校级管理员：注册即提交市州审核，审核通过前不能登录；不留任何登录态
+      clearAuthSession()
+      registerSuccess.value = '注册成功！校级管理员账号需经市州管理员审核激活后方可登录，请等待审核。'
+      registerPersona.value = 'leader'
+      return
+    }
+    saveAuthSession(session)
     auth.loginAs(mapped.role, account, mapped.persona ?? registerPersona.value, mapped.staffLabel)
     registerSuccess.value = `注册成功，正在以「${personaLabels[registerPersona.value]}」身份进入用户端…`
     setTimeout(() => {
