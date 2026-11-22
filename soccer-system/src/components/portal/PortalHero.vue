@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import AppIcon from '../common/AppIcon.vue'
-import soccerVictory from '../../assets/soccer-victory.jpg'
+import soccerHeroArt from '../../assets/soccer-hero.svg'
 
 // 门户首页首屏：整幅深绿背景 + 左文案右图片 + 底部双层波浪
 // 按钮点击通过 open 事件交由父级（HomePage）打开对应功能说明弹窗
@@ -34,7 +34,7 @@ const emit = defineEmits<{
       </div>
 
       <div class="hero-media">
-        <img :src="soccerVictory" alt="绿茵场上的胜利庆祝时刻" />
+        <img :src="soccerHeroArt" alt="绿茵场上的胜利庆祝时刻" />
       </div>
     </div>
 

@@ -77,6 +77,8 @@ function imgSrc(p: PortalPhotoRow) {
   max-width: 1100px;
   margin: 0 auto;
   padding: 32px 24px 64px;
+  /* 空态时也把内容区撑开，footer 不会被顶到页面上部 */
+  min-height: calc(100vh - 380px);
 }
 
 .toolbar {

@@ -1,0 +1,121 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice">
+  <!-- 绿茵汇首页主视觉：夺冠之夜（扁平插画 · 体育场 / 聚光灯 / 金杯 / 彩带） -->
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0e2f1f"/>
+      <stop offset="0.62" stop-color="#17402c"/>
+      <stop offset="1" stop-color="#1e5c38"/>
+    </linearGradient>
+    <linearGradient id="pitch" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2a7a4a"/>
+      <stop offset="1" stop-color="#1d5c36"/>
+    </linearGradient>
+    <linearGradient id="cup" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f9df8a"/>
+      <stop offset="0.55" stop-color="#eebb4d"/>
+      <stop offset="1" stop-color="#cf9426"/>
+    </linearGradient>
+    <linearGradient id="beamL" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.16"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="halo" cx="0.5" cy="0.42" r="0.55">
+      <stop offset="0" stop-color="#ffe9a8" stop-opacity="0.34"/>
+      <stop offset="0.6" stop-color="#f2c14e" stop-opacity="0.1"/>
+      <stop offset="1" stop-color="#f2c14e" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="ballShade" cx="0.35" cy="0.3" r="0.9">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#cfe0d2"/>
+    </radialGradient>
+  </defs>
+
+  <!-- 夜空 -->
+  <rect width="1600" height="1000" fill="url(#sky)"/>
+
+  <!-- 场馆顶棚剪影 -->
+  <path d="M0 150 Q400 60 800 88 T1600 120 V0 H0 Z" fill="#0a2418" opacity="0.9"/>
+  <!-- 顶棚灯点 -->
+  <g fill="#9ad6b2" opacity="0.5">
+    <circle cx="180" cy="118" r="4"/><circle cx="330" cy="92" r="4"/><circle cx="520" cy="82" r="4"/>
+    <circle cx="760" cy="86" r="4"/><circle cx="980" cy="96" r="4"/><circle cx="1200" cy="106" r="4"/>
+    <circle cx="1420" cy="114" r="4"/>
+  </g>
+
+  <!-- 聚光灯光锥 -->
+  <path d="M300 110 L120 660 L520 660 Z" fill="url(#beamL)"/>
+  <path d="M1300 118 L1080 660 L1480 660 Z" fill="url(#beamL)"/>
+  <circle cx="300" cy="110" r="10" fill="#eaf6ee" opacity="0.9"/>
+  <circle cx="1300" cy="118" r="10" fill="#eaf6ee" opacity="0.9"/>
+
+  <!-- 看台剪影（两层） -->
+  <path d="M0 520 Q800 430 1600 500 V640 H0 Z" fill="#0b291b" opacity="0.85"/>
+  <g fill="#7fc49a" opacity="0.55">
+    <circle cx="140" cy="540" r="3"/><circle cx="260" cy="532" r="3"/><circle cx="410" cy="526" r="3"/>
+    <circle cx="560" cy="522" r="3"/><circle cx="720" cy="520" r="3"/><circle cx="880" cy="522" r="3"/>
+    <circle cx="1040" cy="526" r="3"/><circle cx="1200" cy="532" r="3"/><circle cx="1360" cy="540" r="3"/>
+    <circle cx="1480" cy="546" r="3"/>
+  </g>
+
+  <!-- 球场草坪（三条色带 + 中线） -->
+  <rect x="0" y="640" width="1600" height="360" fill="url(#pitch)"/>
+  <rect x="0" y="700" width="1600" height="90" fill="#ffffff" opacity="0.045"/>
+  <rect x="0" y="830" width="1600" height="90" fill="#ffffff" opacity="0.045"/>
+  <rect x="0" y="636" width="1600" height="8" fill="#eaf6ee" opacity="0.5"/>
+  <ellipse cx="800" cy="640" rx="150" ry="14" fill="none" stroke="#eaf6ee" stroke-width="5" opacity="0.55"/>
+
+  <!-- 奖杯金色光晕 -->
+  <ellipse cx="800" cy="470" rx="330" ry="300" fill="url(#halo)"/>
+
+  <!-- 彩带（庆祝粒子） -->
+  <g opacity="0.9">
+    <rect x="530" y="230" width="10" height="26" rx="4" fill="#e5533f" transform="rotate(24 535 243)"/>
+    <rect x="640" y="150" width="9" height="24" rx="4" fill="#3b82c4" transform="rotate(-18 644 162)"/>
+    <rect x="1010" y="170" width="10" height="26" rx="4" fill="#f2c14e" transform="rotate(30 1015 183)"/>
+    <rect x="1105" y="260" width="9" height="22" rx="4" fill="#8ecb6a" transform="rotate(-26 1109 271)"/>
+    <rect x="455" y="360" width="9" height="24" rx="4" fill="#f2c14e" transform="rotate(12 459 372)"/>
+    <rect x="1180" y="380" width="10" height="26" rx="4" fill="#e5533f" transform="rotate(-14 1185 393)"/>
+    <rect x="715" y="120" width="8" height="20" rx="4" fill="#eaf6ee" transform="rotate(40 719 130)"/>
+    <rect x="920" y="110" width="8" height="20" rx="4" fill="#8ecb6a" transform="rotate(-36 924 120)"/>
+    <circle cx="585" cy="300" r="6" fill="#f2c14e"/>
+    <circle cx="1058" cy="330" r="6" fill="#e5533f"/>
+    <circle cx="680" cy="205" r="5" fill="#3b82c4"/>
+    <circle cx="952" cy="240" r="5" fill="#8ecb6a"/>
+    <circle cx="500" cy="470" r="5" fill="#eaf6ee" opacity="0.7"/>
+    <circle cx="1120" cy="470" r="5" fill="#f2c14e" opacity="0.85"/>
+  </g>
+
+  <!-- 金色奖杯（主体居中） -->
+  <g transform="translate(800 395)">
+    <ellipse cx="0" cy="238" rx="120" ry="16" fill="#0a2418" opacity="0.55"/>
+    <!-- 杯口沿 -->
+    <rect x="-104" y="0" width="208" height="22" rx="10" fill="url(#cup)"/>
+    <!-- 杯身 -->
+    <path d="M-96 22 H96 V88 C96 156 66 200 0 200 C-66 200 -96 156 -96 88 Z" fill="url(#cup)"/>
+    <!-- 杯身高光 -->
+    <path d="M-70 34 C-72 96 -58 148 -26 176 C-44 160 -80 120 -78 40 Z" fill="#fff6d8" opacity="0.55"/>
+    <!-- 双耳 -->
+    <path d="M-96 34 C-138 34 -152 62 -142 92 C-134 116 -112 130 -92 132" stroke="url(#cup)" stroke-width="17" fill="none" stroke-linecap="round"/>
+    <path d="M96 34 C138 34 152 62 142 92 C134 116 112 130 92 132" stroke="url(#cup)" stroke-width="17" fill="none" stroke-linecap="round"/>
+    <!-- 杯颈 -->
+    <rect x="-20" y="200" width="40" height="34" fill="url(#cup)"/>
+    <!-- 底座两层 -->
+    <rect x="-58" y="234" width="116" height="26" rx="8" fill="url(#cup)"/>
+    <rect x="-74" y="260" width="148" height="24" rx="9" fill="#f7d97c"/>
+  </g>
+
+  <!-- 底部两侧足球（装饰） -->
+  <g transform="translate(430 856)">
+    <circle r="52" fill="url(#ballShade)" stroke="#17402c" stroke-width="5"/>
+    <path d="M0 -26 L24.7 -8 L15.3 21.1 L-15.3 21.1 L-24.7 -8 Z" fill="#17402c"/>
+    <path d="M0 -26 V-46 M24.7 -8 L43 -14 M15.3 21.1 L27 38 M-15.3 21.1 L-27 38 M-24.7 -8 L-43 -14" stroke="#17402c" stroke-width="6" stroke-linecap="round"/>
+  </g>
+  <g transform="translate(1180 876)">
+    <circle r="38" fill="url(#ballShade)" stroke="#17402c" stroke-width="4"/>
+    <path d="M0 -19 L18.1 -5.9 L11.2 15.4 L-11.2 15.4 L-18.1 -5.9 Z" fill="#17402c"/>
+    <path d="M0 -19 V-34 M18.1 -5.9 L31.5 -10.5 M11.2 15.4 L20 28 M-11.2 15.4 L-20 28 M-18.1 -5.9 L-31.5 -10.5" stroke="#17402c" stroke-width="4.5" stroke-linecap="round"/>
+  </g>
+
+  <!-- 底部渐隐过渡到页面奶白 -->
+  <rect x="0" y="962" width="1600" height="38" fill="#f7f3ea"/>
+</svg>

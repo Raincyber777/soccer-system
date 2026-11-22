@@ -44,7 +44,7 @@ function openItem(item: NewsItem) {
           <p class="news-summary">{{ item.summary }}</p>
           <p class="news-meta">
             <span v-if="item.tournament" class="news-tournament">{{ item.tournament }}</span>
-            {{ item.source }} · {{ item.date }}
+            <span class="meta-text">{{ item.source }} · {{ item.date }}</span>
           </p>
         </article>
       </div>
@@ -106,6 +106,9 @@ function openItem(item: NewsItem) {
   box-shadow: 0 4px 14px rgba(20, 60, 40, 0.05);
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s;
+  /* 纵向布局 + 摘要占满剩余空间：多卡片同行时 meta 区贴底对齐 */
+  display: flex;
+  flex-direction: column;
 }
 
 .news-card:hover {
@@ -121,6 +124,7 @@ function openItem(item: NewsItem) {
   color: var(--green-dark);
   font-size: 12px;
   font-weight: 600;
+  align-self: flex-start;
 }
 
 .news-title {
@@ -140,16 +144,30 @@ function openItem(item: NewsItem) {
   line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  flex: 1;
 }
 
 .news-meta {
   margin-top: 12px;
   font-size: 12px;
   color: var(--muted);
+  /* 单行排布：赛事徽标过长时截断省略，来源与日期不再被挤到下一行 */
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.news-meta .meta-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .news-tournament {
-  margin-right: 8px;
+  flex-shrink: 0;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
   padding: 1px 8px;
   border-radius: 999px;
   border: 1px solid var(--green-light);
