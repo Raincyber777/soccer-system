@@ -36,18 +36,15 @@ function goNews() {
       <line x1="300" y1="10" x2="300" y2="590" />
     </svg>
 
+    <p class="hero-kicker">省级中小学足球赛事服务平台</p>
+
     <div class="hero-inner">
       <!-- 左：赛事焦点大图（图上叠加标题与入口） -->
       <button type="button" class="focus-card" @click="goNews">
         <img :src="heroFocus" alt="赛事焦点" class="focus-img" />
         <div class="focus-shade" aria-hidden="true"></div>
 
-        <div class="focus-top">
-          <span class="focus-badge">省级中小学足球赛事服务平台</span>
-        </div>
-
         <div class="focus-body">
-          <span class="focus-tag">{{ focus?.tag || '赛事焦点' }}</span>
           <h1 class="focus-title">
             {{ focus ? focus.title : '从校园球场，到省级赛场 —— 省级中小学足球赛事服务平台' }}
           </h1>
@@ -83,16 +80,6 @@ function goNews() {
       </aside>
     </div>
 
-    <!-- 金色荣誉饰带 -->
-    <div class="honor-band" aria-hidden="false">
-      <span class="honor-item">省级青少年校园足球联赛</span>
-      <span class="honor-dot">★</span>
-      <span class="honor-item">覆盖全省 21 个市州</span>
-      <span class="honor-dot">★</span>
-      <span class="honor-item">校园足球特色学校 187 所</span>
-      <span class="honor-dot">★</span>
-      <span class="honor-item">注册运动员 400 余人</span>
-    </div>
 
     <!-- 底部波浪：衔接奶白内容区 -->
     <div class="hero-wave" aria-hidden="true">
@@ -129,12 +116,24 @@ function goNews() {
   stroke-width: 2;
 }
 
+.hero-kicker {
+  position: relative;
+  z-index: 1;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 34px 24px 0;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  color: #9fd4b5;
+}
+
 .hero-inner {
   position: relative;
   z-index: 1;
   max-width: 1240px;
   margin: 0 auto;
-  padding: 56px 24px 120px;
+  padding: 20px 24px 110px;
   display: grid;
   grid-template-columns: 1.62fr 0.98fr;
   gap: 28px;
@@ -145,7 +144,7 @@ function goNews() {
 .focus-card {
   position: relative;
   display: block;
-  min-height: 560px;
+  aspect-ratio: 16 / 9;
   border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 18px;
   overflow: hidden;
@@ -184,41 +183,11 @@ function goNews() {
   );
 }
 
-.focus-top {
-  position: absolute;
-  top: 20px;
-  left: 24px;
-}
-
-.focus-badge {
-  display: inline-block;
-  padding: 6px 14px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.14);
-  border: 1px solid rgba(255, 255, 255, 0.26);
-  backdrop-filter: blur(4px);
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.18em;
-  color: #eaf6ee;
-}
-
 .focus-body {
   position: absolute;
   left: 24px;
   right: 24px;
-  bottom: 76px;
-}
-
-.focus-tag {
-  display: inline-block;
-  padding: 3px 12px;
-  border-radius: 999px;
-  background: var(--green-bright);
-  color: #fff;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
+  bottom: 84px;
 }
 
 .focus-title {
@@ -390,29 +359,6 @@ function goNews() {
   color: var(--muted);
 }
 
-/* ===== 金色荣誉饰带 ===== */
-.honor-band {
-  position: relative;
-  z-index: 3;
-  background: linear-gradient(90deg, #b98a1c, #d3a52e 50%, #b98a1c);
-  color: #fff;
-  text-align: center;
-  padding: 12px 16px;
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 18px;
-  flex-wrap: wrap;
-  box-shadow: 0 -6px 24px rgba(10, 36, 24, 0.25);
-}
-
-.honor-dot {
-  font-size: 11px;
-  opacity: 0.85;
-}
 
 /* ===== 底部波浪 ===== */
 .hero-wave {

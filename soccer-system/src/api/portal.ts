@@ -58,8 +58,9 @@ function newsFromApi(item: ApiNews): NewsItem {
     tag: item.category_display,
     title: item.title,
     tournament: item.tournament_name ?? '',
-    // 后端 News.source 是发布来源（单位名），无来源时退回发布人
-    source: item.source || item.created_by_name || '赛事组委会',
+    // 后端 News.source 是发布来源（单位名），无来源时退回发布人；
+    // AI 生成的报告对外统一显示为系统生成
+    source: (item.source || item.created_by_name || '赛事组委会').replace('AI 生成', '系统生成'),
     date,
     summary: item.summary,
     html: item.content,
