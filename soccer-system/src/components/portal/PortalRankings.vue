@@ -6,7 +6,14 @@ import PortalBanner from './PortalBanner.vue'
 import AppSelect from '../common/AppSelect.vue'
 import DataTable from '../common/DataTable.vue'
 import type { TableColumn } from '../common/types'
-import { fetchScorers, fetchStandings, type ScorerRow, type StandingRow } from '../../api/portal'
+import {
+  fetchPublicSelections,
+  fetchScorers,
+  fetchStandings,
+  type PublicSelectionRow,
+  type ScorerRow,
+  type StandingRow,
+} from '../../api/portal'
 
 // 门户公开页 · 赛事榜单：组别积分榜与射手榜，游客无需登录
 // 数据来自后端聚合接口（/api/portal/stats/ranking|standings/，仅统计已发布赛果），见 src/api/portal.ts
@@ -30,15 +37,25 @@ const standingColumns: TableColumn[] = [
 
 const standings = ref<StandingRow[]>([])
 const scorers = ref<ScorerRow[]>([])
+const selections = ref<PublicSelectionRow[]>([])
 
 onMounted(async () => {
   standings.value = await fetchStandings()
   scorers.value = await fetchScorers()
+  selections.value = await fetchPublicSelections()
 })
 
 const visibleStandings = computed(() =>
   groupFilter.value === '全部组别' ? standings.value : standings.value.filter((s) => s.group === groupFilter.value),
 )
+
+const selectionColumns: TableColumn[] = [
+  { key: 'player_name', label: '球员', width: '120px' },
+  { key: 'team_name', label: '所属球队' },
+  { key: 'school_name', label: '所属学校', width: '160px' },
+  { key: 'group_type_display', label: '组别', width: '100px' },
+  { key: 'total', label: '综合得分', width: '110px' },
+]
 
 const scorerColumns: TableColumn[] = [
   { key: 'rank', label: '排名', width: '70px' },
@@ -69,6 +86,17 @@ const scorerColumns: TableColumn[] = [
 
       <h3 class="section-title">射手榜</h3>
       <DataTable :columns="scorerColumns" :rows="scorers" />
+
+      <template v-if="selections.length">
+        <h3 class="section-title">最佳球员公示</h3>
+        <p class="page-tip" style="margin-top: -6px">
+          经校级初审、市级遴选、省级确认三级流程后公布的遴选结果。
+        </p>
+        <DataTable
+          :columns="selectionColumns"
+          :rows="selections"
+        />
+      </template>
 
       <p class="page-tip" style="margin-top: 16px">
         榜单数据来源于管理员端「赛事信息录入」中的进球与助攻记录，比赛完赛并审核发布后自动计入统计。

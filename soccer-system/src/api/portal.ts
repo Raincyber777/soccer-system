@@ -129,6 +129,26 @@ export async function fetchMatches(): Promise<MatchRow[]> {
   }
 }
 
+/** 遴选公示行：省级确认并公布的球员（门户"最佳球员公示"区） */
+export interface PublicSelectionRow {
+  id: number
+  player_name: string
+  team_name: string
+  school_name: string
+  group_type_display: string
+  total: string
+}
+
+/** 门户遴选公示：省级确认无误后公布的球员名单（公开接口，无需登录） */
+export async function fetchPublicSelections(): Promise<PublicSelectionRow[]> {
+  try {
+    const data = await api.get<never, PublicSelectionRow[]>('/api/portal/selection-public/')
+    return data
+  } catch {
+    return []
+  }
+}
+
 /** 射手榜：后端聚合（仅统计已发布赛果的进球），助攻同口径 */
 export async function fetchScorers(): Promise<ScorerRow[]> {
   try {
