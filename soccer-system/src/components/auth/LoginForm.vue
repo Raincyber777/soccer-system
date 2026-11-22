@@ -88,7 +88,6 @@ async function handleLogin() {
       </button>
     </div>
 
-    <p class="login-hint">参赛人员统一登录入口：系统按账号自动识别身份（球队负责人 / 学生运动员 / 教练员）。</p>
 
     <p v-if="errorMsg" class="form-error">{{ errorMsg }}</p>
     <p v-if="successMsg" class="form-success">{{ successMsg }}</p>

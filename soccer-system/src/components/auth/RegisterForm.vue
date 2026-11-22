@@ -168,9 +168,7 @@ async function handleRegister() {
     <button type="submit" class="auth-submit" :disabled="registering">{{ registering ? '注册中…' : '注 册' }}</button>
   </form>
 
-  <p class="register-tip">
-    所属学校通过学校标识码精准绑定，避免重名错填；参赛账号（球队负责人 / 学生运动员 / 教练员）注册后即可登录。
-  </p>
+    <p class="register-tip">所属学校通过学校标识码精准绑定；校级管理员注册后需经市州管理员审核激活。</p>
 </template>
 
 <style scoped src="./authForm.css"></style>

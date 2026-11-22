@@ -39,6 +39,68 @@ body {
     radial-gradient(700px 400px at -10% 30%, rgba(23, 64, 44, 0.05), transparent 55%);
   background-attachment: fixed;
   -webkit-font-smoothing: antialiased;
+  position: relative;
+}
+
+/* 流动光晕：两团半透明绿雾在页面底层缓慢漂移，让奶白底"活"起来（性能友好：纯 transform） */
+body::before,
+body::after {
+  content: '';
+  position: fixed;
+  z-index: -1;
+  border-radius: 50%;
+  filter: blur(60px);
+  pointer-events: none;
+  will-change: transform;
+}
+
+body::before {
+  width: 620px;
+  height: 620px;
+  left: -160px;
+  top: 12vh;
+  background: radial-gradient(circle, rgba(46, 158, 82, 0.13), transparent 68%);
+  animation: glow-drift-a 46s ease-in-out infinite alternate;
+}
+
+body::after {
+  width: 540px;
+  height: 540px;
+  right: -140px;
+  bottom: -120px;
+  background: radial-gradient(circle, rgba(23, 64, 44, 0.11), transparent 66%);
+  animation: glow-drift-b 58s ease-in-out infinite alternate;
+}
+
+@keyframes glow-drift-a {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(220px, 90px) scale(1.12);
+  }
+  100% {
+    transform: translate(90px, -70px) scale(0.94);
+  }
+}
+
+@keyframes glow-drift-b {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(-180px, -110px) scale(1.08);
+  }
+  100% {
+    transform: translate(-60px, 120px) scale(0.92);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body::before,
+  body::after {
+    animation: none;
+  }
 }
 
 a {

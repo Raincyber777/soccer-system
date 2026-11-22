@@ -85,6 +85,55 @@ watch(activeTab, (tab) => {
   overflow: hidden;
 }
 
+/* 背景流动光雾：亮绿光斑在深绿底上缓慢漂移 */
+.auth-page::before,
+.auth-page::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(70px);
+  pointer-events: none;
+  will-change: transform;
+}
+
+.auth-page::before {
+  width: 520px;
+  height: 520px;
+  left: -120px;
+  top: -140px;
+  background: radial-gradient(circle, rgba(120, 220, 160, 0.16), transparent 66%);
+  animation: auth-glow-a 40s ease-in-out infinite alternate;
+}
+
+.auth-page::after {
+  width: 460px;
+  height: 460px;
+  right: -110px;
+  bottom: -150px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.09), transparent 64%);
+  animation: auth-glow-b 52s ease-in-out infinite alternate;
+}
+
+@keyframes auth-glow-a {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(160px, 110px) scale(1.14); }
+  100% { transform: translate(70px, -60px) scale(0.95); }
+}
+
+@keyframes auth-glow-b {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-140px, -90px) scale(1.1); }
+  100% { transform: translate(-50px, 100px) scale(0.92); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-page::before,
+  .auth-page::after {
+    animation: none;
+  }
+}
+
+
 /* 左上角返回门户首页 */
 .auth-back {
   position: absolute;
